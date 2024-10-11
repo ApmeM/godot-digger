@@ -1,4 +1,4 @@
-﻿namespace GodotTemplate.Tests
+﻿namespace GodotDigger.Tests
 {
     using NUnit.Framework;
 

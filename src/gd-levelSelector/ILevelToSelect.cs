@@ -1,4 +1,4 @@
-namespace GodotTemplate.LevelSelector
+namespace GodotDigger.LevelSelector
 {
     public interface ILevelToSelect
     {

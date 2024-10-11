@@ -1,7 +1,7 @@
 using Godot;
 
 using GodotAnalysers;
-using GodotTemplate.Presentation.Utils;
+using GodotDigger.Presentation.Utils;
 
 [SceneReference("CustomPopup.tscn")]
 [Tool]

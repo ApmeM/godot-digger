@@ -1,6 +1,6 @@
 using Godot;
 using GodotAnalysers;
-using GodotTemplate.Presentation.Utils;
+using GodotDigger.Presentation.Utils;
 using System;
 
 [SceneReference("TimerLabel.tscn")]

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace GodotTemplate.Achievements
+namespace GodotDigger.Achievements
 {
     public interface IAchievementRepository
     {

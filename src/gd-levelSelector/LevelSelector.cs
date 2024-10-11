@@ -1,7 +1,7 @@
 using Godot;
 using GodotAnalysers;
-using GodotTemplate.LevelSelector;
-using GodotTemplate.Presentation.Utils;
+using GodotDigger.LevelSelector;
+using GodotDigger.Presentation.Utils;
 using System.Collections.Generic;
 
 [SceneReference("LevelSelector.tscn")]

@@ -1,6 +1,6 @@
 using Godot;
 using GodotAnalysers;
-using GodotTemplate.Achievements;
+using GodotDigger.Achievements;
 
 [SceneReference("AchievementNotifications.tscn")]
 public partial class AchievementNotifications

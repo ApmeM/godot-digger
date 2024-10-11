@@ -1,4 +1,4 @@
-namespace GodotTemplate.Presentation.Utils
+namespace GodotDigger.Presentation.Utils
 {
     public class CommonSignals
     {

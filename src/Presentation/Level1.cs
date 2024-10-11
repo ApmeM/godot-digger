@@ -1,8 +1,8 @@
 using System;
 using Godot;
-using GodotTemplate.LevelSelector;
+using GodotDigger.LevelSelector;
 
-namespace GodotTemplate.Levels
+namespace GodotDigger.Levels
 {
     public class Level1 : ILevelToSelect
     {

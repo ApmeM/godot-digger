@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using GodotAnalysers;
-using GodotTemplate.Levels;
-using GodotTemplate.LevelSelector;
-using GodotTemplate.Presentation.Utils;
+using GodotDigger.Levels;
+using GodotDigger.LevelSelector;
+using GodotDigger.Presentation.Utils;
 
 [SceneReference("Main.tscn")]
 public partial class Main

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using GodotAnalysers;
 
 
-namespace GodotTemplate.Achievements
+namespace GodotDigger.Achievements
 {
     [Injectable(false)]
     public class LocalAchievementRepository : IAchievementRepository
