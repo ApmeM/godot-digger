@@ -20,7 +20,7 @@ public partial class Main
         this.game.Visible = false;
 
         this.achievementsButton.Connect(CommonSignals.Pressed, this, nameof(AchievementsButtonPressed));
-        this.levelSelector.SetLevels(new List<ILevelToSelect> { new Level1() });
+        this.levelSelector.SetLevels(new List<ILevelToSelect> { new Dungeon() });
         this.levelSelector.Connect(nameof(LevelSelector.StartGame), this, nameof(LevelSelected));
     }
 

@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Presentation/Game.cs" type="Script" id=1]
 [ext_resource path="res://Presentation/assets/tiles0.png" type="Texture" id=2]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=3]
+[ext_resource path="res://Presentation/Level1.tscn" type="PackedScene" id=4]
 [ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=6]
 
 [sub_resource type="TileSet" id=1]
@@ -40,28 +41,15 @@ region = Rect2( 16, 32, 16, 16 )
 
 [node name="Game" type="CanvasLayer"]
 script = ExtResource( 1 )
+Level1Scene = ExtResource( 4 )
 
 [node name="AchievementNotifications" parent="." instance=ExtResource( 6 )]
 
-[node name="Map" type="TileMap" parent="."]
-visible = false
-position = Vector2( 0, 64 )
-scale = Vector2( 3, 3 )
-tile_set = SubResource( 1 )
-cell_size = Vector2( 16, 16 )
-format = 1
+[node name="MapContainer" type="Node2D" parent="."]
 
-[node name="Level1" type="TileMap" parent="."]
-position = Vector2( 0, 64 )
-scale = Vector2( 3, 3 )
-tile_set = SubResource( 1 )
-cell_size = Vector2( 16, 16 )
-format = 1
-tile_data = PoolIntArray( 2, 0, 4, 3, 0, 4, 4, 0, 4, 5, 0, 4, 65536, 0, 4, 65537, 0, 4, 65538, 0, 4, 65539, 0, 13, 65540, 0, 13, 65541, 0, 4, 65542, 0, 4, 131072, 0, 4, 131073, 0, 13, 131074, 0, 13, 131075, 0, 13, 131076, 0, 13, 131077, 0, 13, 131078, 0, 4, 131079, 0, 4, 196608, 0, 4, 196609, 0, 13, 196610, 0, 13, 196611, 0, 13, 196612, 0, 13, 196613, 0, 13, 196614, 0, 13, 196615, 0, 4, 196616, 0, 4, 262144, 0, 4, 262145, 0, 13, 262146, 0, 13, 262147, 0, 7, 262148, 0, 13, 262149, 0, 13, 262150, 0, 13, 262151, 0, 13, 262152, 0, 4, 327680, 0, 4, 327681, 0, 13, 327682, 0, 13, 327683, 0, 13, 327684, 0, 13, 327685, 0, 13, 327686, 0, 13, 327687, 0, 13, 327688, 0, 4, 393216, 0, 4, 393217, 0, 13, 393218, 0, 13, 393219, 0, 13, 393220, 0, 13, 393221, 0, 13, 393222, 0, 13, 393223, 0, 13, 393224, 0, 4, 458752, 0, 4, 458753, 0, 13, 458754, 0, 13, 458755, 0, 13, 458756, 0, 13, 458757, 0, 13, 458758, 0, 13, 458759, 0, 13, 458760, 0, 4, 524288, 0, 4, 524289, 0, 13, 524290, 0, 13, 524291, 0, 13, 524292, 0, 13, 524293, 0, 13, 524294, 0, 13, 524295, 0, 13, 524296, 0, 4, 589824, 0, 4, 589825, 0, 13, 589826, 0, 13, 589827, 0, 13, 589828, 0, 13, 589829, 0, 13, 589830, 0, 13, 589831, 0, 13, 589832, 0, 4, 655360, 0, 4, 655361, 0, 13, 655362, 0, 13, 655363, 0, 13, 655364, 0, 13, 655365, 0, 13, 655366, 0, 13, 655367, 0, 13, 655368, 0, 4, 720896, 0, 4, 720897, 0, 4, 720898, 0, 4, 720899, 0, 13, 720900, 0, 13, 720901, 0, 13, 720902, 0, 13, 720903, 0, 4, 720904, 0, 4, 786434, 0, 4, 786435, 0, 4, 786436, 0, 4, 786437, 0, 13, 786438, 0, 4, 786439, 0, 4, 851972, 0, 4, 851973, 0, 4, 851974, 0, 4 )
+[node name="MapHolder" type="Node2D" parent="MapContainer"]
 
-[node name="Fog" type="TileMap" parent="."]
-visible = false
-position = Vector2( 0, 64 )
+[node name="Fog" type="TileMap" parent="MapContainer"]
 scale = Vector2( 3, 3 )
 tile_set = SubResource( 1 )
 cell_size = Vector2( 16, 16 )

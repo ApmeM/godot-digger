@@ -1,13 +1,13 @@
 using Godot;
 using GodotAnalysers;
+using System;
 
-
-[SceneReference("Level1.tscn")]
-public partial class Level1
+[SceneReference("BaseLevel.tscn")]
+public partial class BaseLevel
 {
     public override void _Ready()
     {
         base._Ready();
-        this.FillMembers();        
+        this.FillMembers();
     }
 }

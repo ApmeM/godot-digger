@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using GodotAnalysers;
 using GodotDigger.Presentation.Utils;
@@ -18,7 +17,9 @@ public partial class Game
         set => this.woodCount.Text = value.ToString();
     }
 
-    public TileMap Level1 => this.level1;
+    [Export]
+    public PackedScene Level1Scene;
+    public Level1 map;
 
     public override void _Ready()
     {
@@ -28,6 +29,9 @@ public partial class Game
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.Connect(CommonSignals.VisibilityChanged, this, nameof(VisibilityChanged));
+
+        this.map = this.Level1Scene.Instance<Level1>();
+        this.mapHolder.AddChild(this.map);
     }
 
     private void VisibilityChanged()
@@ -78,17 +82,15 @@ public partial class Game
 
     private CellDefinition[,] CurrentMap = new CellDefinition[10, 16];
 
-    public void InitMap(TileMap level)
+    public void InitMap()
     {
         this.FixVisibility();
-        this.CopyLevel(level);
+        this.CopyLevel(this.map);
         this.HideMapWithFog();
     }
 
     private void FixVisibility()
     {
-        this.level1.Visible = false;
-
         this.fog.Visible = true;
         this.map.Visible = true;
     }
