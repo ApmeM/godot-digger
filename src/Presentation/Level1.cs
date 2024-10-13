@@ -1,5 +1,4 @@
 using System;
-using Godot;
 using GodotDigger.LevelSelector;
 
 namespace GodotDigger.Levels
@@ -11,6 +10,7 @@ namespace GodotDigger.Levels
 
         public void Init(Game game)
         {
+            game.InitMap(game.Level1);
         }
     }
 }

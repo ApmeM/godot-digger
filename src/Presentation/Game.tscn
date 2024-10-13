@@ -44,6 +44,14 @@ script = ExtResource( 1 )
 [node name="AchievementNotifications" parent="." instance=ExtResource( 6 )]
 
 [node name="Map" type="TileMap" parent="."]
+visible = false
+position = Vector2( 0, 64 )
+scale = Vector2( 3, 3 )
+tile_set = SubResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
+
+[node name="Level1" type="TileMap" parent="."]
 position = Vector2( 0, 64 )
 scale = Vector2( 3, 3 )
 tile_set = SubResource( 1 )
