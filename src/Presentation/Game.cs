@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -35,51 +36,20 @@ public partial class Game
         this.header.Visible = this.Visible;
         this.mapHolder.Visible = this.Visible;
     }
-/*
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        base._UnhandledInput(@event);
-        if (@event is InputEventScreenTouch eventMouseButton && eventMouseButton.Pressed)
-        {
-            var position = map.ToLocal(eventMouseButton.Position);
-
-            var cell = map.WorldToMap(position);
-
-            if (this.fog.GetCellv(cell) != -1)
-            {
-                // Clicked on an unknown cell.
-                return;
-            }
-
-            if (TurnsCountValue > 0)
-            {
-                if (this.CurrentMap[(int)cell.x, (int)cell.y].Clickable)
-                {
-                    this.CurrentMap[(int)cell.x, (int)cell.y].HP--;
-                    if (this.CurrentMap[(int)cell.x, (int)cell.y].HP == 0)
-                    {
-                        this.CurrentMap[(int)cell.x, (int)cell.y] = CellDefinition.KnownCells[CellDefinition.Path];
-
-                        // Clicked on a cell that can be removed.
-                        this.map.SetCellv(cell, 0, autotileCoord: CellDefinition.Path);
-                        this.TurnsCountValue--;
-                        this.WoodCountValue++;
-
-                        this.fog.SetCellv(new Vector2(cell.x - 1, cell.y), -1);
-                        this.fog.SetCellv(new Vector2(cell.x + 1, cell.y), -1);
-                        this.fog.SetCellv(new Vector2(cell.x, cell.y - 1), -1);
-                        this.fog.SetCellv(new Vector2(cell.x, cell.y + 1), -1);
-                    }
-                }
-            }
-            // Clicked on a cell that have nothing.
-        }
-    }
-*/
-
+    
     public void InitMap()
     {
         this.map = this.Level1Scene.Instance<Level1>();
         this.mapHolder.AddChild(this.map);
+        this.map.Connect(nameof(BaseLevel.ActionableCellClicked), this, nameof(ActionableCellClicked));
+    }
+
+    public void ActionableCellClicked(Vector2 cell)
+    {
+        if (this.TurnsCountValue > 0)
+        {
+            this.TurnsCountValue--;
+            this.map.ActOnCell(cell);
+        }
     }
 }
