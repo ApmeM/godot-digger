@@ -1,5 +1,4 @@
 using Godot;
-using GodotAnalysers;
 using GodotDigger.Presentation.Utils;
 
 [SceneReference("Game.tscn")]
@@ -19,7 +18,7 @@ public partial class Game
 
     [Export]
     public PackedScene Level1Scene;
-    public Level1 map;
+    public BaseLevel map;
 
     public override void _Ready()
     {
@@ -29,17 +28,14 @@ public partial class Game
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.Connect(CommonSignals.VisibilityChanged, this, nameof(VisibilityChanged));
-
-        this.map = this.Level1Scene.Instance<Level1>();
-        this.mapHolder.AddChild(this.map);
     }
 
     private void VisibilityChanged()
     {
-        this.map.Visible = this.Visible;
-        this.fog.Visible = this.Visible;
+        this.header.Visible = this.Visible;
+        this.mapHolder.Visible = this.Visible;
     }
-
+/*
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
@@ -79,78 +75,11 @@ public partial class Game
             // Clicked on a cell that have nothing.
         }
     }
-
-    private CellDefinition[,] CurrentMap = new CellDefinition[10, 16];
+*/
 
     public void InitMap()
     {
-        this.FixVisibility();
-        this.CopyLevel(this.map);
-        this.HideMapWithFog();
-    }
-
-    private void FixVisibility()
-    {
-        this.fog.Visible = true;
-        this.map.Visible = true;
-    }
-
-    private void CopyLevel(TileMap level)
-    {
-        for (var x = 0; x < 9; x++)
-        {
-            for (var y = 0; y < 15; y++)
-            {
-                var cell = new Vector2(x, y);
-                this.map.SetCellv(cell, level.GetCellv(cell), autotileCoord: level.GetCellAutotileCoord(x, y));
-                var set = level.GetCellv(cell);
-                if (set >= 0)
-                {
-                    var tile = level.GetCellAutotileCoord(x, y);
-                    if (CellDefinition.KnownCells.ContainsKey(tile))
-                    {
-                        this.CurrentMap[x, y] = CellDefinition.KnownCells[tile].Clone();
-                    }
-                    else
-                    {
-                        GD.PrintErr($"Unkonwn cell: {tile}");
-                    }
-                }
-            }
-        }
-    }
-
-    private void HideMapWithFog()
-    {
-        for (var x = 0; x < 9; x++)
-        {
-            for (var y = 0; y < 15; y++)
-            {
-                if (this.map.GetCellv(new Vector2(x, y)) >= 0)
-                {
-                    this.fog.SetCellv(new Vector2(x, y), 0, autotileCoord: new Vector2(0, 0));
-                }
-                else
-                {
-                    this.fog.SetCellv(new Vector2(x, y), -1);
-                }
-            }
-        }
-
-        for (var x = 0; x < 9; x++)
-        {
-            for (var y = 0; y < 15; y++)
-            {
-                var cell = new Vector2(x, y);
-                if (this.map.GetCellv(cell) == 0 && this.map.GetCellAutotileCoord(x, y) == new Vector2(7, 0))
-                {
-                    this.fog.SetCellv(new Vector2(x, y), -1);
-                    this.fog.SetCellv(new Vector2(x - 1, y), -1);
-                    this.fog.SetCellv(new Vector2(x + 1, y), -1);
-                    this.fog.SetCellv(new Vector2(x, y - 1), -1);
-                    this.fog.SetCellv(new Vector2(x, y + 1), -1);
-                }
-            }
-        }
+        this.map = this.Level1Scene.Instance<Level1>();
+        this.mapHolder.AddChild(this.map);
     }
 }

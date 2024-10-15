@@ -1,5 +1,4 @@
 using Godot;
-using GodotAnalysers;
 using GodotDigger.Achievements;
 
 [SceneReference("AchievementList.tscn")]

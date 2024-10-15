@@ -1,5 +1,4 @@
 using Godot;
-using GodotAnalysers;
 using GodotDigger.LevelSelector;
 using GodotDigger.Presentation.Utils;
 using System.Collections.Generic;
