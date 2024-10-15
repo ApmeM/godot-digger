@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using GodotDigger.Levels;
@@ -37,5 +38,12 @@ public partial class Main
 
         // See achievements definitions in gd-achievements/achievements.json
         this.achievementList.ReloadList();
+    }
+
+    public void ExitDungeon()
+    {
+        this.game.Visible = false;
+        this.levelSelector.Visible = true;
+        this.menuLayer.Visible = true;
     }
 }

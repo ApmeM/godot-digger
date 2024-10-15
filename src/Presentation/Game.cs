@@ -42,6 +42,13 @@ public partial class Game
         this.map = this.Level1Scene.Instance<Level1>();
         this.mapHolder.AddChild(this.map);
         this.map.Connect(nameof(BaseLevel.ActionableCellClicked), this, nameof(ActionableCellClicked));
+        this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
+    }
+
+    private void ExitCellClicked()
+    {
+        this.mapHolder.ClearChildren();
+        this.GetParent<Main>().ExitDungeon();;
     }
 
     public void ActionableCellClicked(Vector2 cell)

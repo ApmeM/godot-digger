@@ -9,6 +9,9 @@ public partial class BaseLevel
     [Signal]
     public delegate void ActionableCellClicked(Vector2 cell);
 
+    [Signal]
+    public delegate void ExitCellClicked();
+
     public override void _Ready()
     {
         base._Ready();
@@ -34,7 +37,7 @@ public partial class BaseLevel
             var cellTile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
             if (cellTile == CellDefinition.Stairs)
             {
-                //Clicked on an unactionable cell.
+                this.EmitSignal(nameof(ExitCellClicked));
                 return;
             }
 
@@ -76,7 +79,7 @@ public partial class BaseLevel
             if (!CellDefinition.KnownCells.ContainsKey(tile))
             {
                 GD.PrintErr($"Unkonwn cell: {tile}");
-                return;
+                continue;
             }
 
             this.CurrentMap[cell] = CellDefinition.KnownCells[tile].Clone();
