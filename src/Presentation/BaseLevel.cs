@@ -21,9 +21,9 @@ public partial class BaseLevel
         base._UnhandledInput(@event);
         if (@event is InputEventScreenTouch eventMouseButton && eventMouseButton.Pressed)
         {
-            var position = map.ToLocal(eventMouseButton.Position);
+            var position = this.floor.ToLocal(eventMouseButton.Position);
 
-            var cell = map.WorldToMap(position);
+            var cell = this.floor.WorldToMap(position);
 
             if (this.fog.GetCellv(cell) != -1)
             {
@@ -31,8 +31,8 @@ public partial class BaseLevel
                 return;
             }
 
-            var cellTile = this.map.GetCellAutotileCoord((int)cell.x, (int)cell.y);
-            if (cellTile == CellDefinition.Path || cellTile == CellDefinition.Wall || cellTile == CellDefinition.Stairs)
+            var cellTile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
+            if (cellTile == CellDefinition.Stairs)
             {
                 //Clicked on an unactionable cell.
                 return;
@@ -56,19 +56,22 @@ public partial class BaseLevel
             this.CurrentMap[cell] = CellDefinition.KnownCells[CellDefinition.Path];
 
             // Clicked on a cell that can be removed.
-            this.map.SetCellv(cell, 0, autotileCoord: CellDefinition.Path);
+            this.items.SetCellv(cell, -1);
             this.UnFogCell(cell);
         }
     }
 
     public void FillCurrentMap()
     {
-        foreach (Vector2 cell in this.map.GetUsedCells())
+        foreach (Vector2 cell in this.floor.GetUsedCells())
         {
-            var set = this.map.GetCellv(cell);
-            var tile = this.map.GetCellAutotileCoord((int)cell.x, (int)cell.y);
-
             this.fog.SetCell((int)cell.x, (int)cell.y, 0, autotileCoord: Vector2.Zero);
+        }
+
+        foreach (Vector2 cell in this.items.GetUsedCells())
+        {
+            var set = this.items.GetCellv(cell);
+            var tile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
 
             if (!CellDefinition.KnownCells.ContainsKey(tile))
             {
@@ -79,10 +82,10 @@ public partial class BaseLevel
             this.CurrentMap[cell] = CellDefinition.KnownCells[tile].Clone();
         }
 
-        foreach (Vector2 cell in this.map.GetUsedCells())
+        foreach (Vector2 cell in this.items.GetUsedCells())
         {
-            var set = this.map.GetCellv(cell);
-            var tile = this.map.GetCellAutotileCoord((int)cell.x, (int)cell.y);
+            var set = this.items.GetCellv(cell);
+            var tile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
 
             if (tile == CellDefinition.Stairs)
             {
