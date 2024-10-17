@@ -21,6 +21,8 @@ public partial class Main
         this.achievementsButton.Connect(CommonSignals.Pressed, this, nameof(AchievementsButtonPressed));
         this.levelSelector.SetLevels(new List<ILevelToSelect> { new Dungeon() });
         this.levelSelector.Connect(nameof(LevelSelector.StartGame), this, nameof(LevelSelected));
+
+        this.gameState.NumberOfTurns = 10;
     }
 
     private void LevelSelected(int gameId)
@@ -34,7 +36,7 @@ public partial class Main
     private void AchievementsButtonPressed()
     {
         this.levelSelector.Visible = !this.levelSelector.Visible;
-        this.achievementsListContainer.Visible = !this.achievementsListContainer.Visible;
+        this.achievementList.Visible = !this.achievementList.Visible;
 
         // See achievements definitions in gd-achievements/achievements.json
         this.achievementList.ReloadList();

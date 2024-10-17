@@ -33,7 +33,7 @@ margin_left = 7.66667
 margin_top = -6.66667
 margin_right = 23.6667
 margin_bottom = 7.33333
-text = "10"
+text = "-1"
 
 [node name="Wood" type="Sprite" parent="Header"]
 position = Vector2( 200, 25 )
@@ -45,6 +45,6 @@ margin_left = 7.66667
 margin_top = -6.66667
 margin_right = 23.6667
 margin_bottom = 7.33333
-text = "0"
+text = "-1"
 
 [node name="MapHolder" type="Node2D" parent="."]
