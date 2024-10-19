@@ -1,0 +1,55 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
+[ext_resource path="res://gd-levelSelector/LevelSelector.tscn" type="PackedScene" id=3]
+[ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Presentation/assets/items.png" type="Texture" id=6]
+
+[sub_resource type="AtlasTexture" id=1]
+flags = 4
+atlas = ExtResource( 6 )
+region = Rect2( 80, 192, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=2]
+flags = 4
+atlas = ExtResource( 6 )
+region = Rect2( 16, 32, 16, 16 )
+
+[node name="MenuLayer" type="CanvasLayer"]
+script = ExtResource( 1 )
+
+[node name="AchievementsButton" type="Button" parent="."]
+margin_right = 12.0
+margin_bottom = 20.0
+text = "Achievements"
+
+[node name="LevelSelector" parent="." instance=ExtResource( 3 )]
+
+[node name="AchievementList" parent="." instance=ExtResource( 4 )]
+visible = false
+
+[node name="Header" type="Node2D" parent="."]
+
+[node name="Turns" type="Sprite" parent="Header"]
+position = Vector2( 25, 25 )
+scale = Vector2( 3, 3 )
+texture = SubResource( 1 )
+
+[node name="TurnsCount" type="Label" parent="Header/Turns"]
+margin_left = 7.66667
+margin_top = -6.66667
+margin_right = 23.6667
+margin_bottom = 7.33333
+text = "-1"
+
+[node name="Wood" type="Sprite" parent="Header"]
+position = Vector2( 200, 25 )
+scale = Vector2( 3, 3 )
+texture = SubResource( 2 )
+
+[node name="WoodCount" type="Label" parent="Header/Wood"]
+margin_left = 7.66667
+margin_top = -6.66667
+margin_right = 23.6667
+margin_bottom = 7.33333
+text = "-1"

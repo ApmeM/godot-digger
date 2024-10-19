@@ -11,6 +11,9 @@ public partial class Game
         set => this.woodCount.Text = value.ToString();
     }
 
+    [Signal]
+    public delegate void ExitDungeon();
+
     [Export]
     public PackedScene Level1Scene;
     public BaseLevel map;
@@ -51,7 +54,7 @@ public partial class Game
     private void ExitCellClicked()
     {
         this.mapHolder.ClearChildren();
-        this.GetParent<Main>().ExitDungeon();;
+        this.EmitSignal(nameof(ExitDungeon));
     }
 
     public void ActionableCellClicked(Vector2 cell)
