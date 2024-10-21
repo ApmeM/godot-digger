@@ -5,6 +5,7 @@ using Godot;
 public partial class BaseLevel
 {
     private Dictionary<Vector2, CellDefinition> CurrentMap = new Dictionary<Vector2, CellDefinition>();
+    private GameState gameState;
 
     [Signal]
     public delegate void ActionableCellClicked(Vector2 cell);
@@ -17,6 +18,8 @@ public partial class BaseLevel
         base._Ready();
         this.FillMembers();
         this.FillCurrentMap();
+
+        this.gameState = this.GetNode<GameState>("/root/Main/GameState");
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -53,14 +56,17 @@ public partial class BaseLevel
             return;
         }
 
-        this.CurrentMap[cell].HP--;
-        if (this.CurrentMap[cell].HP == 0)
+        this.CurrentMap[cell].HP -= this.gameState.DigPower;
+        if (this.CurrentMap[cell].HP <= 0)
         {
-            this.CurrentMap[cell] = CellDefinition.KnownCells[CellDefinition.Path];
-
+            var cellData = this.CurrentMap[cell];
             // Clicked on a cell that can be removed.
+
+            this.CurrentMap.Remove(cell);
             this.items.SetCellv(cell, -1);
             this.UnFogCell(cell);
+
+            this.gameState.AddResource(cellData.Resource, cellData.ResourceCount);
         }
     }
 

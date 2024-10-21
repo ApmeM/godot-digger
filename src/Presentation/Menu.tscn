@@ -1,9 +1,14 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
-[ext_resource path="res://gd-levelSelector/LevelSelector.tscn" type="PackedScene" id=3]
+[ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=6]
+
+[sub_resource type="DynamicFont" id=3]
+size = 64
+use_mipmaps = true
+font_data = ExtResource( 2 )
 
 [sub_resource type="AtlasTexture" id=1]
 flags = 4
@@ -18,15 +23,39 @@ region = Rect2( 16, 32, 16, 16 )
 [node name="MenuLayer" type="CanvasLayer"]
 script = ExtResource( 1 )
 
-[node name="AchievementsButton" type="Button" parent="."]
-margin_right = 12.0
-margin_bottom = 20.0
+[node name="LevelSelector" type="VBoxContainer" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -381.0
+custom_constants/separation = 15
+
+[node name="Achievements" type="Button" parent="LevelSelector"]
+margin_right = 483.0
+margin_bottom = 84.0
+custom_fonts/font = SubResource( 3 )
 text = "Achievements"
 
-[node name="LevelSelector" parent="." instance=ExtResource( 3 )]
+[node name="Dungeon" type="Button" parent="LevelSelector"]
+margin_top = 99.0
+margin_right = 483.0
+margin_bottom = 183.0
+custom_fonts/font = SubResource( 3 )
+text = "Dungeon"
 
-[node name="AchievementList" parent="." instance=ExtResource( 4 )]
-visible = false
+[node name="Sleep" type="Button" parent="LevelSelector"]
+margin_top = 198.0
+margin_right = 483.0
+margin_bottom = 282.0
+custom_fonts/font = SubResource( 3 )
+text = "Sleep"
+
+[node name="Blacksmith" type="Button" parent="LevelSelector"]
+margin_top = 297.0
+margin_right = 483.0
+margin_bottom = 381.0
+custom_fonts/font = SubResource( 3 )
+text = "Blacksmith"
 
 [node name="Header" type="Node2D" parent="."]
 
@@ -53,3 +82,12 @@ margin_top = -6.66667
 margin_right = 23.6667
 margin_bottom = 7.33333
 text = "-1"
+
+[node name="WindowDialog" type="WindowDialog" parent="."]
+margin_right = 467.0
+margin_bottom = 469.0
+popup_exclusive = true
+window_title = "Achievements"
+resizable = true
+
+[node name="AchievementList" parent="WindowDialog" instance=ExtResource( 4 )]
