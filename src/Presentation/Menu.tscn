@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
 [ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=3]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=6]
 
@@ -15,10 +16,15 @@ flags = 4
 atlas = ExtResource( 6 )
 region = Rect2( 80, 192, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=2]
+[sub_resource type="AtlasTexture" id=4]
 flags = 4
-atlas = ExtResource( 6 )
-region = Rect2( 16, 32, 16, 16 )
+atlas = ExtResource( 3 )
+region = Rect2( 0, 0, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=5]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 16, 0, 16, 16 )
 
 [node name="MenuLayer" type="CanvasLayer"]
 script = ExtResource( 1 )
@@ -74,9 +80,21 @@ text = "-1"
 [node name="Wood" type="Sprite" parent="Header"]
 position = Vector2( 200, 25 )
 scale = Vector2( 3, 3 )
-texture = SubResource( 2 )
+texture = SubResource( 4 )
 
 [node name="WoodCount" type="Label" parent="Header/Wood"]
+margin_left = 7.66667
+margin_top = -6.66667
+margin_right = 23.6667
+margin_bottom = 7.33333
+text = "-1"
+
+[node name="Steel" type="Sprite" parent="Header"]
+position = Vector2( 303, 25 )
+scale = Vector2( 3, 3 )
+texture = SubResource( 5 )
+
+[node name="SteelCount" type="Label" parent="Header/Steel"]
 margin_left = 7.66667
 margin_top = -6.66667
 margin_right = 23.6667

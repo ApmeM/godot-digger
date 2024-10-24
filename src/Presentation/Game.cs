@@ -40,7 +40,8 @@ public partial class Game
 
     private void ResourcesChanged()
     {
-        this.woodCount.Text = this.gameState.GetResource(Resources.Iron).ToString();
+        this.woodCount.Text = this.gameState.GetResource(Loot.Wood).ToString();
+        this.steelCount.Text = this.gameState.GetResource(Loot.Steel).ToString();
     }
 
     private void VisibilityChanged()
@@ -53,7 +54,6 @@ public partial class Game
     {
         this.map = this.Level1Scene.Instance<Level1>();
         this.mapHolder.AddChild(this.map);
-        this.map.Connect(nameof(BaseLevel.ActionableCellClicked), this, nameof(ActionableCellClicked));
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
     }
 
@@ -61,14 +61,5 @@ public partial class Game
     {
         this.mapHolder.ClearChildren();
         this.EmitSignal(nameof(ExitDungeon));
-    }
-
-    public void ActionableCellClicked(Vector2 cell)
-    {
-        if (this.gameState.NumberOfTurns > 0)
-        {
-            this.gameState.NumberOfTurns--;
-            this.map.ActOnCell(cell);
-        }
     }
 }

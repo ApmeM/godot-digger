@@ -8,14 +8,14 @@ public partial class GameState
     [Signal]
     public delegate void NumberOfTurnsChanged();
 
-    private readonly Dictionary<Resources, int> Resources = new Dictionary<Resources, int>();
+    private readonly Dictionary<Loot, int> Resources = new Dictionary<Loot, int>();
 
-    public int GetResource(Resources resource)
+    public int GetResource(Loot resource)
     {
         return !Resources.ContainsKey(resource) ? 0 : Resources[resource];
     }
 
-    public void AddResource(Resources resource, int diff)
+    public void AddResource(Loot resource, int diff)
     {
         Resources[resource] = Math.Max(0, GetResource(resource) + diff);
         this.EmitSignal(nameof(ResourcesChanged));

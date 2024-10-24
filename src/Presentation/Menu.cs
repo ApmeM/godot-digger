@@ -30,7 +30,8 @@ public partial class Menu
 
     private void ResourcesChanged()
     {
-        this.woodCount.Text = this.gameState.GetResource(Resources.Iron).ToString();
+        this.woodCount.Text = this.gameState.GetResource(Loot.Wood).ToString();
+        this.steelCount.Text = this.gameState.GetResource(Loot.Steel).ToString();
     }
 
     private void AchievementsPressed()
@@ -53,11 +54,11 @@ public partial class Menu
 
     private void BlacksmithPressed()
     {
-        var irons = this.gameState.GetResource(Resources.Iron);
+        var irons = this.gameState.GetResource(Loot.Steel);
         if (irons >= 5 * this.gameState.DigPower)
         {
             this.gameState.DigPower++;
-            this.gameState.AddResource(Resources.Iron, -5);
+            this.gameState.AddResource(Loot.Steel, -5);
         }
     }
 }

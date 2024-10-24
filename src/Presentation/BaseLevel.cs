@@ -8,9 +8,6 @@ public partial class BaseLevel
     private GameState gameState;
 
     [Signal]
-    public delegate void ActionableCellClicked(Vector2 cell);
-
-    [Signal]
     public delegate void ExitCellClicked();
 
     public override void _Ready()
@@ -27,46 +24,57 @@ public partial class BaseLevel
         base._UnhandledInput(@event);
         if (@event is InputEventScreenTouch eventMouseButton && eventMouseButton.Pressed)
         {
-            var position = this.floor.ToLocal(eventMouseButton.Position);
+            var pos = this.floor.WorldToMap(this.floor.ToLocal(eventMouseButton.Position));
 
-            var cell = this.floor.WorldToMap(position);
-
-            if (this.fog.GetCellv(cell) != -1)
+            var fogCell = this.fog.GetCellv(pos);
+            var fogCellTile = this.fog.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+            if (fogCell != -1)
             {
                 // Clicked on an unknown cell.
                 return;
             }
 
-            var cellTile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
-            if (cellTile == CellDefinition.Stairs)
+            var blocksCell = this.blocks.GetCellv(pos);
+            var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+            var lootCell = this.loot.GetCellv(pos);
+            var lootCellTile = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+            if ((Blocks)blocksCellTile.x == Blocks.StairsUp && blocksCell >= 0)
             {
                 this.EmitSignal(nameof(ExitCellClicked));
                 return;
             }
 
-            this.EmitSignal(nameof(ActionableCellClicked), cell);
-        }
-    }
+            if (blocksCell != -1)
+            {
+                if (this.gameState.NumberOfTurns > 0)
+                {
+                    this.gameState.NumberOfTurns--;
+                    if (!this.CurrentMap.ContainsKey(pos))
+                    {
+                        GD.PrintErr($"Cell at {pos} not exists in CurrentMap.");
+                        return;
+                    }
 
-    public void ActOnCell(Vector2 cell)
-    {
-        if (!this.CurrentMap.ContainsKey(cell))
-        {
-            GD.PrintErr($"Cell {cell} not exists in CurrentMap.");
-            return;
-        }
+                    this.CurrentMap[pos].HP -= this.gameState.DigPower;
+                    if (this.CurrentMap[pos].HP > 0)
+                    {
+                        return;
+                    }
 
-        this.CurrentMap[cell].HP -= this.gameState.DigPower;
-        if (this.CurrentMap[cell].HP <= 0)
-        {
-            var cellData = this.CurrentMap[cell];
-            // Clicked on a cell that can be removed.
+                    var cellData = this.CurrentMap[pos];
+                    this.CurrentMap.Remove(pos);
+                    this.blocks.SetCellv(pos, -1);
+                    this.UnFogCell(pos);
+                }
 
-            this.CurrentMap.Remove(cell);
-            this.items.SetCellv(cell, -1);
-            this.UnFogCell(cell);
+                return;
+            }
 
-            this.gameState.AddResource(cellData.Resource, cellData.ResourceCount);
+            if (lootCell != -1)
+            {
+                this.gameState.AddResource((Loot)lootCellTile.x, 1);
+                this.loot.SetCellv(pos, -1);
+            }
         }
     }
 
@@ -77,26 +85,26 @@ public partial class BaseLevel
             this.fog.SetCell((int)cell.x, (int)cell.y, 0, autotileCoord: Vector2.Zero);
         }
 
-        foreach (Vector2 cell in this.items.GetUsedCells())
+        foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
-            var set = this.items.GetCellv(cell);
-            var tile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
+            var blocksCell = this.blocks.GetCellv(cell);
+            var blocksCellTile = this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y);
 
-            if (!CellDefinition.KnownCells.ContainsKey(tile))
+            if (!CellDefinition.KnownBlocks.ContainsKey((Blocks)blocksCellTile.x))
             {
-                GD.PrintErr($"Unkonwn cell: {tile}");
+                GD.PrintErr($"Unkonwn cell: {blocksCellTile}");
                 continue;
             }
 
-            this.CurrentMap[cell] = CellDefinition.KnownCells[tile].Clone();
+            this.CurrentMap[cell] = CellDefinition.KnownBlocks[(Blocks)blocksCellTile.x].Clone();
         }
 
-        foreach (Vector2 cell in this.items.GetUsedCells())
+        foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
-            var set = this.items.GetCellv(cell);
-            var tile = this.items.GetCellAutotileCoord((int)cell.x, (int)cell.y);
+            var set = this.blocks.GetCellv(cell);
+            var tile = this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y);
 
-            if (tile == CellDefinition.Stairs)
+            if ((Blocks)tile.x == Blocks.StairsUp)
             {
                 UnFogCell(cell);
             }
