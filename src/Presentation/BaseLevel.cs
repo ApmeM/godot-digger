@@ -111,12 +111,29 @@ public partial class BaseLevel
         }
     }
 
+    private Vector2[] unfogDirections = new[]{
+        Vector2.Left,
+        Vector2.Right,
+        Vector2.Up,
+        Vector2.Down,
+    };
+
     private void UnFogCell(Vector2 cell)
     {
         this.fog.SetCellv(cell, -1);
-        this.fog.SetCellv(new Vector2(cell.x - 1, cell.y), -1);
-        this.fog.SetCellv(new Vector2(cell.x + 1, cell.y), -1);
-        this.fog.SetCellv(new Vector2(cell.x, cell.y - 1), -1);
-        this.fog.SetCellv(new Vector2(cell.x, cell.y + 1), -1);
+        foreach (var dir in unfogDirections)
+        {
+            var dirCell = cell + dir;
+            if (this.fog.GetCellv(dirCell) == -1)
+            {
+                continue;
+            }
+
+            this.fog.SetCellv(dirCell, -1);
+            if (this.blocks.GetCellv(dirCell) == -1 && this.floor.GetCellAutotileCoord((int)dirCell.x, (int)dirCell.y).x != 1)
+            {
+                UnFogCell(dirCell);
+            }
+        }
     }
 }
