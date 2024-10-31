@@ -15,17 +15,11 @@ public partial class Menu
         this.FillMembers();
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
-        this.gameState.Connect(nameof(GameState.NumberOfTurnsChanged), this, nameof(NumberOfTurnsChanged));
         this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed), new Godot.Collections.Array { 0 });
         this.sleep.Connect(CommonSignals.Pressed, this, nameof(SleepPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
-    }
-
-    private void NumberOfTurnsChanged()
-    {
-        this.turnsCount.Text = this.gameState.NumberOfTurns.ToString();
     }
 
     private void ResourcesChanged()

@@ -43,7 +43,7 @@ public partial class GameState
         }
     }
 
-    public float NumberOfTurnsRecoveryTime = 60;
+    public float NumberOfTurnsRecoveryTime = 20;
 
     public float NumberOfTurnsCurrentRecoveryTime = 0;
 

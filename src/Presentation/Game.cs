@@ -27,15 +27,9 @@ public partial class Game
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
-        this.gameState.Connect(nameof(GameState.NumberOfTurnsChanged), this, nameof(NumberOfTurnsChanged));
         this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
 
         this.Connect(CommonSignals.VisibilityChanged, this, nameof(VisibilityChanged));
-    }
-
-    private void NumberOfTurnsChanged()
-    {
-        this.turnsCount.Text = this.gameState.NumberOfTurns.ToString();
     }
 
     private void ResourcesChanged()
