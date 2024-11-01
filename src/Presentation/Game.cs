@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -14,8 +13,6 @@ public partial class Game
     [Signal]
     public delegate void ExitDungeon();
 
-    [Export]
-    public PackedScene Level1Scene;
     public BaseLevel map;
     private GameState gameState;
 
@@ -44,9 +41,9 @@ public partial class Game
         this.mapHolder.Visible = this.Visible;
     }
     
-    public void InitMap()
+    public void InitMap(string levelName)
     {
-        this.map = this.Level1Scene.Instance<Level1>();
+        this.map = ResourceLoader.Load<PackedScene>($"res://Presentation/levels/{levelName}.tscn").Instance<BaseLevel>();
         this.mapHolder.AddChild(this.map);
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
     }

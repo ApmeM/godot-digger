@@ -22,7 +22,7 @@ public partial class BaseLevel
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
-        if (@event is InputEventScreenTouch eventMouseButton && eventMouseButton.Pressed)
+        if (@event is InputEventScreenTouch eventMouseButton && !eventMouseButton.Pressed)
         {
             var pos = this.floor.WorldToMap(this.floor.ToLocal(eventMouseButton.Position));
 

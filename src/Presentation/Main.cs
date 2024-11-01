@@ -19,11 +19,11 @@ public partial class Main
         this.menu.Connect(nameof(Menu.LevelSelected), this, nameof(LevelSelected));
     }
 
-    private void LevelSelected(int gameId)
+    private void LevelSelected(string levelName)
     {
         this.game.Visible = true;
         this.menu.Visible = false;
-        this.game.InitMap();
+        this.game.InitMap(levelName);
     }
 
 
