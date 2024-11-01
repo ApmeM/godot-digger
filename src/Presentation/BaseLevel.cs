@@ -55,9 +55,9 @@ public partial class BaseLevel
                         return;
                     }
 
-                    this.CurrentMap[pos].HP -= this.gameState.DigPower;
-                    if (this.CurrentMap[pos].HP > 0)
+                    if (this.CurrentMap[pos].HP > this.gameState.DigPower)
                     {
+                        this.CurrentMap[pos].HP -= this.gameState.DigPower;
                         return;
                     }
 

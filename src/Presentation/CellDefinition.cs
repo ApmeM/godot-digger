@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Godot;
 
 public enum Fog
 {
@@ -33,7 +32,7 @@ public class CellDefinition
         { Blocks.Steel, new CellDefinition{HP = 2} },
     };
 
-    public int HP;
+    public uint HP;
 
     public CellDefinition Clone()
     {

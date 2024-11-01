@@ -13,7 +13,6 @@ public partial class Main
 
         this.game.Visible = false;
         this.menu.Visible = true;
-        this.gameState.NumberOfTurns = 10;
 
         this.game.Connect(nameof(Game.ExitDungeon), this, nameof(ExitDungeon));
         this.menu.Connect(nameof(Menu.LevelSelected), this, nameof(LevelSelected));

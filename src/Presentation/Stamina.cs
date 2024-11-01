@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 [SceneReference("Stamina.tscn")]
@@ -23,6 +24,13 @@ public partial class Stamina
     public override void _Process(float delta)
     {
         base._Process(delta);
-        this.staminaProgress.Value = this.gameState.NumberOfTurnsCurrentRecoveryTime * 100 / this.gameState.NumberOfTurnsRecoveryTime;
+        if (this.gameState.NumberOfTurns == this.gameState.NumberOfTurnsMax)
+        {
+            this.staminaProgress.Value = 0;
+        }
+        else
+        {
+            this.staminaProgress.Value = (DateTime.Now - this.gameState.NumberOfTurnsLastUpdate).TotalSeconds * 100 / this.gameState.NumberOfTurnsRecoverySeconds;
+        }
     }
 }
