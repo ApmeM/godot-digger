@@ -1,10 +1,13 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
 [ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=3]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Presentation/Stamina.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Presentation/LevelButton.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=7]
+[ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=8]
 
 [sub_resource type="DynamicFont" id=3]
 size = 64
@@ -38,19 +41,23 @@ margin_bottom = 84.0
 custom_fonts/font = SubResource( 3 )
 text = "X"
 
-[node name="Level1" type="Button" parent="DungeonSelector"]
+[node name="Level1" parent="DungeonSelector" instance=ExtResource( 6 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
 margin_top = 99.0
 margin_right = 480.0
 margin_bottom = 183.0
-custom_fonts/font = SubResource( 3 )
 text = "Basement"
+dungeonScene = ExtResource( 8 )
 
-[node name="Level2" type="Button" parent="DungeonSelector"]
+[node name="Level2" parent="DungeonSelector" instance=ExtResource( 6 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
 margin_top = 198.0
 margin_right = 480.0
 margin_bottom = 282.0
-custom_fonts/font = SubResource( 3 )
 text = "Cave 1"
+dungeonScene = ExtResource( 7 )
 
 [node name="LevelSelector" type="VBoxContainer" parent="."]
 anchor_top = 1.0

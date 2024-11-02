@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -5,7 +6,7 @@ using GodotDigger.Presentation.Utils;
 public partial class Menu
 {
     [Signal]
-    public delegate void LevelSelected(int levelId);
+    public delegate void LevelSelected(PackedScene levelScene);
     private GameState gameState;
 
     public override void _Ready()
@@ -15,15 +16,38 @@ public partial class Menu
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
         this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
-        this.gameState.Connect(nameof(GameState.LevelSelected), this, nameof(LevelPressed));
+        this.gameState.Connect(nameof(GameState.LoadLevel), this, nameof(LoadLevel));
+        this.gameState.Connect(nameof(GameState.OpenedLevelsChanged), this, nameof(OpenedLevelsChanged));
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
         this.sleep.Connect(CommonSignals.Pressed, this, nameof(SleepPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
         this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
+        foreach (var child in this.dungeonSelector.GetChildren())
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
 
-        this.level1.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { nameof(Level1) });
-        this.level2.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { nameof(Level2) });
+            level.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { level.dungeonScene });
+        }
+    }
+
+    private void OpenedLevelsChanged()
+    {
+        foreach (var child in this.dungeonSelector.GetChildren())
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            level.Disabled = !this.gameState.IsLevelOpened(level.LevelName);
+        }
+
+        // First level alvays visible
+        this.level1.Disabled = false;
     }
 
     private void ResourcesChanged()
@@ -50,10 +74,27 @@ public partial class Menu
         this.dungeonSelector.Visible = false;
     }
 
-    private void LevelPressed(string levelName)
+    private void LevelPressed(PackedScene levelScene)
     {
         this.DungeonPressed();
-        this.EmitSignal(nameof(LevelSelected), levelName);
+        this.EmitSignal(nameof(LevelSelected), levelScene);
+    }
+
+    private void LoadLevel(string levelName)
+    {
+        foreach (var child in this.dungeonSelector.GetChildren())
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            if (level.LevelName == levelName)
+            {
+                LevelPressed(level.dungeonScene);
+                return;
+            }
+        }
     }
 
     private void SleepPressed()

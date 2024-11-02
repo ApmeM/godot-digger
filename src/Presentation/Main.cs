@@ -18,11 +18,11 @@ public partial class Main
         this.menu.Connect(nameof(Menu.LevelSelected), this, nameof(LevelSelected));
     }
 
-    private void LevelSelected(string levelName)
+    private void LevelSelected(PackedScene levelScene)
     {
         this.game.Visible = true;
         this.menu.Visible = false;
-        this.game.InitMap(levelName);
+        this.game.InitMap(levelScene);
     }
 
     public void ExitDungeon()
