@@ -140,49 +140,31 @@ public partial class BaseLevel
         }
     }
 
-    public void Save(File saveGame)
+    public void SaveFog(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.fog, list);
+    public void SaveLoot(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.loot, list);
+    public void SaveBlocks(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.blocks, list);
+    public void SaveFloor(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.floor, list);
+    private void SaveTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
     {
-        SaveTileMap(saveGame, this.floor);
-        SaveTileMap(saveGame, this.loot);
-        SaveTileMap(saveGame, this.blocks);
-        SaveTileMap(saveGame, this.fog);
-    }
-
-    public void Load(File saveGame)
-    {
-        LoadTileMap(saveGame, this.floor);
-        LoadTileMap(saveGame, this.loot);
-        LoadTileMap(saveGame, this.blocks);
-        LoadTileMap(saveGame, this.fog);
-    }
-
-    private void SaveTileMap(File saveGame, TileMap level)
-    {
+        list.Clear();
         var levelCells = level.GetUsedCells();
-        saveGame.Store32((uint)levelCells.Count);
         foreach (Vector2 cell in levelCells)
         {
-            saveGame.StoreFloat(cell.x);
-            saveGame.StoreFloat(cell.y);
-            saveGame.Store32((uint)level.GetCellv(cell));
-            saveGame.StoreFloat(level.GetCellAutotileCoord((int)cell.x, (int)cell.y).x);
-            saveGame.StoreFloat(level.GetCellAutotileCoord((int)cell.x, (int)cell.y).y);
+            list.Add((cell, (uint)level.GetCellv(cell), level.GetCellAutotileCoord((int)cell.x, (int)cell.y)));
         }
     }
 
-    private void LoadTileMap(File saveGame, TileMap level)
+    public void LoadFog(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.fog, list);
+    public void LoadLoot(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.loot, list);
+    public void LoadBlocks(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.blocks, list);
+    public void LoadFloor(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.floor, list);
+    private void LoadTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
     {
         level.Clear();
-        var count = saveGame.Get32();
-        for (var i = 0; i < count; i++)
+        foreach (var data in list)
         {
-            var x = saveGame.GetFloat();
-            var y = saveGame.GetFloat();
-            var cellV = saveGame.Get32();
-            var coordX = saveGame.GetFloat();
-            var coordY = saveGame.GetFloat();
-
-            level.SetCellv(new Vector2(x,y), (int)cellV, autotileCoord:new Vector2(coordX, coordY));
+            level.SetCellv(data.Item1, (int)data.Item2, autotileCoord: data.Item3);
         }
     }
+
 }

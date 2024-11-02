@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 using Newtonsoft.Json;
@@ -10,13 +9,18 @@ public partial class GameState
 {
     private class State
     {
-        public Dictionary<Loot, uint> resources;
+        public readonly Dictionary<Loot, uint> resources = new Dictionary<Loot, uint>();
         public uint digPower;
         public uint numberOfTurnsMax;
         public uint numberOfTurns;
         public float numberOfTurnsRecoverySeconds;
         public DateTime numberOfTurnsLastUpdate;
-        public HashSet<string> openedLevels;
+        public readonly HashSet<string> openedLevels = new HashSet<string>();
+        public string LevelName;
+        public readonly List<(Vector2, uint, Vector2)> Floor = new List<(Vector2, uint, Vector2)>();
+        public readonly List<(Vector2, uint, Vector2)> Blocks = new List<(Vector2, uint, Vector2)>();
+        public readonly List<(Vector2, uint, Vector2)> Loot = new List<(Vector2, uint, Vector2)>();
+        public readonly List<(Vector2, uint, Vector2)> Fog = new List<(Vector2, uint, Vector2)>();
     }
 
     [Signal]
@@ -149,21 +153,30 @@ public partial class GameState
         {
             needSave = false;
 
-            var stringState = JsonConvert.SerializeObject(this.state);
-
             var savedScenes = this.GetTree().GetNodesInGroup(Groups.SavedScene);
+            if (savedScenes.Count > 0)
+            {
+                var scene = (BaseLevel)savedScenes[0];
+                this.state.LevelName = scene.Name;
+                scene.SaveFog(this.state.Fog);
+                scene.SaveBlocks(this.state.Blocks);
+                scene.SaveFloor(this.state.Floor);
+                scene.SaveLoot(this.state.Loot);
+            }
+            else
+            {
+                this.state.LevelName = string.Empty;
+                this.state.Fog.Clear();
+                this.state.Blocks.Clear();
+                this.state.Floor.Clear();
+                this.state.Loot.Clear();
+            }
+
+            var stringState = JsonConvert.SerializeObject(this.state);
 
             var saveGame = new File();
             saveGame.Open($"user://Savegame.save", File.ModeFlags.Write);
             saveGame.StoreLine(stringState);
-            saveGame.Store8((byte)(savedScenes.Count > 0 ? 1 : 0));
-            if (savedScenes.Count > 0)
-            {
-                var currentLevel = (BaseLevel)savedScenes[0];
-                saveGame.StoreLine(currentLevel.Name);
-                currentLevel.Save(saveGame);
-            }
-            saveGame.Store8(0); // Last is always 0 to be possible to extend the savegame file
             saveGame.Close();
             GD.Print($"State saved : {stringState}");
         }
@@ -179,26 +192,24 @@ public partial class GameState
     {
         var saveGame = new File();
 
-        if (saveGame.FileExists("user://Savegame.save"))
+        if (!saveGame.FileExists("user://Savegame.save"))
         {
             GD.Print("Save game file not exists.");
-            
+
             this.state = new State
             {
-                resources = new Dictionary<Loot, uint>(),
                 digPower = 1,
                 numberOfTurnsMax = 10,
                 numberOfTurns = 10,
                 numberOfTurnsRecoverySeconds = 20,
                 numberOfTurnsLastUpdate = DateTime.Now,
-                openedLevels = new HashSet<string>()
             };
 
             this.EmitSignal(nameof(ResourcesChanged));
             this.EmitSignal(nameof(NumberOfTurnsChanged));
             this.EmitSignal(nameof(OpenedLevelsChanged));
 
-            GD.Print("State created");
+            GD.Print("State created.");
             this.SaveGame();
 
             return;
@@ -207,16 +218,19 @@ public partial class GameState
         saveGame.Open($"user://Savegame.save", File.ModeFlags.Read);
         var stringState = saveGame.GetLine();
         GD.Print($"State loaded : {stringState}");
-        if (saveGame.Get8() > 0)
+
+        this.state = JsonConvert.DeserializeObject<State>(stringState);
+        if (!string.IsNullOrWhiteSpace(this.state.LevelName))
         {
-            var levelName = saveGame.GetLine();
-            this.EmitSignal(nameof(LoadLevel), levelName);
-            var currentLevel = (BaseLevel)this.GetTree().GetNodesInGroup(Groups.SavedScene)[0];
-            currentLevel.Load(saveGame);
+            this.EmitSignal(nameof(LoadLevel), this.state.LevelName);
+            var scene = (BaseLevel)this.GetTree().GetNodesInGroup(Groups.SavedScene)[0];
+            scene.LoadFog(this.state.Fog);
+            scene.LoadBlocks(this.state.Blocks);
+            scene.LoadFloor(this.state.Floor);
+            scene.LoadLoot(this.state.Loot);
         }
         saveGame.Close();
 
-        this.state = JsonConvert.DeserializeObject<State>(stringState);
 
         this.EmitSignal(nameof(ResourcesChanged));
         this.EmitSignal(nameof(NumberOfTurnsChanged));
