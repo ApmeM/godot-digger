@@ -37,12 +37,12 @@ public partial class GameState
     {
         this.state.openedLevels.Add(levelName);
         this.EmitSignal(nameof(OpenedLevelsChanged));
-        SaveGame();
+        this.SaveGame();
     }
 
     public bool IsLevelOpened(string levelName)
     {
-         return this.state.openedLevels.Contains(levelName);
+        return this.state.openedLevels.Contains(levelName);
     }
 
     public uint GetResource(Loot resource)
@@ -52,9 +52,9 @@ public partial class GameState
 
     public void AddResource(Loot resource, int diff)
     {
-        state.resources[resource] = (uint)Math.Max(0, GetResource(resource) + diff);
+        this.state.resources[resource] = (uint)Math.Max(0, GetResource(resource) + diff);
         this.EmitSignal(nameof(ResourcesChanged));
-        SaveGame();
+        this.SaveGame();
     }
 
     public uint DigPower
@@ -62,8 +62,8 @@ public partial class GameState
         get => state.digPower;
         set
         {
-            state.digPower = value;
-            SaveGame();
+            this.state.digPower = value;
+            this.SaveGame();
         }
     }
 
@@ -72,8 +72,8 @@ public partial class GameState
         get => state.numberOfTurnsMax;
         set
         {
-            state.numberOfTurnsMax = value;
-            SaveGame();
+            this.state.numberOfTurnsMax = value;
+            this.SaveGame();
         }
     }
 
@@ -84,7 +84,7 @@ public partial class GameState
         {
             if (this.state.numberOfTurns == this.NumberOfTurnsMax && value < this.NumberOfTurnsMax)
             {
-                this.state.numberOfTurnsLastUpdate = DateTime.Now;
+                this.NumberOfTurnsLastUpdate = DateTime.Now;
             }
 
             this.state.numberOfTurns = value;
@@ -102,8 +102,8 @@ public partial class GameState
         get => state.numberOfTurnsRecoverySeconds;
         set
         {
-            state.numberOfTurnsRecoverySeconds = value;
-            SaveGame();
+            this.state.numberOfTurnsRecoverySeconds = value;
+            this.SaveGame();
         }
     }
 
@@ -112,8 +112,8 @@ public partial class GameState
         get => state.numberOfTurnsLastUpdate;
         set
         {
-            state.numberOfTurnsLastUpdate = value;
-            SaveGame();
+            this.state.numberOfTurnsLastUpdate = value;
+            this.SaveGame();
         }
     }
 
@@ -144,27 +144,35 @@ public partial class GameState
             NumberOfTurns++;
             NumberOfTurnsLastUpdate = NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds);
         }
+
+        if (needSave)
+        {
+            needSave = false;
+
+            var stringState = JsonConvert.SerializeObject(this.state);
+
+            var savedScenes = this.GetTree().GetNodesInGroup(Groups.SavedScene);
+
+            var saveGame = new File();
+            saveGame.Open($"user://Savegame.save", File.ModeFlags.Write);
+            saveGame.StoreLine(stringState);
+            saveGame.Store8((byte)(savedScenes.Count > 0 ? 1 : 0));
+            if (savedScenes.Count > 0)
+            {
+                var currentLevel = (BaseLevel)savedScenes[0];
+                saveGame.StoreLine(currentLevel.Name);
+                currentLevel.Save(saveGame);
+            }
+            saveGame.Store8(0); // Last is always 0 to be possible to extend the savegame file
+            saveGame.Close();
+            GD.Print($"State saved : {stringState}");
+        }
     }
 
-    public void SaveGame()
+    private bool needSave = false;
+    private void SaveGame()
     {
-        var stringState = JsonConvert.SerializeObject(this.state);
-
-        var savedScenes = this.GetTree().GetNodesInGroup(Groups.SavedScene);
-
-        var saveGame = new File();
-        saveGame.Open($"user://Savegame.save", File.ModeFlags.Write);
-        saveGame.StoreLine(stringState);
-        saveGame.Store8((byte)(savedScenes.Count > 0 ? 1 : 0));
-        if (savedScenes.Count > 0)
-        {
-            var currentLevel = (BaseLevel)savedScenes[0];
-            saveGame.StoreLine(currentLevel.Name);
-            currentLevel.Save(saveGame);
-        }
-        saveGame.Store8(0); // Last is always 0 to be possible to extend the savegame file
-        saveGame.Close();
-        GD.Print($"State saved : {stringState}");
+        this.needSave = true;
     }
 
     public void LoadGame()
@@ -174,6 +182,7 @@ public partial class GameState
         if (saveGame.FileExists("user://Savegame.save"))
         {
             GD.Print("Save game file not exists.");
+            
             this.state = new State
             {
                 resources = new Dictionary<Loot, uint>(),
@@ -190,7 +199,7 @@ public partial class GameState
             this.EmitSignal(nameof(OpenedLevelsChanged));
 
             GD.Print("State created");
-            SaveGame();
+            this.SaveGame();
 
             return;
         }
