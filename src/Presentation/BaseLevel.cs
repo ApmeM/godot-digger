@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -17,6 +18,8 @@ public partial class BaseLevel
         this.FillCurrentMap();
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
+
+        this.AddToGroup(Groups.SavedScene);
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -134,6 +137,52 @@ public partial class BaseLevel
             {
                 UnFogCell(dirCell);
             }
+        }
+    }
+
+    public void Save(File saveGame)
+    {
+        SaveTileMap(saveGame, this.floor);
+        SaveTileMap(saveGame, this.loot);
+        SaveTileMap(saveGame, this.blocks);
+        SaveTileMap(saveGame, this.fog);
+    }
+
+    public void Load(File saveGame)
+    {
+        LoadTileMap(saveGame, this.floor);
+        LoadTileMap(saveGame, this.loot);
+        LoadTileMap(saveGame, this.blocks);
+        LoadTileMap(saveGame, this.fog);
+    }
+
+    private void SaveTileMap(File saveGame, TileMap level)
+    {
+        var levelCells = level.GetUsedCells();
+        saveGame.Store32((uint)levelCells.Count);
+        foreach (Vector2 cell in levelCells)
+        {
+            saveGame.StoreFloat(cell.x);
+            saveGame.StoreFloat(cell.y);
+            saveGame.Store32((uint)level.GetCellv(cell));
+            saveGame.StoreFloat(level.GetCellAutotileCoord((int)cell.x, (int)cell.y).x);
+            saveGame.StoreFloat(level.GetCellAutotileCoord((int)cell.x, (int)cell.y).y);
+        }
+    }
+
+    private void LoadTileMap(File saveGame, TileMap level)
+    {
+        level.Clear();
+        var count = saveGame.Get32();
+        for (var i = 0; i < count; i++)
+        {
+            var x = saveGame.GetFloat();
+            var y = saveGame.GetFloat();
+            var cellV = saveGame.Get32();
+            var coordX = saveGame.GetFloat();
+            var coordY = saveGame.GetFloat();
+
+            level.SetCellv(new Vector2(x,y), (int)cellV, autotileCoord:new Vector2(coordX, coordY));
         }
     }
 }

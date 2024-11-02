@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -16,14 +15,15 @@ public partial class Menu
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
         this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
+        this.gameState.Connect(nameof(GameState.LevelSelected), this, nameof(LevelPressed));
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
         this.sleep.Connect(CommonSignals.Pressed, this, nameof(SleepPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
         this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
 
-        this.level1.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { "Level1" });
-        this.level2.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { "Level2" });
+        this.level1.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { nameof(Level1) });
+        this.level2.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { nameof(Level2) });
     }
 
     private void ResourcesChanged()
@@ -52,6 +52,7 @@ public partial class Menu
 
     private void LevelPressed(string levelName)
     {
+        this.DungeonPressed();
         this.EmitSignal(nameof(LevelSelected), levelName);
     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using GodotDigger.Presentation.Utils;
 using Newtonsoft.Json;
 
 [SceneReference("GameState.tscn")]
@@ -21,6 +22,9 @@ public partial class GameState
 
     [Signal]
     public delegate void ResourcesChanged();
+
+    [Signal]
+    public delegate void LevelSelected(int levelId);
 
     private State state = new State();
 
@@ -64,7 +68,6 @@ public partial class GameState
             if (this.state.numberOfTurns == this.NumberOfTurnsMax && value < this.NumberOfTurnsMax)
             {
                 this.state.numberOfTurnsLastUpdate = DateTime.Now;
-                GD.Print($"this.state.numberOfTurnsLastUpdate: {this.state.numberOfTurnsLastUpdate}");
             }
 
             this.state.numberOfTurns = value;
@@ -72,7 +75,6 @@ public partial class GameState
             {
                 this.state.numberOfTurns = this.NumberOfTurnsMax;
             }
-            GD.Print($"this.state.numberOfTurns: {this.state.numberOfTurns}");
             this.EmitSignal(nameof(NumberOfTurnsChanged));
             this.SaveGame();
         }
@@ -102,6 +104,12 @@ public partial class GameState
     {
         base._Ready();
         this.FillMembers();
+
+        this.GetParent<Main>().Connect(CommonSignals.Ready, this, nameof(PostReady));
+    }
+
+    private void PostReady()
+    {
         this.LoadGame();
     }
 
@@ -125,11 +133,20 @@ public partial class GameState
     {
         var stringState = JsonConvert.SerializeObject(this.state);
 
+        var savedScenes = this.GetTree().GetNodesInGroup(Groups.SavedScene);
+
         var saveGame = new File();
         saveGame.Open($"user://Savegame.save", File.ModeFlags.Write);
         saveGame.StoreLine(stringState);
+        saveGame.Store8((byte)(savedScenes.Count > 0 ? 1 : 0));
+        if (savedScenes.Count > 0)
+        {
+            var currentLevel = (BaseLevel)this.GetTree().GetNodesInGroup(Groups.SavedScene)[0];
+            saveGame.StoreLine(currentLevel.GetType().Name);
+            currentLevel.Save(saveGame);
+        }
         saveGame.Close();
-        GD.Print($"State saved: {stringState}");
+        GD.Print($"State saved");
     }
 
     public void LoadGame()
@@ -153,15 +170,22 @@ public partial class GameState
             this.EmitSignal(nameof(NumberOfTurnsChanged));
 
             GD.Print("State created");
+            SaveGame();
 
             return;
         }
 
         saveGame.Open($"user://Savegame.save", File.ModeFlags.Read);
         var stringState = saveGame.GetLine();
+        if(saveGame.Get8() > 0){
+            var levelName = saveGame.GetLine();
+            this.EmitSignal(nameof(LevelSelected), levelName);
+            var currentLevel = (BaseLevel)this.GetTree().GetNodesInGroup(Groups.SavedScene)[0];
+            currentLevel.Load(saveGame);
+        }
         saveGame.Close();
 
-        GD.Print($"State loaded: {stringState}");
+        GD.Print($"State loaded");
         this.state = JsonConvert.DeserializeObject<State>(stringState);
 
         this.EmitSignal(nameof(ResourcesChanged));

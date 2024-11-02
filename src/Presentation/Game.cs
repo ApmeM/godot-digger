@@ -41,11 +41,12 @@ public partial class Game
         this.mapHolder.Visible = this.Visible;
     }
     
-    public void InitMap(string levelName)
+    public BaseLevel InitMap(string levelName)
     {
         this.map = ResourceLoader.Load<PackedScene>($"res://Presentation/levels/{levelName}.tscn").Instance<BaseLevel>();
         this.mapHolder.AddChild(this.map);
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
+        return this.map;
     }
 
     private void ExitCellClicked()
