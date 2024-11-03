@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -11,7 +12,7 @@ public partial class Game
     }
 
     [Signal]
-    public delegate void ExitDungeon();
+    public delegate void ExitDungeon(int stairsType, string fromLevel);
 
     public BaseLevel map;
     private GameState gameState;
@@ -49,9 +50,10 @@ public partial class Game
         return this.map;
     }
 
-    private void ExitCellClicked()
+    private void ExitCellClicked(int stairsType)
     {
         this.mapHolder.ClearChildren();
-        this.EmitSignal(nameof(ExitDungeon));
+        this.map = null;
+        this.EmitSignal(nameof(ExitDungeon), stairsType, this.map.Name);
     }
 }

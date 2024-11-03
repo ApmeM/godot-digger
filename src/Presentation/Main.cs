@@ -25,9 +25,17 @@ public partial class Main
         this.game.InitMap(levelScene);
     }
 
-    public void ExitDungeon()
+    public void ExitDungeon(int stairsType, string fromLevel)
     {
-        this.game.Visible = false;
-        this.menu.Visible = true;
+        if ((Blocks)stairsType == Blocks.StairsUp)
+        {
+            this.game.Visible = false;
+            this.menu.Visible = true;
+            return;
+        }
+        var nextLevel = this.menu.GetNextLevel(stairsType, fromLevel);
+
+        this.gameState.OpenLevel(nextLevel);
+        this.menu.LoadLevel(nextLevel);
     }
 }

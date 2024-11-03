@@ -80,7 +80,7 @@ public partial class Menu
         this.EmitSignal(nameof(LevelSelected), levelScene);
     }
 
-    private void LoadLevel(string levelName)
+    public void LoadLevel(string levelName)
     {
         foreach (var child in this.dungeonSelector.GetChildren())
         {
@@ -109,6 +109,17 @@ public partial class Menu
         {
             this.gameState.DigPower++;
             this.gameState.AddResource(Loot.Steel, -5);
+        }
+    }
+
+    public string GetNextLevel(int stairsType, string fromLevel)
+    {
+        switch (fromLevel)
+        {
+            case "Level1":
+                return "Level2";
+            default:
+                throw new Exception("Victory!!!");
         }
     }
 }

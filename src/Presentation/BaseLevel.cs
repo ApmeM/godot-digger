@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -9,7 +8,7 @@ public partial class BaseLevel
     private GameState gameState;
 
     [Signal]
-    public delegate void ExitCellClicked();
+    public delegate void ExitCellClicked(int stairsType);
 
     public override void _Ready()
     {
@@ -41,9 +40,10 @@ public partial class BaseLevel
             var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
             var lootCell = this.loot.GetCellv(pos);
             var lootCellTile = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-            if ((Blocks)blocksCellTile.x == Blocks.StairsUp && blocksCell >= 0)
+            if (blocksCell >= 0 &&
+                ((Blocks)blocksCellTile.x == Blocks.StairsUp || (Blocks)blocksCellTile.x == Blocks.StairsDown))
             {
-                this.EmitSignal(nameof(ExitCellClicked));
+                this.EmitSignal(nameof(ExitCellClicked), (int)blocksCellTile.x);
                 return;
             }
 
