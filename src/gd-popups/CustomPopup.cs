@@ -8,12 +8,19 @@ public partial class CustomPopup
     [Signal]
     public delegate void PopupClosed();
 
+    [Export]
+    public string Title
+    {
+        get => this.titleLabel.Text;
+        set => this.titleLabel.Text = value;
+    }
+
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
 
-        this.popupBackButton.Connect(CommonSignals.Pressed, this, nameof(BackButtonPressed));
+        this.closeButton.Connect(CommonSignals.Pressed, this, nameof(BackButtonPressed));
     }
 
     private void BackButtonPressed()
