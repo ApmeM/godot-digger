@@ -9,24 +9,32 @@ flags = 4
 atlas = ExtResource( 1 )
 region = Rect2( 80, 192, 16, 16 )
 
-[node name="Stamina" type="Sprite"]
-position = Vector2( 25, 25 )
-scale = Vector2( 3, 3 )
-texture = SubResource( 1 )
+[node name="VBoxContainer" type="VBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
 script = ExtResource( 2 )
 
-[node name="TurnsCount" type="Label" parent="."]
-margin_left = 7.66667
-margin_top = -6.66667
-margin_right = 23.6667
-margin_bottom = 7.33333
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 200.0
+margin_bottom = 50.0
+
+[node name="Stamina" type="TextureRect" parent="HBoxContainer"]
+margin_right = 50.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+texture = SubResource( 1 )
+expand = true
+
+[node name="TurnsCount" type="Label" parent="HBoxContainer"]
+margin_left = 54.0
+margin_top = 18.0
+margin_right = 67.0
+margin_bottom = 32.0
 text = "-1"
 
 [node name="StaminaProgress" type="TextureProgress" parent="."]
-margin_left = -3.33334
-margin_top = 6.0
-margin_right = 196.667
-margin_bottom = 32.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_top = 54.0
+margin_right = 200.0
+margin_bottom = 80.0
 value = 100.0
 texture_progress = ExtResource( 3 )

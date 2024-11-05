@@ -4,16 +4,27 @@ using Godot;
 [Tool]
 public partial class CustomTextPopup
 {
+    private string content;
+
     [Export(PropertyHint.MultilineText)]
     public string ContentText
     {
-        get => this.contentText.Text;
-        set => this.contentText.Text = value;
+        get => this.content;
+        set
+        {
+            if (IsInsideTree())
+            {
+                this.contentText.Text = value;
+            }
+            this.content = value;
+        }
     }
 
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
+
+        this.ContentText = content;
     }
 }

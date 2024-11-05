@@ -6,6 +6,7 @@
 [node name="CustomPopupInentorySlot" type="CenterContainer"]
 margin_right = 40.0
 margin_bottom = 40.0
+script = ExtResource( 2 )
 
 [node name="Background" type="TextureRect" parent="."]
 margin_left = 10.0
@@ -13,4 +14,3 @@ margin_top = 10.0
 margin_right = 30.0
 margin_bottom = 30.0
 texture = ExtResource( 1 )
-script = ExtResource( 2 )

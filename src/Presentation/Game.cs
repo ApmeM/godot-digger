@@ -5,17 +5,10 @@ using GodotDigger.Presentation.Utils;
 [SceneReference("Game.tscn")]
 public partial class Game
 {
-    public int WoodCountValue
-    {
-        get => int.Parse(this.woodCount.Text);
-        set => this.woodCount.Text = value.ToString();
-    }
-
     [Signal]
     public delegate void ExitDungeon(int stairsType, string fromLevel);
 
     public BaseLevel map;
-    private GameState gameState;
 
     public override void _Ready()
     {
@@ -24,16 +17,13 @@ public partial class Game
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        this.gameState = this.GetNode<GameState>("/root/Main/GameState");
-        this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
-
         this.Connect(CommonSignals.VisibilityChanged, this, nameof(VisibilityChanged));
+        this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
     }
 
-    private void ResourcesChanged()
+    private void ShowInventoryPopup()
     {
-        this.woodCount.Text = this.gameState.GetResource(Loot.Wood).ToString();
-        this.steelCount.Text = this.gameState.GetResource(Loot.Steel).ToString();
+        this.customPopupInventory.Show();
     }
 
     private void VisibilityChanged()
@@ -53,7 +43,12 @@ public partial class Game
     private void ExitCellClicked(int stairsType)
     {
         this.mapHolder.ClearChildren();
-        this.map = null;
         this.EmitSignal(nameof(ExitDungeon), stairsType, this.map.Name);
+        this.map = null;
+    }
+
+    internal bool TryAddResource(Loot item, int count)
+    {
+        return this.customPopupInventory.TryAddItem((int)item, count);
     }
 }

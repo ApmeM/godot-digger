@@ -12,9 +12,10 @@ font_data = ExtResource( 3 )
 
 [node name="CustomPopupInventory" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
-Size = 16
+Size = 8
 SizePerRow = 4
 InventorySlot = ExtResource( 6 )
+resources = [  ]
 
 [node name="CustomPopupContainer" parent="." index="0"]
 margin_right = 245.0
@@ -28,33 +29,27 @@ margin_right = 90.0
 
 [node name="PopupContainer" parent="CustomPopupContainer" index="1"]
 margin_right = 128.0
-margin_bottom = 170.0
 
 [node name="MarginContainer" parent="CustomPopupContainer/PopupContainer" index="0"]
 margin_right = 128.0
-margin_bottom = 149.0
 
 [node name="InventoryFrame" parent="CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 128.0
-margin_bottom = 149.0
 
 [node name="OuterInventoryMargin" parent="CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 128.0
-margin_bottom = 149.0
 
 [node name="InventoryBackground" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
 margin_right = 119.0
-margin_bottom = 140.0
 
 [node name="ContentMargin" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
 margin_right = 119.0
-margin_bottom = 140.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
 margin_left = 9.0
 margin_top = 9.0
 margin_right = 101.0
-margin_bottom = 122.0
+margin_bottom = 79.0
 
 [node name="InventoreNameLabel" type="Label" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/VBoxContainer" index="0"]
 margin_right = 92.0
@@ -75,10 +70,9 @@ stretch_mode = 6
 [node name="SlotContainer" type="GridContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/VBoxContainer" index="2"]
 margin_top = 21.0
 margin_right = 92.0
-margin_bottom = 113.0
+margin_bottom = 65.0
 columns = 4
 
 [node name="CloseButton" parent="CustomPopupContainer/PopupContainer" index="1"]
 margin_left = 119.0
 margin_right = 128.0
-margin_bottom = 149.0

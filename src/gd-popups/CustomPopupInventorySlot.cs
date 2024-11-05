@@ -20,6 +20,7 @@ public partial class CustomPopupInventorySlot
 
     public void AddItem(Node loot, int count)
     {
+        GD.Print($"Additem {loot}");
         this.loot = loot;
         this.count = count;
         this.AddChild(loot);

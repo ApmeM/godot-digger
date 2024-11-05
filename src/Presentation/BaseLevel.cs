@@ -75,8 +75,10 @@ public partial class BaseLevel
 
             if (lootCell != -1)
             {
-                this.gameState.AddResource((Loot)lootCellTile.x, 1);
-                this.loot.SetCellv(pos, -1);
+                if (this.GetParent().GetParent<Game>().TryAddResource((Loot)lootCellTile.x, 1))
+                {
+                    this.loot.SetCellv(pos, -1);
+                }
             }
         }
     }

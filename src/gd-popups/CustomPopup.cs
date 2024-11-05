@@ -8,11 +8,20 @@ public partial class CustomPopup
     [Signal]
     public delegate void PopupClosed();
 
+    private string title;
+
     [Export]
     public string Title
     {
-        get => this.titleLabel.Text;
-        set => this.titleLabel.Text = value;
+        get => title;
+        set
+        {
+            if (IsInsideTree())
+            {
+                this.titleLabel.Text = value;
+            }
+            title = value;
+        }
     }
 
     public override void _Ready()
@@ -21,6 +30,7 @@ public partial class CustomPopup
         this.FillMembers();
 
         this.closeButton.Connect(CommonSignals.Pressed, this, nameof(BackButtonPressed));
+        Title = title;
     }
 
     private void BackButtonPressed()
