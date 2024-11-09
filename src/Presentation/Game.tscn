@@ -1,10 +1,9 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Presentation/Game.cs" type="Script" id=1]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=2]
 [ext_resource path="res://Presentation/Stamina.tscn" type="PackedScene" id=3]
 [ext_resource path="res://gd-popups/CustomPopupInventory.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Presentation/assets/fog.png" type="Texture" id=5]
 [ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=7]
 
@@ -13,18 +12,9 @@ flags = 4
 atlas = ExtResource( 2 )
 region = Rect2( 48, 16, 16, 16 )
 
-[sub_resource type="AtlasTexture" id=2]
-flags = 4
-atlas = ExtResource( 7 )
-region = Rect2( 0, 0, 16, 16 )
-
-[sub_resource type="AtlasTexture" id=3]
-flags = 4
-atlas = ExtResource( 7 )
-region = Rect2( 16, 0, 16, 16 )
-
 [node name="Game" type="CanvasLayer"]
 script = ExtResource( 1 )
+LootTexture = ExtResource( 7 )
 
 [node name="AchievementNotifications" parent="." instance=ExtResource( 6 )]
 
@@ -45,4 +35,6 @@ expand = true
 [node name="MapHolder" type="Node2D" parent="."]
 
 [node name="CustomPopupInventory" parent="." instance=ExtResource( 4 )]
-resources = [ SubResource( 2 ), SubResource( 3 ) ]
+visible = false
+scale = Vector2( 2, 2 )
+transform = Transform2D( 2, 0, 0, 2, 0, 0 )

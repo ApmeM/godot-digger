@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
@@ -10,7 +11,7 @@ public partial class CustomPopupInventory
     public PackedScene InventorySlot;
 
     [Export]
-    public List<Texture> resources = new List<Texture>();
+    public List<Texture> Resources = new List<Texture>();
 
     private int size;
     [Export]
@@ -52,7 +53,7 @@ public partial class CustomPopupInventory
 
     public bool TryAddItem(int itemIndex, int count)
     {GD.Print("TryAddResource");
-        if (resources.Count <= itemIndex)
+        if (Resources.Count <= itemIndex)
         {
             GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");
             return false;
@@ -60,7 +61,7 @@ public partial class CustomPopupInventory
 
         var loot = new TextureRect
         {
-            Texture = resources[itemIndex]
+            Texture = Resources[itemIndex]
         };
 
         foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren())
@@ -96,5 +97,11 @@ public partial class CustomPopupInventory
         this.FillMembers();
         this.SizePerRow = this.sizePerRow;
         this.Size = size;
+    }
+
+    public void ShowAt(Vector2 rectPosition)
+    {
+        this.customPopupContainer.RectPosition = rectPosition + Vector2.Left * this.customPopupContainer.RectSize / 2;
+        this.Show();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -17,8 +18,9 @@ public partial class BaseLevel
         this.FillCurrentMap();
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
+        this.gameState.LevelName = this.Name;
 
-        this.AddToGroup(Groups.SavedScene);
+        this.AddToGroup(Groups.LevelScene);
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -68,6 +70,8 @@ public partial class BaseLevel
                     this.CurrentMap.Remove(pos);
                     this.blocks.SetCellv(pos, -1);
                     this.UnFogCell(pos);
+
+                    this.gameState.SaveMaps(this.floor, this.blocks, this.loot, this.fog);
                 }
 
                 return;
@@ -78,6 +82,7 @@ public partial class BaseLevel
                 if (this.GetParent().GetParent<Game>().TryAddResource((Loot)lootCellTile.x, 1))
                 {
                     this.loot.SetCellv(pos, -1);
+                    this.gameState.SaveMaps(this.floor, this.blocks, this.loot, this.fog);
                 }
             }
         }
@@ -142,31 +147,8 @@ public partial class BaseLevel
         }
     }
 
-    public void SaveFog(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.fog, list);
-    public void SaveLoot(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.loot, list);
-    public void SaveBlocks(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.blocks, list);
-    public void SaveFloor(List<(Vector2, uint, Vector2)> list) => SaveTileMap(this.floor, list);
-    private void SaveTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
+    public void LoadGame()
     {
-        list.Clear();
-        var levelCells = level.GetUsedCells();
-        foreach (Vector2 cell in levelCells)
-        {
-            list.Add((cell, (uint)level.GetCellv(cell), level.GetCellAutotileCoord((int)cell.x, (int)cell.y)));
-        }
+        this.gameState.LoadMaps(this.floor, this.blocks, this.loot, this.fog);
     }
-
-    public void LoadFog(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.fog, list);
-    public void LoadLoot(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.loot, list);
-    public void LoadBlocks(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.blocks, list);
-    public void LoadFloor(List<(Vector2, uint, Vector2)> list) => LoadTileMap(this.floor, list);
-    private void LoadTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
-    {
-        level.Clear();
-        foreach (var data in list)
-        {
-            level.SetCellv(data.Item1, (int)data.Item2, autotileCoord: data.Item3);
-        }
-    }
-
 }

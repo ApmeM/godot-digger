@@ -107,8 +107,8 @@ public partial class Menu
         var irons = this.gameState.GetResource(Loot.Steel);
         if (irons >= 5 * this.gameState.DigPower)
         {
+            this.gameState.AddResource(Loot.Steel, -(int)(5 * this.gameState.DigPower));
             this.gameState.DigPower++;
-            this.gameState.AddResource(Loot.Steel, -5);
         }
     }
 

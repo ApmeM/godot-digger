@@ -17,6 +17,7 @@ public partial class GameState
         public DateTime numberOfTurnsLastUpdate;
         public readonly HashSet<string> openedLevels = new HashSet<string>();
         public string LevelName;
+        public readonly List<(int, int)> LevelInventoryItems = new List<(int, int)>();
         public readonly List<(Vector2, uint, Vector2)> Floor = new List<(Vector2, uint, Vector2)>();
         public readonly List<(Vector2, uint, Vector2)> Blocks = new List<(Vector2, uint, Vector2)>();
         public readonly List<(Vector2, uint, Vector2)> Loot = new List<(Vector2, uint, Vector2)>();
@@ -71,6 +72,16 @@ public partial class GameState
         }
     }
 
+    public string LevelName
+    {
+        get => state.LevelName;
+        set
+        {
+            this.state.LevelName = value;
+            this.SaveGame();
+        }
+    }
+
     public uint NumberOfTurnsMax
     {
         get => state.numberOfTurnsMax;
@@ -121,6 +132,59 @@ public partial class GameState
         }
     }
 
+    public void LoadMaps(TileMap floor, TileMap blocks, TileMap loot, TileMap fog)
+    {
+        if (
+            this.state.Fog.Count == 0 &&
+            this.state.Loot.Count == 0 &&
+            this.state.Blocks.Count == 0 &&
+            this.state.Floor.Count == 0
+            )
+        {
+            return;
+        }
+        
+        LoadTileMap(fog, this.state.Fog);
+        LoadTileMap(loot, this.state.Loot);
+        LoadTileMap(blocks, this.state.Blocks);
+        LoadTileMap(floor, this.state.Floor);
+    }
+    private void LoadTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
+    {
+        level.Clear();
+        foreach (var data in list)
+        {
+            level.SetCellv(data.Item1, (int)data.Item2, autotileCoord: data.Item3);
+        }
+    }
+
+    public void SaveMaps(TileMap floor, TileMap blocks, TileMap loot, TileMap fog)
+    {
+        SaveTileMap(fog, this.state.Fog);
+        SaveTileMap(loot, this.state.Loot);
+        SaveTileMap(blocks, this.state.Blocks);
+        SaveTileMap(floor, this.state.Floor);
+    }
+
+    private void SaveTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
+    {
+        list.Clear();
+        var levelCells = level.GetUsedCells();
+        foreach (Vector2 cell in levelCells)
+        {
+            list.Add((cell, (uint)level.GetCellv(cell), level.GetCellAutotileCoord((int)cell.x, (int)cell.y)));
+        }
+    }
+
+    public void ClearMaps()
+    {
+        this.state.Fog.Clear();
+        this.state.Loot.Clear();
+        this.state.Blocks.Clear();
+        this.state.Floor.Clear();
+        this.SaveGame();
+    }
+
     public override void _Ready()
     {
         base._Ready();
@@ -153,25 +217,6 @@ public partial class GameState
         {
             needSave = false;
 
-            var savedScenes = this.GetTree().GetNodesInGroup(Groups.SavedScene);
-            if (savedScenes.Count > 0)
-            {
-                var scene = (BaseLevel)savedScenes[0];
-                this.state.LevelName = scene.Name;
-                scene.SaveFog(this.state.Fog);
-                scene.SaveBlocks(this.state.Blocks);
-                scene.SaveFloor(this.state.Floor);
-                scene.SaveLoot(this.state.Loot);
-            }
-            else
-            {
-                this.state.LevelName = string.Empty;
-                this.state.Fog.Clear();
-                this.state.Blocks.Clear();
-                this.state.Floor.Clear();
-                this.state.Loot.Clear();
-            }
-
             var stringState = JsonConvert.SerializeObject(this.state);
 
             var saveGame = new File();
@@ -180,6 +225,23 @@ public partial class GameState
             saveGame.Close();
             GD.Print($"State saved : {stringState}");
         }
+    }
+
+    public void AddLevelInventoryItem(int item, int count)
+    {
+        this.state.LevelInventoryItems.Add((item, count));
+        SaveGame();
+    }
+
+    public List<(int, int)> GetLevelInventoryItems()
+    {
+        return this.state.LevelInventoryItems;
+    }
+
+    public void ClearLevelInventoryItems()
+    {
+        this.state.LevelInventoryItems.Clear();
+        this.SaveGame();
     }
 
     private bool needSave = false;
@@ -211,29 +273,32 @@ public partial class GameState
 
             GD.Print("State created.");
             this.SaveGame();
-
-            return;
+        }
+        else
+        {
+            saveGame.Open($"user://Savegame.save", File.ModeFlags.Read);
+            var stringState = saveGame.GetLine();
+            saveGame.Close();
+            GD.Print($"State loaded : {stringState}");
+            this.state = JsonConvert.DeserializeObject<State>(stringState);
         }
 
-        saveGame.Open($"user://Savegame.save", File.ModeFlags.Read);
-        var stringState = saveGame.GetLine();
-        GD.Print($"State loaded : {stringState}");
-
-        this.state = JsonConvert.DeserializeObject<State>(stringState);
         if (!string.IsNullOrWhiteSpace(this.state.LevelName))
         {
             this.EmitSignal(nameof(LoadLevel), this.state.LevelName);
-            var scene = (BaseLevel)this.GetTree().GetNodesInGroup(Groups.SavedScene)[0];
-            scene.LoadFog(this.state.Fog);
-            scene.LoadBlocks(this.state.Blocks);
-            scene.LoadFloor(this.state.Floor);
-            scene.LoadLoot(this.state.Loot);
         }
-        saveGame.Close();
-
-
         this.EmitSignal(nameof(ResourcesChanged));
         this.EmitSignal(nameof(NumberOfTurnsChanged));
         this.EmitSignal(nameof(OpenedLevelsChanged));
+    }
+
+    public void MoveInventory()
+    {
+        foreach (var item in this.GetLevelInventoryItems())
+        {
+            this.AddResource((Loot)item.Item1, item.Item2);
+        }
+        this.ClearLevelInventoryItems();
+        this.SaveGame();
     }
 }
