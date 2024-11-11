@@ -1,8 +1,8 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
 [ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=2]
-[ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=3]
+[ext_resource path="res://Presentation/assets/items.png" type="Texture" id=3]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Presentation/Stamina.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Presentation/LevelButton.tscn" type="PackedScene" id=6]
@@ -13,6 +13,8 @@
 [ext_resource path="res://Presentation/assets/Buildings/Inn.png" type="Texture" id=11]
 [ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=12]
 [ext_resource path="res://gd-popups/CustomTextPopup.tscn" type="PackedScene" id=13]
+[ext_resource path="res://gd-popups/CustomPopupInventory.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=15]
 
 [sub_resource type="DynamicFont" id=3]
 size = 64
@@ -22,15 +24,11 @@ font_data = ExtResource( 2 )
 [sub_resource type="AtlasTexture" id=4]
 flags = 4
 atlas = ExtResource( 3 )
-region = Rect2( 0, 0, 16, 16 )
-
-[sub_resource type="AtlasTexture" id=5]
-flags = 4
-atlas = ExtResource( 3 )
-region = Rect2( 16, 0, 16, 16 )
+region = Rect2( 48, 16, 16, 16 )
 
 [node name="MenuLayer" type="CanvasLayer"]
 script = ExtResource( 1 )
+LootTexture = ExtResource( 15 )
 
 [node name="DungeonSelector" type="VBoxContainer" parent="."]
 visible = false
@@ -97,33 +95,21 @@ margin_bottom = 1355.0
 rect_scale = Vector2( 0.15, 0.15 )
 texture_normal = ExtResource( 11 )
 
-[node name="Header" type="Node2D" parent="."]
+[node name="Header" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+margin_bottom = 80.0
 
 [node name="Stamina" parent="Header" instance=ExtResource( 5 )]
+margin_right = 200.0
+margin_bottom = 80.0
 
-[node name="Wood" type="Sprite" parent="Header"]
-position = Vector2( 200, 25 )
-scale = Vector2( 3, 3 )
-texture = SubResource( 4 )
-
-[node name="WoodCount" type="Label" parent="Header/Wood"]
-margin_left = 7.66667
-margin_top = -6.66667
-margin_right = 23.6667
-margin_bottom = 7.33333
-text = "-1"
-
-[node name="Steel" type="Sprite" parent="Header"]
-position = Vector2( 303, 25 )
-scale = Vector2( 3, 3 )
-texture = SubResource( 5 )
-
-[node name="SteelCount" type="Label" parent="Header/Steel"]
-margin_left = 7.66667
-margin_top = -6.66667
-margin_right = 23.6667
-margin_bottom = 7.33333
-text = "-1"
+[node name="Inventory" type="TextureButton" parent="Header"]
+margin_left = 204.0
+margin_right = 284.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 80, 80 )
+texture_normal = SubResource( 4 )
+expand = true
 
 [node name="WindowDialog" type="WindowDialog" parent="."]
 margin_right = 467.0
@@ -137,8 +123,14 @@ resizable = true
 [node name="CustomConfirmPopup" parent="." instance=ExtResource( 12 )]
 visible = false
 Title = "Are you sure"
+ShowCloseButton = false
 ContentText = ""
 
 [node name="CustomTextPopup" parent="." instance=ExtResource( 13 )]
 visible = false
 Title = "Notification"
+
+[node name="CustomPopupInventory" parent="." instance=ExtResource( 14 )]
+visible = false
+scale = Vector2( 2, 2 )
+transform = Transform2D( 2, 0, 0, 2, 0, 0 )

@@ -52,7 +52,8 @@ public partial class CustomPopupInventory
     }
 
     public bool TryAddItem(int itemIndex, int count)
-    {GD.Print("TryAddResource");
+    {
+        GD.Print("TryAddResource");
         if (Resources.Count <= itemIndex)
         {
             GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");

@@ -10,13 +10,15 @@ public enum Blocks
     StairsUp,
     StairsDown,
     Wood,
-    Steel
+    Steel,
+    Wardrobe
 }
 
 public enum Loot
 {
     Wood,
-    Steel
+    Steel,
+    Cloth
 }
 
 public enum Path
@@ -30,6 +32,7 @@ public class CellDefinition
     public static Dictionary<Blocks, CellDefinition> KnownBlocks = new Dictionary<Blocks, CellDefinition>{
         { Blocks.Wood, new CellDefinition{HP = 1} },
         { Blocks.Steel, new CellDefinition{HP = 2} },
+        { Blocks.Wardrobe, new CellDefinition{HP = 4} },
     };
 
     public uint HP;

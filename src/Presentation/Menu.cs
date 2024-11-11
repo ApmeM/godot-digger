@@ -7,6 +7,10 @@ public partial class Menu
 {
     [Signal]
     public delegate void LevelSelected(PackedScene levelScene);
+
+    [Export]
+    public Texture LootTexture;
+
     private GameState gameState;
 
     public override void _Ready()
@@ -23,6 +27,17 @@ public partial class Menu
         this.sleep.Connect(CommonSignals.Pressed, this, nameof(SleepPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
         this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
+        this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        var number = LootTexture.GetWidth() / 16;
+        for (var i = 0; i < number; i++)
+        {
+            this.customPopupInventory.Resources.Add(new AtlasTexture
+            {
+                Atlas = LootTexture,
+                Region = new Rect2(i * 16, 0, 16, 16)
+            });
+        }
+
         foreach (var child in this.dungeonSelector.GetChildren())
         {
             if (!(child is LevelButton level))
@@ -32,6 +47,11 @@ public partial class Menu
 
             level.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { level.dungeonScene });
         }
+    }
+
+    private void ShowInventoryPopup()
+    {
+        this.customPopupInventory.ShowAt(this.inventory.RectPosition / this.customPopupInventory.Scale);
     }
 
     private void OpenedLevelsChanged()
@@ -52,8 +72,11 @@ public partial class Menu
 
     private void ResourcesChanged()
     {
-        this.woodCount.Text = this.gameState.GetResource(Loot.Wood).ToString();
-        this.steelCount.Text = this.gameState.GetResource(Loot.Steel).ToString();
+        this.customPopupInventory.ClearItems();
+        foreach (Loot item in Enum.GetValues(typeof(Loot)))
+        {
+            this.customPopupInventory.TryAddItem((int)item, (int)this.gameState.GetResource(item));
+        }
     }
 
     private void AchievementsPressed()
