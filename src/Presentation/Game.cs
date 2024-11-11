@@ -83,6 +83,5 @@ public partial class Game
         }
 
         return result;
-
     }
 }

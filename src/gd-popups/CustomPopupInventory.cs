@@ -98,10 +98,4 @@ public partial class CustomPopupInventory
         this.SizePerRow = this.sizePerRow;
         this.Size = size;
     }
-
-    public void ShowAt(Vector2 rectPosition)
-    {
-        this.customPopupContainer.RectPosition = rectPosition + Vector2.Left * this.customPopupContainer.RectSize / 2;
-        this.Show();
-    }
 }

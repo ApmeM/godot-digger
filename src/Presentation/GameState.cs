@@ -202,17 +202,6 @@ public partial class GameState
     {
         base._Process(delta);
 
-        if (NumberOfTurns >= NumberOfTurnsMax)
-        {
-            return;
-        }
-
-        if (NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds) < DateTime.Now)
-        {
-            NumberOfTurns++;
-            NumberOfTurnsLastUpdate = NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds);
-        }
-
         if (needSave)
         {
             needSave = false;
@@ -224,6 +213,12 @@ public partial class GameState
             saveGame.StoreLine(stringState);
             saveGame.Close();
             GD.Print($"State saved : {stringState}");
+        }
+
+        if (NumberOfTurns < NumberOfTurnsMax && NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds) < DateTime.Now)
+        {
+            NumberOfTurns++;
+            NumberOfTurnsLastUpdate = NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds);
         }
     }
 

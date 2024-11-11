@@ -102,13 +102,24 @@ public partial class Menu
         this.gameState.NumberOfTurns += 5;
     }
 
-    private void BlacksmithPressed()
+    private async void BlacksmithPressed()
     {
         var irons = this.gameState.GetResource(Loot.Steel);
         if (irons >= 5 * this.gameState.DigPower)
         {
-            this.gameState.AddResource(Loot.Steel, -(int)(5 * this.gameState.DigPower));
-            this.gameState.DigPower++;
+            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {5 * this.gameState.DigPower} irons.";
+            this.customConfirmPopup.ShowCentered();
+            var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+            if (decision)
+            {
+                this.gameState.AddResource(Loot.Steel, -(int)(5 * this.gameState.DigPower));
+                this.gameState.DigPower++;
+            }
+        }
+        else
+        {
+            this.customTextPopup.ContentText = $"Not enough iron.\n{5 * this.gameState.DigPower} irons required.";
+            this.customTextPopup.ShowCentered();
         }
     }
 
