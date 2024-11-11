@@ -25,7 +25,6 @@ public partial class CustomPopupInventorySlot
             return;
         }
 
-        GD.Print($"Additem {loot}");
         this.lootContainer.AddChild(loot);
         this.countLabel.Text = count.ToString();
         this.countLabel.Visible = count > 1;

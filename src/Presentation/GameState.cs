@@ -11,6 +11,7 @@ public partial class GameState
     {
         public readonly Dictionary<Loot, uint> resources = new Dictionary<Loot, uint>();
         public uint digPower;
+        public uint inventorySlots;
         public uint numberOfTurnsMax;
         public uint numberOfTurns;
         public float numberOfTurnsRecoverySeconds;
@@ -68,6 +69,16 @@ public partial class GameState
         set
         {
             this.state.digPower = value;
+            this.SaveGame();
+        }
+    }
+
+    public uint InventorySlots
+    {
+        get => state.inventorySlots;
+        set
+        {
+            this.state.inventorySlots = value;
             this.SaveGame();
         }
     }
@@ -256,15 +267,12 @@ public partial class GameState
             this.state = new State
             {
                 digPower = 1,
+                inventorySlots = 3,
                 numberOfTurnsMax = 10,
                 numberOfTurns = 10,
                 numberOfTurnsRecoverySeconds = 20,
                 numberOfTurnsLastUpdate = DateTime.Now,
             };
-
-            this.EmitSignal(nameof(ResourcesChanged));
-            this.EmitSignal(nameof(NumberOfTurnsChanged));
-            this.EmitSignal(nameof(OpenedLevelsChanged));
 
             GD.Print("State created.");
             this.SaveGame();

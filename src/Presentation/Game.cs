@@ -53,6 +53,7 @@ public partial class Game
         this.mapHolder.AddChild(this.map);
 
         this.map.LoadGame();
+        this.customPopupInventory.Size = this.gameState.InventorySlots;
 
         foreach (var item in this.gameState.GetLevelInventoryItems())
         {

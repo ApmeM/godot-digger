@@ -26,6 +26,7 @@ public partial class Menu
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
         this.sleep.Connect(CommonSignals.Pressed, this, nameof(SleepPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
+        this.leather.Connect(CommonSignals.Pressed, this, nameof(LeatherPressed));
         this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
         this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
         var number = LootTexture.GetWidth() / 16;
@@ -127,21 +128,46 @@ public partial class Menu
 
     private async void BlacksmithPressed()
     {
-        var irons = this.gameState.GetResource(Loot.Steel);
-        if (irons >= 5 * this.gameState.DigPower)
+        var res = Loot.Cloth;
+        var irons = this.gameState.GetResource(res);
+        var required = Fibonacci.Calc(this.gameState.DigPower);
+        if (irons >= required)
         {
-            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {5 * this.gameState.DigPower} irons.";
+            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} irons.";
             this.customConfirmPopup.ShowCentered();
             var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
             if (decision)
             {
-                this.gameState.AddResource(Loot.Steel, -(int)(5 * this.gameState.DigPower));
+                this.gameState.AddResource(res, -required);
                 this.gameState.DigPower++;
             }
         }
         else
         {
-            this.customTextPopup.ContentText = $"Not enough iron.\n{5 * this.gameState.DigPower} irons required.";
+            this.customTextPopup.ContentText = $"Not enough iron.\n{required} irons required.";
+            this.customTextPopup.ShowCentered();
+        }
+    }
+
+    private async void LeatherPressed()
+    {
+        var res = Loot.Cloth;
+        var cloth = this.gameState.GetResource(res);
+        var required = Fibonacci.Calc(this.gameState.InventorySlots);
+        if (cloth >= required)
+        {
+            this.customConfirmPopup.ContentText = $"Increase number of inventory slots?\nIt requires {required} cloth.";
+            this.customConfirmPopup.ShowCentered();
+            var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+            if (decision)
+            {
+                this.gameState.AddResource(res, -required);
+                this.gameState.InventorySlots++;
+            }
+        }
+        else
+        {
+            this.customTextPopup.ContentText = $"Not enough cloth.\n{required} cloth required.";
             this.customTextPopup.ShowCentered();
         }
     }

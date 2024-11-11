@@ -13,9 +13,9 @@ public partial class CustomPopupInventory
     [Export]
     public List<Texture> Resources = new List<Texture>();
 
-    private int size;
+    private uint size;
     [Export]
-    public int Size
+    public uint Size
     {
         get
         {
@@ -53,7 +53,6 @@ public partial class CustomPopupInventory
 
     public bool TryAddItem(int itemIndex, int count)
     {
-        GD.Print("TryAddResource");
         if (Resources.Count <= itemIndex)
         {
             GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");
