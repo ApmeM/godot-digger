@@ -10,19 +10,38 @@ public partial class AchievementNotifications
     [Export]
     public float MoveTime{get; set;} = 1;
 
+    private AudioStream globalSound;
+
     [Export]
     public AudioStream GlobalSound
     {
-        get { return this.audioStreamPlayer.Stream; }
-        set { this.audioStreamPlayer.Stream = value; }
+        get => globalSound;
+        set
+        {
+            if (IsInsideTree())
+            {
+                this.audioStreamPlayer.Stream = value;
+            }
+            globalSound = value;
+        }
     }
+
+    private float globalSoundVolume;
 
     [Export]
     public float GlobalSoundVolume
     {
-        get { return this.audioStreamPlayer.VolumeDb; }
-        set { this.audioStreamPlayer.VolumeDb = value; }
+        get => globalSoundVolume;
+        set
+        {
+            if (IsInsideTree())
+            {
+                this.audioStreamPlayer.VolumeDb = value;
+            }
+            globalSoundVolume = value;
+        }
     }
+
     [Export]
     public PackedScene AchievementNotificationScene;
 

@@ -130,7 +130,7 @@ public partial class Menu
     {
         var res = Loot.Cloth;
         var irons = this.gameState.GetResource(res);
-        var required = Fibonacci.Calc(this.gameState.DigPower);
+        var required = Fibonacci.Calc(this.gameState.DigPower + 5);
         if (irons >= required)
         {
             this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} irons.";
