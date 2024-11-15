@@ -39,7 +39,7 @@ public partial class Menu
             });
         }
 
-        foreach (var child in this.dungeonSelector.GetChildren())
+        foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
         {
             if (!(child is LevelButton level))
             {

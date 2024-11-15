@@ -12,5 +12,6 @@ public partial class LevelButton
     {
         base._Ready();
         this.FillMembers();
+        this.AddToGroup(Groups.LevelButton);
     }
 }
