@@ -49,17 +49,18 @@ public partial class Game
 
     public BaseLevel InitMap(PackedScene levelScene, uint maxNumberOfTurns)
     {
-        this.map = levelScene.Instance<BaseLevel>();
-        this.mapHolder.AddChild(this.map);
-
-        this.map.LoadGame();
         this.customPopupInventory.Size = this.gameState.InventorySlots;
 
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
+
+        this.map = levelScene.Instance<BaseLevel>();
         this.map.CanDig = true;
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
         this.map.Connect(nameof(BaseLevel.DigCellClicked), this, nameof(DigCellClicked));
+
+        this.mapHolder.AddChild(this.map);
+
         return this.map;
     }
 
@@ -71,8 +72,6 @@ public partial class Game
 
     private void ExitCellClicked(int stairsType)
     {
-        this.gameState.LevelName = string.Empty;
-        this.gameState.ClearMaps();
         foreach (var item in this.customPopupInventory.GetItems())
         {
             this.gameState.AddResource((Loot)item.Item1, item.Item2);

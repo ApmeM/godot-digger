@@ -13,11 +13,6 @@ public partial class GameState
         public uint digPower;
         public uint inventorySlots;
         public readonly HashSet<string> openedLevels = new HashSet<string>();
-        public string LevelName;
-        public readonly List<(Vector2, uint, Vector2)> Floor = new List<(Vector2, uint, Vector2)>();
-        public readonly List<(Vector2, uint, Vector2)> Blocks = new List<(Vector2, uint, Vector2)>();
-        public readonly List<(Vector2, uint, Vector2)> Loot = new List<(Vector2, uint, Vector2)>();
-        public readonly List<(Vector2, uint, Vector2)> Fog = new List<(Vector2, uint, Vector2)>();
     }
 
     [Signal]
@@ -73,69 +68,6 @@ public partial class GameState
             this.state.inventorySlots = value;
             this.SaveGame();
         }
-    }
-
-    public string LevelName
-    {
-        get => state.LevelName;
-        set
-        {
-            this.state.LevelName = value;
-            this.SaveGame();
-        }
-    }
-
-    public void LoadMaps(TileMap floor, TileMap blocks, TileMap loot, TileMap fog)
-    {
-        if (
-            this.state.Fog.Count == 0 &&
-            this.state.Loot.Count == 0 &&
-            this.state.Blocks.Count == 0 &&
-            this.state.Floor.Count == 0
-            )
-        {
-            return;
-        }
-        
-        LoadTileMap(fog, this.state.Fog);
-        LoadTileMap(loot, this.state.Loot);
-        LoadTileMap(blocks, this.state.Blocks);
-        LoadTileMap(floor, this.state.Floor);
-    }
-    private void LoadTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
-    {
-        level.Clear();
-        foreach (var data in list)
-        {
-            level.SetCellv(data.Item1, (int)data.Item2, autotileCoord: data.Item3);
-        }
-    }
-
-    public void SaveMaps(TileMap floor, TileMap blocks, TileMap loot, TileMap fog)
-    {
-        SaveTileMap(fog, this.state.Fog);
-        SaveTileMap(loot, this.state.Loot);
-        SaveTileMap(blocks, this.state.Blocks);
-        SaveTileMap(floor, this.state.Floor);
-    }
-
-    private void SaveTileMap(TileMap level, List<(Vector2, uint, Vector2)> list)
-    {
-        list.Clear();
-        var levelCells = level.GetUsedCells();
-        foreach (Vector2 cell in levelCells)
-        {
-            list.Add((cell, (uint)level.GetCellv(cell), level.GetCellAutotileCoord((int)cell.x, (int)cell.y)));
-        }
-    }
-
-    public void ClearMaps()
-    {
-        this.state.Fog.Clear();
-        this.state.Loot.Clear();
-        this.state.Blocks.Clear();
-        this.state.Floor.Clear();
-        this.SaveGame();
     }
 
     public override void _Ready()
@@ -201,10 +133,6 @@ public partial class GameState
             this.state = JsonConvert.DeserializeObject<State>(stringState);
         }
 
-        if (!string.IsNullOrWhiteSpace(this.state.LevelName))
-        {
-            this.EmitSignal(nameof(LoadLevel), this.state.LevelName);
-        }
         this.EmitSignal(nameof(ResourcesChanged));
         this.EmitSignal(nameof(OpenedLevelsChanged));
     }

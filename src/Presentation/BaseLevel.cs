@@ -24,7 +24,6 @@ public partial class BaseLevel
         this.FillCurrentMap();
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
-        this.gameState.LevelName = this.Name;
 
         this.AddToGroup(Groups.LevelScene);
     }
@@ -77,8 +76,6 @@ public partial class BaseLevel
                     this.CurrentMap.Remove(pos);
                     this.blocks.SetCellv(pos, -1);
                     this.UnFogCell(pos);
-
-                    this.gameState.SaveMaps(this.floor, this.blocks, this.loot, this.fog);
                 }
 
                 return;
@@ -89,7 +86,6 @@ public partial class BaseLevel
                 if (this.GetParent().GetParent<Game>().TryAddResource((Loot)lootCellTile.x, 1))
                 {
                     this.loot.SetCellv(pos, -1);
-                    this.gameState.SaveMaps(this.floor, this.blocks, this.loot, this.fog);
                 }
             }
         }
@@ -152,10 +148,5 @@ public partial class BaseLevel
                 UnFogCell(dirCell);
             }
         }
-    }
-
-    public void LoadGame()
-    {
-        this.gameState.LoadMaps(this.floor, this.blocks, this.loot, this.fog);
     }
 }
