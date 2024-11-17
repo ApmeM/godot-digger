@@ -28,13 +28,12 @@ expand = true
 [node name="TurnsCount" type="Label" parent="HBoxContainer"]
 margin_left = 54.0
 margin_top = 18.0
-margin_right = 67.0
+margin_right = 70.0
 margin_bottom = 32.0
-text = "-1"
+text = "10"
 
 [node name="StaminaProgress" type="TextureProgress" parent="."]
 margin_top = 54.0
 margin_right = 200.0
 margin_bottom = 80.0
-value = 100.0
 texture_progress = ExtResource( 3 )

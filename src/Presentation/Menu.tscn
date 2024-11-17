@@ -1,10 +1,9 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
 [ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=3]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Presentation/Stamina.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Presentation/LevelButton.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=8]
@@ -18,7 +17,6 @@
 [ext_resource path="res://Presentation/assets/Buildings/Leather Shop.png" type="Texture" id=16]
 [ext_resource path="res://Presentation/assets/Buildings/Woodcutter.png" type="Texture" id=17]
 [ext_resource path="res://gd-popups/resources/sprites/x_normal.png" type="Texture" id=18]
-[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=19]
 [ext_resource path="res://Presentation/levels/Woodcutter.tscn" type="PackedScene" id=20]
 
 [sub_resource type="DynamicFont" id=3]
@@ -93,7 +91,7 @@ margin_bottom = 1187.0
 rect_scale = Vector2( 0.15, 0.15 )
 texture_normal = ExtResource( 10 )
 
-[node name="Sleep" type="TextureButton" parent="LevelSelector"]
+[node name="INN" type="TextureButton" parent="LevelSelector"]
 margin_left = 31.0
 margin_top = 496.0
 margin_right = 919.0
@@ -118,17 +116,13 @@ rect_scale = Vector2( 0.15, 0.15 )
 texture_normal = ExtResource( 17 )
 dungeonScene = ExtResource( 20 )
 
-[node name="Header" type="HBoxContainer" parent="."]
-anchor_right = 1.0
-margin_bottom = 80.0
-
-[node name="Stamina" parent="Header" instance=ExtResource( 5 )]
-margin_right = 200.0
-margin_bottom = 80.0
+[node name="Header" type="Node2D" parent="."]
 
 [node name="Inventory" type="TextureButton" parent="Header"]
-margin_left = 204.0
-margin_right = 284.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = 198.0
+margin_right = 278.0
 margin_bottom = 80.0
 rect_min_size = Vector2( 80, 80 )
 texture_normal = SubResource( 4 )
@@ -157,6 +151,3 @@ Title = "Notification"
 visible = false
 scale = Vector2( 2, 2 )
 transform = Transform2D( 2, 0, 0, 2, 0, 0 )
-
-[node name="CustomPopup" parent="." instance=ExtResource( 19 )]
-visible = false

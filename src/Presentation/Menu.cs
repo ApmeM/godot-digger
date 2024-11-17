@@ -24,7 +24,6 @@ public partial class Menu
         this.gameState.Connect(nameof(GameState.OpenedLevelsChanged), this, nameof(OpenedLevelsChanged));
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
-        this.sleep.Connect(CommonSignals.Pressed, this, nameof(SleepPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
         this.leather.Connect(CommonSignals.Pressed, this, nameof(LeatherPressed));
         this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
@@ -119,11 +118,6 @@ public partial class Menu
                 return;
             }
         }
-    }
-
-    private void SleepPressed()
-    {
-        this.gameState.NumberOfTurns += 5;
     }
 
     private async void BlacksmithPressed()

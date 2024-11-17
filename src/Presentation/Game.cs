@@ -47,7 +47,7 @@ public partial class Game
         this.mapHolder.Visible = this.Visible;
     }
 
-    public BaseLevel InitMap(PackedScene levelScene)
+    public BaseLevel InitMap(PackedScene levelScene, uint maxNumberOfTurns)
     {
         this.map = levelScene.Instance<BaseLevel>();
         this.mapHolder.AddChild(this.map);
@@ -60,8 +60,18 @@ public partial class Game
             this.customPopupInventory.TryAddItem(item.Item1, item.Item2);
         }
 
+        this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
+        this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
+        this.map.CanDig = true;
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
+        this.map.Connect(nameof(BaseLevel.DigCellClicked), this, nameof(DigCellClicked));
         return this.map;
+    }
+
+    private void DigCellClicked()
+    {
+        this.stamina.CurrentNumberOfTurns--;
+        this.map.CanDig = this.stamina.CurrentNumberOfTurns > 0;
     }
 
     private void ExitCellClicked(int stairsType)

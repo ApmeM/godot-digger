@@ -11,6 +11,12 @@ public partial class BaseLevel
     [Signal]
     public delegate void ExitCellClicked(int stairsType);
 
+    [Signal]
+    public delegate void DigCellClicked();
+
+    [Export]
+    public bool CanDig = true;
+
     public override void _Ready()
     {
         base._Ready();
@@ -51,14 +57,15 @@ public partial class BaseLevel
 
             if (blocksCell != -1)
             {
-                if (this.gameState.NumberOfTurns > 0)
+                if (CanDig)
                 {
-                    this.gameState.NumberOfTurns--;
                     if (!this.CurrentMap.ContainsKey(pos))
                     {
                         GD.PrintErr($"Cell at {pos} not exists in CurrentMap.");
                         return;
                     }
+
+                    this.EmitSignal(nameof(DigCellClicked));
 
                     if (this.CurrentMap[pos].HP > this.gameState.DigPower)
                     {

@@ -12,10 +12,6 @@ public partial class GameState
         public readonly Dictionary<Loot, uint> resources = new Dictionary<Loot, uint>();
         public uint digPower;
         public uint inventorySlots;
-        public uint numberOfTurnsMax;
-        public uint numberOfTurns;
-        public float numberOfTurnsRecoverySeconds;
-        public DateTime numberOfTurnsLastUpdate;
         public readonly HashSet<string> openedLevels = new HashSet<string>();
         public string LevelName;
         public readonly List<(int, int)> LevelInventoryItems = new List<(int, int)>();
@@ -89,56 +85,6 @@ public partial class GameState
         set
         {
             this.state.LevelName = value;
-            this.SaveGame();
-        }
-    }
-
-    public uint NumberOfTurnsMax
-    {
-        get => state.numberOfTurnsMax;
-        set
-        {
-            this.state.numberOfTurnsMax = value;
-            this.SaveGame();
-        }
-    }
-
-    public uint NumberOfTurns
-    {
-        get => state.numberOfTurns;
-        set
-        {
-            if (this.state.numberOfTurns == this.NumberOfTurnsMax && value < this.NumberOfTurnsMax)
-            {
-                this.NumberOfTurnsLastUpdate = DateTime.Now;
-            }
-
-            this.state.numberOfTurns = value;
-            if (this.state.numberOfTurns > this.NumberOfTurnsMax)
-            {
-                this.state.numberOfTurns = this.NumberOfTurnsMax;
-            }
-            this.EmitSignal(nameof(NumberOfTurnsChanged));
-            this.SaveGame();
-        }
-    }
-
-    public float NumberOfTurnsRecoverySeconds
-    {
-        get => state.numberOfTurnsRecoverySeconds;
-        set
-        {
-            this.state.numberOfTurnsRecoverySeconds = value;
-            this.SaveGame();
-        }
-    }
-
-    public DateTime NumberOfTurnsLastUpdate
-    {
-        get => state.numberOfTurnsLastUpdate;
-        set
-        {
-            this.state.numberOfTurnsLastUpdate = value;
             this.SaveGame();
         }
     }
@@ -225,12 +171,6 @@ public partial class GameState
             saveGame.Close();
             GD.Print($"State saved : {stringState}");
         }
-
-        if (NumberOfTurns < NumberOfTurnsMax && NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds) < DateTime.Now)
-        {
-            NumberOfTurns++;
-            NumberOfTurnsLastUpdate = NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds);
-        }
     }
 
     public void AddLevelInventoryItem(int item, int count)
@@ -268,10 +208,6 @@ public partial class GameState
             {
                 digPower = 1,
                 inventorySlots = 3,
-                numberOfTurnsMax = 10,
-                numberOfTurns = 10,
-                numberOfTurnsRecoverySeconds = 20,
-                numberOfTurnsLastUpdate = DateTime.Now,
             };
 
             GD.Print("State created.");
