@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
@@ -14,6 +13,7 @@ public partial class CustomPopupInventory
     public List<Texture> Resources = new List<Texture>();
 
     private uint size;
+
     [Export]
     public uint Size
     {
@@ -28,7 +28,8 @@ public partial class CustomPopupInventory
                 this.slotContainer.ClearChildren();
                 for (var i = 0; i < value; i++)
                 {
-                    this.slotContainer.AddChild(this.InventorySlot.Instance());
+                    var slot = this.InventorySlot.Instance<CustomPopupInventorySlot>();
+                    this.slotContainer.AddChild(slot);
                 }
             }
             this.size = value;
@@ -71,7 +72,7 @@ public partial class CustomPopupInventory
                 continue;
             }
 
-            slot.AddItem(loot, count);
+            slot.AddItem(loot, itemIndex, count);
             return true;
         }
 
@@ -88,6 +89,18 @@ public partial class CustomPopupInventory
             }
 
             slot.RemoveItem();
+        }
+    }
+
+    public IEnumerable<(int, int)> GetItems(){
+        foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren())
+        {
+            if (!slot.HasItem())
+            {
+                continue;
+            }
+
+            yield return slot.GetItem();
         }
     }
 

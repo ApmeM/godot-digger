@@ -55,11 +55,6 @@ public partial class Game
         this.map.LoadGame();
         this.customPopupInventory.Size = this.gameState.InventorySlots;
 
-        foreach (var item in this.gameState.GetLevelInventoryItems())
-        {
-            this.customPopupInventory.TryAddItem(item.Item1, item.Item2);
-        }
-
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
         this.map.CanDig = true;
@@ -78,7 +73,10 @@ public partial class Game
     {
         this.gameState.LevelName = string.Empty;
         this.gameState.ClearMaps();
-        this.gameState.MoveInventory();
+        foreach (var item in this.customPopupInventory.GetItems())
+        {
+            this.gameState.AddResource((Loot)item.Item1, item.Item2);
+        }
         this.customPopupInventory.ClearItems();
         this.mapHolder.ClearChildren();
         this.EmitSignal(nameof(ExitDungeon), stairsType, this.map.Name);
@@ -87,12 +85,6 @@ public partial class Game
 
     public bool TryAddResource(Loot item, int count)
     {
-        var result = this.customPopupInventory.TryAddItem((int)item, count);
-        if (result)
-        {
-            this.gameState.AddLevelInventoryItem((int)item, count);
-        }
-
-        return result;
+        return this.customPopupInventory.TryAddItem((int)item, count);
     }
 }

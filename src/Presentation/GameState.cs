@@ -14,15 +14,11 @@ public partial class GameState
         public uint inventorySlots;
         public readonly HashSet<string> openedLevels = new HashSet<string>();
         public string LevelName;
-        public readonly List<(int, int)> LevelInventoryItems = new List<(int, int)>();
         public readonly List<(Vector2, uint, Vector2)> Floor = new List<(Vector2, uint, Vector2)>();
         public readonly List<(Vector2, uint, Vector2)> Blocks = new List<(Vector2, uint, Vector2)>();
         public readonly List<(Vector2, uint, Vector2)> Loot = new List<(Vector2, uint, Vector2)>();
         public readonly List<(Vector2, uint, Vector2)> Fog = new List<(Vector2, uint, Vector2)>();
     }
-
-    [Signal]
-    public delegate void NumberOfTurnsChanged();
 
     [Signal]
     public delegate void ResourcesChanged();
@@ -173,23 +169,6 @@ public partial class GameState
         }
     }
 
-    public void AddLevelInventoryItem(int item, int count)
-    {
-        this.state.LevelInventoryItems.Add((item, count));
-        SaveGame();
-    }
-
-    public List<(int, int)> GetLevelInventoryItems()
-    {
-        return this.state.LevelInventoryItems;
-    }
-
-    public void ClearLevelInventoryItems()
-    {
-        this.state.LevelInventoryItems.Clear();
-        this.SaveGame();
-    }
-
     private bool needSave = false;
     private void SaveGame()
     {
@@ -227,17 +206,6 @@ public partial class GameState
             this.EmitSignal(nameof(LoadLevel), this.state.LevelName);
         }
         this.EmitSignal(nameof(ResourcesChanged));
-        this.EmitSignal(nameof(NumberOfTurnsChanged));
         this.EmitSignal(nameof(OpenedLevelsChanged));
-    }
-
-    public void MoveInventory()
-    {
-        foreach (var item in this.GetLevelInventoryItems())
-        {
-            this.AddResource((Loot)item.Item1, item.Item2);
-        }
-        this.ClearLevelInventoryItems();
-        this.SaveGame();
     }
 }

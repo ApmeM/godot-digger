@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -5,11 +6,31 @@ using GodotDigger.Presentation.Utils;
 [Tool]
 public partial class CustomPopupInventorySlot
 {
+    [Export]
+    public int ItemIndex;
+    private int itemsCount;
+
+    [Export]
+    public int ItemsCount
+    {
+        get => itemsCount; set
+        {
+            itemsCount = value;
+            if (IsInsideTree())
+            {
+                this.countLabel.Text = value.ToString();
+                this.countLabel.Visible = value > 1;
+            }
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
         this.RemoveItem();
+
+        this.ItemsCount = itemsCount;
     }
 
     public bool HasItem()
@@ -17,7 +38,7 @@ public partial class CustomPopupInventorySlot
         return this.countLabel.Text != "0";
     }
 
-    public void AddItem(Node loot, int count)
+    public void AddItem(Node loot, int item, int count)
     {
         if (HasItem())
         {
@@ -26,8 +47,20 @@ public partial class CustomPopupInventorySlot
         }
 
         this.lootContainer.AddChild(loot);
-        this.countLabel.Text = count.ToString();
-        this.countLabel.Visible = count > 1;
+        this.ItemIndex = item;
+        this.ItemsCount = count;
+    }
+
+    public (int, int) GetItem()
+    {
+        if (this.HasItem())
+        {
+            return (this.ItemIndex, ItemsCount);
+        }
+        else
+        {
+            return (0, 0);
+        }
     }
 
     public void UpdateCount(int countDiff)
@@ -49,14 +82,13 @@ public partial class CustomPopupInventorySlot
             return;
         }
 
-        this.countLabel.Text = result.ToString();
-        this.countLabel.Visible = result > 1;
+        this.ItemsCount = result;
     }
 
     public void RemoveItem()
     {
         this.lootContainer.ClearChildren();
-        this.countLabel.Visible = false;
-        this.countLabel.Text = "0";
+        this.ItemsCount = 0;
+        this.ItemIndex = 0;
     }
 }
