@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 [SceneReference("Main.tscn")]
@@ -22,11 +23,13 @@ public partial class Main
     {
         this.game.Visible = true;
         this.menu.Visible = false;
-        this.game.InitMap(levelScene, this.menu.MaxNumberOfTurns, this.menu.InventorySlots, this.menu.DigPower);// ToDo: MaxNumberOfTurns
+        this.game.InitMap(levelScene, this.menu.MaxNumberOfTurns, this.menu.InventorySlots, this.menu.DigPower);
     }
 
-    public void ExitDungeon(int stairsType, string fromLevel)
+    public void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources)
     {
+        this.menu.ResourcesAdded(resources);
+
         if ((Blocks)stairsType == Blocks.StairsUp)
         {
             this.game.Visible = false;

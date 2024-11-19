@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -20,16 +21,14 @@ public partial class Menu
     [Export]
     public uint MaxNumberOfTurns = 10;
 
-    private GameState gameState;
-
+    [Export]
+    public readonly Dictionary<Loot, int> Resources = new Dictionary<Loot, int>();
 
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
 
-        this.gameState = this.GetNode<GameState>("/root/Main/GameState");
-        this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
@@ -62,12 +61,16 @@ public partial class Menu
         this.customPopupInventory.ShowAt(this.inventory.RectPosition / this.customPopupInventory.Scale);
     }
 
-    private void ResourcesChanged()
+    public void ResourcesAdded(List<Loot> newResources)
     {
-        this.customPopupInventory.ClearItems();
-        foreach (Loot item in Enum.GetValues(typeof(Loot)))
+        foreach (Loot item in newResources)
         {
-            this.customPopupInventory.TryAddItem((int)item, (int)this.gameState.GetResource(item));
+            this.Resources[item] = !this.Resources.ContainsKey(item) ? 1 : this.Resources[item] + 1;
+        }
+        this.customPopupInventory.ClearItems();
+        foreach (var res in this.Resources)
+        {
+            this.customPopupInventory.TryAddItem((int)res.Key, res.Value);
         }
     }
 
@@ -132,7 +135,7 @@ public partial class Menu
     private async void BlacksmithPressed()
     {
         var res = Loot.Cloth;
-        var irons = this.gameState.GetResource(res);
+        var irons = this.Resources[res];
         var required = Fibonacci.Calc(this.DigPower + 5);
         if (irons >= required)
         {
@@ -141,7 +144,7 @@ public partial class Menu
             var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
             if (decision)
             {
-                this.gameState.AddResource(res, -required);
+                this.Resources[res] = !this.Resources.ContainsKey(res) ? 0 : this.Resources[res] - required;
                 this.DigPower++;
             }
         }
@@ -155,7 +158,7 @@ public partial class Menu
     private async void LeatherPressed()
     {
         var res = Loot.Cloth;
-        var cloth = this.gameState.GetResource(res);
+        var cloth = this.Resources[res];
         var required = Fibonacci.Calc(this.InventorySlots);
         if (cloth >= required)
         {
@@ -164,7 +167,7 @@ public partial class Menu
             var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
             if (decision)
             {
-                this.gameState.AddResource(res, -required);
+                this.Resources[res] = !this.Resources.ContainsKey(res) ? 0 : this.Resources[res] - required;
                 this.InventorySlots++;
             }
         }

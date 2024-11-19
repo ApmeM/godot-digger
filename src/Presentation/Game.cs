@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -6,14 +7,12 @@ using GodotDigger.Presentation.Utils;
 public partial class Game
 {
     [Signal]
-    public delegate void ExitDungeon(int stairsType, string fromLevel);
+    public delegate void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources);
 
     public BaseLevel map;
 
     [Export]
     public Texture LootTexture;
-
-    private GameState gameState;
 
     public override void _Ready()
     {
@@ -21,7 +20,6 @@ public partial class Game
         this.FillMembers();
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
-        this.gameState = this.GetNode<GameState>("/root/Main/GameState");
 
         this.Connect(CommonSignals.VisibilityChanged, this, nameof(VisibilityChanged));
         this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
@@ -73,16 +71,12 @@ public partial class Game
 
     private void ExitCellClicked(int stairsType)
     {
-        foreach (var item in this.customPopupInventory.GetItems())
-        {
-            this.gameState.AddResource((Loot)item.Item1, item.Item2);
-        }
-        this.customPopupInventory.ClearItems();
-
         var oldMap = this.map;
         this.map = null;
         this.mapHolder.ClearChildren();
-        this.EmitSignal(nameof(ExitDungeon), stairsType, oldMap.Name);
+        var resources = this.customPopupInventory.GetItems().Select(a => (Loot)a.Item1).ToList();
+        this.customPopupInventory.ClearItems();
+        this.EmitSignal(nameof(ExitDungeon), stairsType, oldMap.Name, resources);
     }
 
     public bool TryAddResource(Loot item, int count)
