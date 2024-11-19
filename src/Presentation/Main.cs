@@ -35,7 +35,7 @@ public partial class Main
         }
         var nextLevel = this.menu.GetNextLevel(stairsType, fromLevel);
 
-        this.gameState.OpenLevel(nextLevel);
+        this.menu.OpenLevel(nextLevel);
         this.menu.LoadLevel(nextLevel);
     }
 }

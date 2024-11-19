@@ -29,7 +29,7 @@ flags = 4
 atlas = ExtResource( 3 )
 region = Rect2( 48, 16, 16, 16 )
 
-[node name="MenuLayer" type="CanvasLayer"]
+[node name="Menu" type="CanvasLayer"]
 script = ExtResource( 1 )
 LootTexture = ExtResource( 15 )
 
@@ -56,6 +56,7 @@ rect_scale = Vector2( 10, 10 )
 texture_normal = ExtResource( 18 )
 
 [node name="Level2" parent="DungeonSelector" instance=ExtResource( 6 )]
+visible = false
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_left = 198.0

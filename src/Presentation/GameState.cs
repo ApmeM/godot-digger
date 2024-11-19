@@ -12,31 +12,12 @@ public partial class GameState
         public readonly Dictionary<Loot, uint> resources = new Dictionary<Loot, uint>();
         public uint digPower;
         public uint inventorySlots;
-        public readonly HashSet<string> openedLevels = new HashSet<string>();
     }
 
     [Signal]
     public delegate void ResourcesChanged();
 
-    [Signal]
-    public delegate void OpenedLevelsChanged();
-
-    [Signal]
-    public delegate void LoadLevel(string levelName);
-
     private State state = new State();
-
-    public void OpenLevel(string levelName)
-    {
-        this.state.openedLevels.Add(levelName);
-        this.EmitSignal(nameof(OpenedLevelsChanged));
-        this.SaveGame();
-    }
-
-    public bool IsLevelOpened(string levelName)
-    {
-        return this.state.openedLevels.Contains(levelName);
-    }
 
     public uint GetResource(Loot resource)
     {
@@ -134,6 +115,5 @@ public partial class GameState
         }
 
         this.EmitSignal(nameof(ResourcesChanged));
-        this.EmitSignal(nameof(OpenedLevelsChanged));
     }
 }

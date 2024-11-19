@@ -77,9 +77,11 @@ public partial class Game
             this.gameState.AddResource((Loot)item.Item1, item.Item2);
         }
         this.customPopupInventory.ClearItems();
-        this.mapHolder.ClearChildren();
-        this.EmitSignal(nameof(ExitDungeon), stairsType, this.map.Name);
+
+        var oldMap = this.map;
         this.map = null;
+        this.mapHolder.ClearChildren();
+        this.EmitSignal(nameof(ExitDungeon), stairsType, oldMap.Name);
     }
 
     public bool TryAddResource(Loot item, int count)

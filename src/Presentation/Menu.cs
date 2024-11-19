@@ -20,8 +20,6 @@ public partial class Menu
 
         this.gameState = this.GetNode<GameState>("/root/Main/GameState");
         this.gameState.Connect(nameof(GameState.ResourcesChanged), this, nameof(ResourcesChanged));
-        this.gameState.Connect(nameof(GameState.LoadLevel), this, nameof(LoadLevel));
-        this.gameState.Connect(nameof(GameState.OpenedLevelsChanged), this, nameof(OpenedLevelsChanged));
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
@@ -52,22 +50,6 @@ public partial class Menu
     private void ShowInventoryPopup()
     {
         this.customPopupInventory.ShowAt(this.inventory.RectPosition / this.customPopupInventory.Scale);
-    }
-
-    private void OpenedLevelsChanged()
-    {
-        foreach (var child in this.dungeonSelector.GetChildren())
-        {
-            if (!(child is LevelButton level))
-            {
-                continue;
-            }
-
-            level.Disabled = !this.gameState.IsLevelOpened(level.LevelName);
-        }
-
-        // First level alvays visible
-        this.level1.Disabled = false;
     }
 
     private void ResourcesChanged()
@@ -115,6 +97,23 @@ public partial class Menu
             if (level.LevelName == levelName)
             {
                 LevelPressed(level.dungeonScene);
+                return;
+            }
+        }
+    }
+
+    public void OpenLevel(string levelName)
+    {
+        foreach (var child in this.dungeonSelector.GetChildren())
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            if (level.LevelName == levelName)
+            {
+                level.Visible = true;
                 return;
             }
         }
