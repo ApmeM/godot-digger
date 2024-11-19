@@ -22,7 +22,7 @@ public partial class Main
     {
         this.game.Visible = true;
         this.menu.Visible = false;
-        this.game.InitMap(levelScene, 10);// ToDo: MaxNumberOfTurns
+        this.game.InitMap(levelScene, this.menu.MaxNumberOfTurns, this.menu.InventorySlots, this.menu.DigPower);// ToDo: MaxNumberOfTurns
     }
 
     public void ExitDungeon(int stairsType, string fromLevel)

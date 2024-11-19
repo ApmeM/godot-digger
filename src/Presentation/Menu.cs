@@ -11,7 +11,17 @@ public partial class Menu
     [Export]
     public Texture LootTexture;
 
+    [Export]
+    public uint InventorySlots = 3;
+
+    [Export]
+    public uint DigPower = 1;
+
+    [Export]
+    public uint MaxNumberOfTurns = 10;
+
     private GameState gameState;
+
 
     public override void _Ready()
     {
@@ -123,7 +133,7 @@ public partial class Menu
     {
         var res = Loot.Cloth;
         var irons = this.gameState.GetResource(res);
-        var required = Fibonacci.Calc(this.gameState.DigPower + 5);
+        var required = Fibonacci.Calc(this.DigPower + 5);
         if (irons >= required)
         {
             this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} irons.";
@@ -132,7 +142,7 @@ public partial class Menu
             if (decision)
             {
                 this.gameState.AddResource(res, -required);
-                this.gameState.DigPower++;
+                this.DigPower++;
             }
         }
         else
@@ -146,7 +156,7 @@ public partial class Menu
     {
         var res = Loot.Cloth;
         var cloth = this.gameState.GetResource(res);
-        var required = Fibonacci.Calc(this.gameState.InventorySlots);
+        var required = Fibonacci.Calc(this.InventorySlots);
         if (cloth >= required)
         {
             this.customConfirmPopup.ContentText = $"Increase number of inventory slots?\nIt requires {required} cloth.";
@@ -155,7 +165,7 @@ public partial class Menu
             if (decision)
             {
                 this.gameState.AddResource(res, -required);
-                this.gameState.InventorySlots++;
+                this.InventorySlots++;
             }
         }
         else

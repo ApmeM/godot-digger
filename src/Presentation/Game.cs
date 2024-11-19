@@ -47,15 +47,16 @@ public partial class Game
         this.mapHolder.Visible = this.Visible;
     }
 
-    public BaseLevel InitMap(PackedScene levelScene, uint maxNumberOfTurns)
+    public BaseLevel InitMap(PackedScene levelScene, uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
-        this.customPopupInventory.Size = this.gameState.InventorySlots;
+        this.customPopupInventory.Size = inventorySlots;
 
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
 
         this.map = levelScene.Instance<BaseLevel>();
         this.map.CanDig = true;
+        this.map.DigPower = digPower;
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
         this.map.Connect(nameof(BaseLevel.DigCellClicked), this, nameof(DigCellClicked));
 

@@ -10,8 +10,6 @@ public partial class GameState
     private class State
     {
         public readonly Dictionary<Loot, uint> resources = new Dictionary<Loot, uint>();
-        public uint digPower;
-        public uint inventorySlots;
     }
 
     [Signal]
@@ -29,26 +27,6 @@ public partial class GameState
         this.state.resources[resource] = (uint)Math.Max(0, GetResource(resource) + diff);
         this.EmitSignal(nameof(ResourcesChanged));
         this.SaveGame();
-    }
-
-    public uint DigPower
-    {
-        get => state.digPower;
-        set
-        {
-            this.state.digPower = value;
-            this.SaveGame();
-        }
-    }
-
-    public uint InventorySlots
-    {
-        get => state.inventorySlots;
-        set
-        {
-            this.state.inventorySlots = value;
-            this.SaveGame();
-        }
     }
 
     public override void _Ready()
@@ -96,12 +74,8 @@ public partial class GameState
         {
             GD.Print("Save game file not exists.");
 
-            this.state = new State
-            {
-                digPower = 1,
-                inventorySlots = 3,
-            };
-
+            this.state = new State();
+            
             GD.Print("State created.");
             this.SaveGame();
         }

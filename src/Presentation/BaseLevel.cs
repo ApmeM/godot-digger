@@ -6,7 +6,6 @@ using Godot;
 public partial class BaseLevel
 {
     private Dictionary<Vector2, CellDefinition> CurrentMap = new Dictionary<Vector2, CellDefinition>();
-    private GameState gameState;
 
     [Signal]
     public delegate void ExitCellClicked(int stairsType);
@@ -17,13 +16,15 @@ public partial class BaseLevel
     [Export]
     public bool CanDig = true;
 
+    [Export]
+    public uint DigPower = 1;
+
+
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
         this.FillCurrentMap();
-
-        this.gameState = this.GetNode<GameState>("/root/Main/GameState");
 
         this.AddToGroup(Groups.LevelScene);
     }
@@ -66,9 +67,9 @@ public partial class BaseLevel
 
                     this.EmitSignal(nameof(DigCellClicked));
 
-                    if (this.CurrentMap[pos].HP > this.gameState.DigPower)
+                    if (this.CurrentMap[pos].HP > this.DigPower)
                     {
-                        this.CurrentMap[pos].HP -= this.gameState.DigPower;
+                        this.CurrentMap[pos].HP -= this.DigPower;
                         return;
                     }
 
