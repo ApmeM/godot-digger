@@ -13,6 +13,9 @@ public partial class BaseLevel
     [Signal]
     public delegate void DigCellClicked();
 
+    [Signal]
+    public delegate void ResourceClicked(Loot resource, Vector2 atPosition);
+
     [Export]
     public bool CanDig = true;
 
@@ -84,10 +87,7 @@ public partial class BaseLevel
 
             if (lootCell != -1)
             {
-                if (this.GetParent().GetParent<Game>().TryAddResource((Loot)lootCellTile.x, 1))
-                {
-                    this.loot.SetCellv(pos, -1);
-                }
+                this.EmitSignal(nameof(ResourceClicked), (Loot)lootCellTile.x, pos);
             }
         }
     }
@@ -149,5 +149,10 @@ public partial class BaseLevel
                 UnFogCell(dirCell);
             }
         }
+    }
+
+    public void RemoveResource(Vector2 atPosition)
+    {
+         this.loot.SetCellv(atPosition, -1);
     }
 }

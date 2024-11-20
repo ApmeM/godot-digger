@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -20,9 +21,6 @@ public partial class Menu
 
     [Export]
     public uint MaxNumberOfTurns = 10;
-
-    [Export]
-    public readonly Dictionary<Loot, int> Resources = new Dictionary<Loot, int>();
 
     public override void _Ready()
     {
@@ -63,14 +61,9 @@ public partial class Menu
 
     public void ResourcesAdded(List<Loot> newResources)
     {
-        foreach (Loot item in newResources)
+        foreach (var res in newResources)
         {
-            this.Resources[item] = !this.Resources.ContainsKey(item) ? 1 : this.Resources[item] + 1;
-        }
-        this.customPopupInventory.ClearItems();
-        foreach (var res in this.Resources)
-        {
-            this.customPopupInventory.TryAddItem((int)res.Key, res.Value);
+            this.customPopupInventory.TryAddItem((int)res, 1);
         }
     }
 
@@ -132,48 +125,37 @@ public partial class Menu
         }
     }
 
-    private async void BlacksmithPressed()
+    private void BlacksmithPressed()
     {
-        var res = Loot.Cloth;
-        var irons = this.Resources[res];
-        var required = Fibonacci.Calc(this.DigPower + 5);
-        if (irons >= required)
-        {
-            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} irons.";
-            this.customConfirmPopup.ShowCentered();
-            var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
-            if (decision)
-            {
-                this.Resources[res] = !this.Resources.ContainsKey(res) ? 0 : this.Resources[res] - required;
-                this.DigPower++;
-            }
-        }
-        else
-        {
-            this.customTextPopup.ContentText = $"Not enough iron.\n{required} irons required.";
-            this.customTextPopup.ShowCentered();
-        }
+        SpendResource(Loot.Steel, "irons", Fibonacci.Calc(this.DigPower + 5), () => this.DigPower++);
     }
 
-    private async void LeatherPressed()
+    private void LeatherPressed()
     {
-        var res = Loot.Cloth;
-        var cloth = this.Resources[res];
-        var required = Fibonacci.Calc(this.InventorySlots);
-        if (cloth >= required)
+        SpendResource(Loot.Cloth, "cloth", Fibonacci.Calc(this.InventorySlots), () => this.InventorySlots++);
+    }
+
+    private async void SpendResource(Loot res, string resName, uint required, Action action)
+    {
+        var existing = this.customPopupInventory.GetItemCount((int)res);
+        if (existing >= required)
         {
-            this.customConfirmPopup.ContentText = $"Increase number of inventory slots?\nIt requires {required} cloth.";
+            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} {resName}.";
             this.customConfirmPopup.ShowCentered();
             var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
             if (decision)
             {
-                this.Resources[res] = !this.Resources.ContainsKey(res) ? 0 : this.Resources[res] - required;
-                this.InventorySlots++;
+                existing = this.customPopupInventory.GetItemCount((int)res);
+                if (existing >= required)
+                {
+                    this.customPopupInventory.TryRemoveItems((int)res, required);
+                    action();
+                }
             }
         }
         else
         {
-            this.customTextPopup.ContentText = $"Not enough cloth.\n{required} cloth required.";
+            this.customTextPopup.ContentText = $"Not enough {resName}.\n{required} {resName} required.";
             this.customTextPopup.ShowCentered();
         }
     }

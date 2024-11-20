@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -36,6 +38,8 @@ public partial class CustomPopupInventory
         }
     }
 
+    [Export]
+    public int MaxCountPerSlot = 10;
 
     private int sizePerRow;
     [Export]
@@ -52,12 +56,69 @@ public partial class CustomPopupInventory
         }
     }
 
-    public bool TryAddItem(int itemIndex, int count)
+    public override void _Ready()
     {
+        base._Ready();
+        this.FillMembers();
+        this.SizePerRow = this.sizePerRow;
+        this.Size = size;
+    }
+
+    public uint TryRemoveItems(int itemIndex, uint count)
+    {
+        if (count == 0)
+        {
+            return 0;
+        }
+
         if (Resources.Count <= itemIndex)
         {
             GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");
-            return false;
+            return count;
+        }
+
+        foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren().Cast<CustomPopupInventorySlot>().Reverse())
+        {
+            if (!slot.HasItem())
+            {
+                continue;
+            }
+
+            if (slot.GetItem().Item1 != itemIndex)
+            {
+                continue;
+            }
+
+            var currentCount = slot.GetItem().Item2;
+            if (currentCount > count)
+            {
+                slot.UpdateCount(-(int)count);
+                return 0;
+            }
+
+            slot.RemoveItem();
+            count -= (uint)currentCount;
+            
+            if (count == 0)
+            {
+                return 0;
+            }
+        }
+
+        return count;
+    }
+
+    public uint TryAddItem(int itemIndex, uint count)
+    {
+        if (count == 0)
+        {
+            return 0;
+        }
+
+        if (Resources.Count <= itemIndex)
+        {
+            GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");
+            return count;
         }
 
         var loot = new TextureRect
@@ -67,16 +128,29 @@ public partial class CustomPopupInventory
 
         foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren())
         {
-            if (slot.HasItem())
+            if (!slot.HasItem())
+            {
+                slot.SetItem(loot, itemIndex);
+            }
+
+            if (slot.GetItem().Item1 != itemIndex)
             {
                 continue;
             }
 
-            slot.AddItem(loot, itemIndex, count);
-            return true;
+            var currentCount = slot.GetItem().Item2;
+            var spaceLeft = this.MaxCountPerSlot - currentCount;
+            if (spaceLeft >= count)
+            {
+                slot.UpdateCount((int)count);
+                return 0;
+            }
+
+            slot.UpdateCount(spaceLeft);
+            count -= (uint)spaceLeft;
         }
 
-        return false;
+        return count;
     }
 
     public void ClearItems()
@@ -92,23 +166,22 @@ public partial class CustomPopupInventory
         }
     }
 
-    public IEnumerable<(int, int)> GetItems(){
-        foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren())
-        {
-            if (!slot.HasItem())
-            {
-                continue;
-            }
-
-            yield return slot.GetItem();
-        }
+    public IEnumerable<(int, int)> GetItems()
+    {
+        return this.slotContainer.GetChildren()
+            .OfType<CustomPopupInventorySlot>()
+            .Where(a => a.HasItem())
+            .Select(a => a.GetItem());
     }
 
-    public override void _Ready()
+
+    public int GetItemCount(int item)
     {
-        base._Ready();
-        this.FillMembers();
-        this.SizePerRow = this.sizePerRow;
-        this.Size = size;
+        return this.slotContainer.GetChildren()
+            .OfType<CustomPopupInventorySlot>()
+            .Where(a => a.HasItem())
+            .Select(a => a.GetItem())
+            .Where(a => a.Item1 == item)
+            .Sum(a => a.Item2);
     }
 }

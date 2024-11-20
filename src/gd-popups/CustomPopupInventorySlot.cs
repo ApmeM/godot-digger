@@ -8,7 +8,7 @@ public partial class CustomPopupInventorySlot
 {
     [Export]
     public int ItemIndex;
-    private int itemsCount;
+    private int itemsCount = 0;
 
     [Export]
     public int ItemsCount
@@ -35,10 +35,10 @@ public partial class CustomPopupInventorySlot
 
     public bool HasItem()
     {
-        return this.countLabel.Text != "0";
+        return this.lootContainer.GetChildCount() > 0;
     }
 
-    public void AddItem(Node loot, int item, int count)
+    public void SetItem(Node loot, int item)
     {
         if (HasItem())
         {
@@ -48,7 +48,6 @@ public partial class CustomPopupInventorySlot
 
         this.lootContainer.AddChild(loot);
         this.ItemIndex = item;
-        this.ItemsCount = count;
     }
 
     public (int, int) GetItem()
@@ -59,36 +58,41 @@ public partial class CustomPopupInventorySlot
         }
         else
         {
-            return (0, 0);
+            return (-1, 0);
         }
     }
 
     public void UpdateCount(int countDiff)
     {
-        int result;
-        if (int.TryParse(this.countLabel.Text, out var current))
+        if (countDiff == 0)
         {
-            result = current + countDiff;
-        }
-        else
-        {
-            GD.PrintErr("Can not update count as original value is not set.");
-            result = countDiff;
-        }
-
-        if (result < 0)
-        {
-            RemoveItem();
             return;
         }
 
+        if (!HasItem())
+        {
+            GD.PrintErr($"Updating count for slot with no item set.");
+        }
+
+        var result = itemsCount + countDiff;
+        if (result < 0)
+        {
+            GD.PrintErr($"Removing count {countDiff} from slot with only {itemsCount}.\nIt is succesfull, but final sum up calculations might be wrong.");
+        }
+
         this.ItemsCount = result;
+
+        if (result <= 0)
+        {
+            RemoveItem();
+        }
+
     }
 
     public void RemoveItem()
     {
         this.lootContainer.ClearChildren();
         this.ItemsCount = 0;
-        this.ItemIndex = 0;
+        this.ItemIndex = -1;
     }
 }

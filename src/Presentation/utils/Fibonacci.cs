@@ -4,10 +4,10 @@ using System.Collections.Generic;
 public static class Fibonacci
 {
     // Dictionary to store computed Fibonacci numbers for memoization
-    private static readonly Dictionary<uint, int> memorization = new Dictionary<uint, int>();
+    private static readonly Dictionary<uint, uint> memorization = new Dictionary<uint, uint>();
 
     // Method to calculate the n-th Fibonacci number
-    public static int Calc(uint n)
+    public static uint Calc(uint n)
     {
         // Base cases
         if (n == 0) return 0;
@@ -18,7 +18,7 @@ public static class Fibonacci
             return memorization[n];
 
         // Recursive calculation with memoization
-        int result = Calc(n - 1) + Calc(n - 2);
+        uint result = Calc(n - 1) + Calc(n - 2);
         memorization[n] = result; // Store the result in the dictionary
 
         return result;

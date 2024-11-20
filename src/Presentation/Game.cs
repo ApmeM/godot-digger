@@ -57,6 +57,7 @@ public partial class Game
         this.map.DigPower = digPower;
         this.map.Connect(nameof(BaseLevel.ExitCellClicked), this, nameof(ExitCellClicked));
         this.map.Connect(nameof(BaseLevel.DigCellClicked), this, nameof(DigCellClicked));
+        this.map.Connect(nameof(BaseLevel.ResourceClicked), this, nameof(ResourceClicked));
 
         this.mapHolder.AddChild(this.map);
 
@@ -79,8 +80,11 @@ public partial class Game
         this.EmitSignal(nameof(ExitDungeon), stairsType, oldMap.Name, resources);
     }
 
-    public bool TryAddResource(Loot item, int count)
+    public void ResourceClicked(Loot item, Vector2 atPosition)
     {
-        return this.customPopupInventory.TryAddItem((int)item, count);
+        if (this.customPopupInventory.TryAddItem((int)item, 1) == 0)
+        {
+            this.map.RemoveResource(atPosition);
+        }
     }
 }
