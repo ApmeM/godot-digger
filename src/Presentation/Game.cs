@@ -36,7 +36,7 @@ public partial class Game
 
     private void ShowInventoryPopup()
     {
-        this.customPopupInventory.ShowAt(this.inventory.RectPosition / this.customPopupInventory.Scale);
+        this.customPopupInventory.ShowCentered();
     }
 
     private void VisibilityChanged()

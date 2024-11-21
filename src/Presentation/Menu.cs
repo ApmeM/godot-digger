@@ -56,7 +56,7 @@ public partial class Menu
 
     private void ShowInventoryPopup()
     {
-        this.customPopupInventory.ShowAt(this.inventory.RectPosition / this.customPopupInventory.Scale);
+        this.customPopupInventory.ShowCentered();
     }
 
     public void ResourcesAdded(List<Loot> newResources)

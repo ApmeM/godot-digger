@@ -65,8 +65,22 @@ public partial class CustomPopup
 
     public void ShowCentered()
     {
-        var rectPosition = this.GetViewport().Size / 2;
+        var rectPosition = this.GetViewport().Size / 2 / this.Scale;
         this.customPopupContainer.RectPosition = rectPosition - this.customPopupContainer.RectSize / 2;
         this.Show();
+    }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        base._UnhandledInput(@event);
+        if (!Visible)
+        {
+            return;
+        }
+
+        if (@event is InputEventMouse mouse && ((ButtonList)mouse.ButtonMask & ButtonList.Left) == ButtonList.Left)
+        {
+            Close();
+        }
     }
 }
