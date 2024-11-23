@@ -144,12 +144,47 @@ Title = "Are you sure"
 ShowCloseButton = false
 ContentText = ""
 
+[node name="HeaderMargin" parent="CustomConfirmPopup/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 96.0
+margin_right = 211.0
+
+[node name="TitleBackground" parent="CustomConfirmPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 115.0
+
+[node name="TitleMargin" parent="CustomConfirmPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 115.0
+
+[node name="TitleLabel" parent="CustomConfirmPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 105.0
+text = "Are you sure"
+
+[node name="CloseButton" parent="CustomConfirmPopup/CustomPopupContainer/PopupContainer" index="1"]
+visible = false
+
 [node name="CustomTextPopup" parent="." instance=ExtResource( 13 )]
 visible = false
 Title = "Notification"
+
+[node name="HeaderMargin" parent="CustomTextPopup/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 101.0
+margin_right = 206.0
+
+[node name="TitleBackground" parent="CustomTextPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 105.0
+
+[node name="TitleMargin" parent="CustomTextPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 105.0
+
+[node name="TitleLabel" parent="CustomTextPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 95.0
+text = "Notification"
 
 [node name="CustomPopupInventory" parent="." instance=ExtResource( 14 )]
 visible = false
 scale = Vector2( 2, 2 )
 transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 MaxCountPerSlot = 10
+
+[editable path="CustomConfirmPopup"]
+[editable path="CustomTextPopup"]
+[editable path="CustomPopupInventory"]

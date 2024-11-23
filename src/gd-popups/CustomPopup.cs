@@ -49,6 +49,9 @@ public partial class CustomPopup
         this.closeButton.Connect(CommonSignals.Pressed, this, nameof(Close));
         Title = title;
         ShowCloseButton = showCloseButton;
+
+        this.GetTree().EditedSceneRoot?.SetEditableInstance(this, true);
+        this.SetDisplayFolded(true);
     }
 
     protected void Close()
