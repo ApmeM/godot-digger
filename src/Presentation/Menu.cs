@@ -70,7 +70,7 @@ public partial class Menu
     private void AchievementsPressed()
     {
         this.achievementList.ReloadList();
-        this.windowDialog.PopupCentered();
+        this.customPopupAchievements.ShowCentered();
     }
 
     private void DungeonPressed()

@@ -1,9 +1,10 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Presentation/Menu.cs" type="Script" id=1]
 [ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=3]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=4]
+[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Presentation/LevelButton.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=8]
@@ -129,15 +130,6 @@ rect_min_size = Vector2( 80, 80 )
 texture_normal = SubResource( 4 )
 expand = true
 
-[node name="WindowDialog" type="WindowDialog" parent="."]
-margin_right = 467.0
-margin_bottom = 469.0
-popup_exclusive = true
-window_title = "Achievements"
-resizable = true
-
-[node name="AchievementList" parent="WindowDialog" instance=ExtResource( 4 )]
-
 [node name="CustomConfirmPopup" parent="." instance=ExtResource( 12 )]
 visible = false
 Title = "Are you sure"
@@ -185,6 +177,69 @@ scale = Vector2( 2, 2 )
 transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 MaxCountPerSlot = 10
 
+[node name="CustomPopupAchievements" parent="." instance=ExtResource( 5 )]
+Title = "Achievements"
+
+[node name="CustomPopupContainer" parent="CustomPopupAchievements" index="0"]
+margin_left = 50.0
+margin_right = 433.0
+margin_bottom = 672.0
+
+[node name="HeaderCenter" parent="CustomPopupAchievements/CustomPopupContainer" index="0"]
+margin_right = 383.0
+
+[node name="HeaderMargin" parent="CustomPopupAchievements/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 128.0
+margin_right = 255.0
+
+[node name="TitleBackground" parent="CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 127.0
+
+[node name="TitleMargin" parent="CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 127.0
+
+[node name="TitleLabel" parent="CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 117.0
+text = "Achievements"
+
+[node name="PopupContainer" parent="CustomPopupAchievements/CustomPopupContainer" index="1"]
+margin_right = 383.0
+margin_bottom = 634.0
+
+[node name="MarginContainer" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer" index="0"]
+margin_right = 383.0
+margin_bottom = 613.0
+
+[node name="InventoryFrame" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+margin_right = 383.0
+margin_bottom = 613.0
+
+[node name="OuterInventoryMargin" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+margin_right = 383.0
+margin_bottom = 613.0
+
+[node name="InventoryBackground" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
+margin_right = 374.0
+margin_bottom = 604.0
+
+[node name="ContentMargin" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
+margin_right = 374.0
+margin_bottom = 604.0
+
+[node name="AchievementList" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 4 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 356.0
+margin_bottom = 586.0
+
+[node name="CloseButton" parent="CustomPopupAchievements/CustomPopupContainer/PopupContainer" index="1"]
+margin_left = 374.0
+margin_right = 383.0
+margin_bottom = 613.0
+
 [editable path="CustomConfirmPopup"]
 [editable path="CustomTextPopup"]
 [editable path="CustomPopupInventory"]
+[editable path="CustomPopupAchievements"]
