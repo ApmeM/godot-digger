@@ -10,38 +10,19 @@ public partial class AchievementNotifications
     [Export]
     public float MoveTime{get; set;} = 1;
 
-    private AudioStream globalSound;
-
     [Export]
     public AudioStream GlobalSound
     {
-        get => globalSound;
-        set
-        {
-            if (IsInsideTree())
-            {
-                this.audioStreamPlayer.Stream = value;
-            }
-            globalSound = value;
-        }
+        get { return this.audioStreamPlayer.Stream; }
+        set { this.audioStreamPlayer.Stream = value; }
     }
-
-    private float globalSoundVolume;
 
     [Export]
     public float GlobalSoundVolume
     {
-        get => globalSoundVolume;
-        set
-        {
-            if (IsInsideTree())
-            {
-                this.audioStreamPlayer.VolumeDb = value;
-            }
-            globalSoundVolume = value;
-        }
+        get { return this.audioStreamPlayer.VolumeDb; }
+        set { this.audioStreamPlayer.VolumeDb = value; }
     }
-
     [Export]
     public PackedScene AchievementNotificationScene;
 
@@ -64,14 +45,14 @@ public partial class AchievementNotifications
         ProcessAchievement(key, achievementRepository.UnlockAchievement(key));
     }
 
-    private void ProcessAchievement(string key, bool isOperationSuccess)
+    private async void ProcessAchievement(string key, bool isOperationSuccess)
     {
         if (!isOperationSuccess)
         {
             return;
         }
 
-        var data = achievementRepository.GetAchievement(key);
+        var data = await achievementRepository.GetAchievement(key);
         CreateAchievementPanel(data);
     }
 

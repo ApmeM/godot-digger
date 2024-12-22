@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -50,7 +49,7 @@ public partial class Menu
                 continue;
             }
 
-            level.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { level.dungeonScene });
+            level.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { level.GameToStart });
         }
     }
 
@@ -102,7 +101,7 @@ public partial class Menu
 
             if (level.LevelName == levelName)
             {
-                LevelPressed(level.dungeonScene);
+                LevelPressed(level.GameToStart);
                 return;
             }
         }
@@ -162,12 +161,19 @@ public partial class Menu
 
     public string GetNextLevel(int stairsType, string fromLevel)
     {
-        switch (fromLevel)
+        foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
         {
-            case "Level1":
-                return "Level2";
-            default:
-                throw new Exception("Victory!!!");
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            if (level.LevelName == fromLevel)
+            {
+                return level.NextLevelButton.IsEmpty() ? null : level.GetNextLevel().LevelName;
+            }
         }
+        
+        return null;
     }
 }

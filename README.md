@@ -1,4 +1,4 @@
-# godot-template
+# godot-digger
 
 ## Overview
 
