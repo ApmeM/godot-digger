@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
+using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseLevel.tscn")]
 public partial class BaseLevel
@@ -8,13 +10,10 @@ public partial class BaseLevel
     private Dictionary<Vector2, CellDefinition> CurrentMap = new Dictionary<Vector2, CellDefinition>();
 
     [Signal]
-    public delegate void ExitCellClicked(int stairsType);
+    public delegate void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources);
 
-    [Signal]
-    public delegate void DigCellClicked();
-
-    [Signal]
-    public delegate void ResourceClicked(Loot resource, Vector2 atPosition);
+    [Export]
+    public Texture LootTexture;
 
     [Export]
     public bool CanDig = true;
@@ -28,6 +27,20 @@ public partial class BaseLevel
         base._Ready();
         this.FillMembers();
         this.FillCurrentMap();
+
+
+        // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
+
+        this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        var number = LootTexture.GetWidth() / 16;
+        for (var i = 0; i < number; i++)
+        {
+            this.customPopupInventory.Resources.Add(new AtlasTexture
+            {
+                Atlas = LootTexture,
+                Region = new Rect2(i * 16, 0, 16, 16)
+            });
+        }
 
         this.AddToGroup(Groups.LevelScene);
     }
@@ -54,7 +67,7 @@ public partial class BaseLevel
             if (blocksCell >= 0 &&
                 ((Blocks)blocksCellTile.x == Blocks.StairsUp || (Blocks)blocksCellTile.x == Blocks.StairsDown))
             {
-                this.EmitSignal(nameof(ExitCellClicked), (int)blocksCellTile.x);
+                this.ExitCellClicked((int)blocksCellTile.x);
                 return;
             }
 
@@ -68,7 +81,8 @@ public partial class BaseLevel
                         return;
                     }
 
-                    this.EmitSignal(nameof(DigCellClicked));
+                    this.stamina.CurrentNumberOfTurns--;
+                    this.CanDig = this.stamina.CurrentNumberOfTurns > 0;
 
                     if (this.CurrentMap[pos].HP > this.DigPower)
                     {
@@ -87,7 +101,10 @@ public partial class BaseLevel
 
             if (lootCell != -1)
             {
-                this.EmitSignal(nameof(ResourceClicked), (Loot)lootCellTile.x, pos);
+                if (this.customPopupInventory.TryAddItem((int)lootCellTile.x, 1) == 0)
+                {
+                    this.loot.SetCellv(pos, -1);
+                }
             }
         }
     }
@@ -125,6 +142,29 @@ public partial class BaseLevel
         }
     }
 
+    private void ShowInventoryPopup()
+    {
+        this.customPopupInventory.ShowCentered();
+    }
+
+    public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
+    {
+        this.customPopupInventory.Size = inventorySlots;
+
+        this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
+        this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
+
+        this.CanDig = true;
+        this.DigPower = digPower;
+    }
+
+    private void ExitCellClicked(int stairsType)
+    {
+        var resources = this.customPopupInventory.GetItems().Select(a => (Loot)a.Item1).ToList();
+        this.customPopupInventory.ClearItems();
+        this.EmitSignal(nameof(ExitDungeon), stairsType, this.Name, resources);
+    }
+
     private Vector2[] unfogDirections = new[]{
         Vector2.Left,
         Vector2.Right,
@@ -149,10 +189,5 @@ public partial class BaseLevel
                 UnFogCell(dirCell);
             }
         }
-    }
-
-    public void RemoveResource(Vector2 atPosition)
-    {
-         this.loot.SetCellv(atPosition, -1);
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Godot;
+using GodotDigger.Presentation.Utils;
 
 [SceneReference("Main.tscn")]
 public partial class Main
@@ -12,33 +14,193 @@ public partial class Main
         // For debug purposes all achievements can be reset
         // this.di.localAchievementRepository.ResetAchievements();
 
-        this.game.Visible = false;
-        this.menu.Visible = true;
+        this.gamePosition.Visible = false;
+        this.menuPosition.Visible = true;
 
-        this.game.Connect(nameof(Game.ExitDungeon), this, nameof(ExitDungeon));
-        this.menu.Connect(nameof(Menu.LevelSelected), this, nameof(LevelSelected));
-    }
+        this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
+        this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
+        this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
+        this.leather.Connect(CommonSignals.Pressed, this, nameof(LeatherPressed));
+        this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
+        this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        var number = LootTexture.GetWidth() / 16;
+        for (var i = 0; i < number; i++)
+        {
+            this.customPopupInventory.Resources.Add(new AtlasTexture
+            {
+                Atlas = LootTexture,
+                Region = new Rect2(i * 16, 0, 16, 16)
+            });
+        }
 
-    private void LevelSelected(PackedScene levelScene)
-    {
-        this.game.Visible = true;
-        this.menu.Visible = false;
-        this.game.InitMap(levelScene, this.menu.MaxNumberOfTurns, this.menu.InventorySlots, this.menu.DigPower);
+        foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            level.Connect(CommonSignals.Pressed, this, nameof(LevelPressed), new Godot.Collections.Array { level.GameToStart });
+        }
     }
 
     public void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources)
     {
-        this.menu.ResourcesAdded(resources);
+        this.gamePosition.ClearChildren();
+        this.ResourcesAdded(resources);
 
         if ((Blocks)stairsType == Blocks.StairsUp)
         {
-            this.game.Visible = false;
-            this.menu.Visible = true;
+            this.gamePosition.Visible = false;
+            this.menuPosition.Visible = true;
             return;
         }
-        var nextLevel = this.menu.GetNextLevel(stairsType, fromLevel);
+        var nextLevel = this.GetNextLevel(stairsType, fromLevel);
 
-        this.menu.OpenLevel(nextLevel);
-        this.menu.LoadLevel(nextLevel);
+        this.OpenLevel(nextLevel);
+        this.LoadLevel(nextLevel);
+    }
+
+    [Export]
+    public Texture LootTexture;
+
+    [Export]
+    public uint InventorySlots = 3;
+
+    [Export]
+    public uint DigPower = 1;
+
+    [Export]
+    public uint MaxNumberOfTurns = 10;
+
+    private void ShowInventoryPopup()
+    {
+        this.customPopupInventory.ShowCentered();
+    }
+
+    public void ResourcesAdded(List<Loot> newResources)
+    {
+        foreach (var res in newResources)
+        {
+            this.customPopupInventory.TryAddItem((int)res, 1);
+        }
+    }
+
+    private void AchievementsPressed()
+    {
+        this.achievementList.ReloadList();
+        this.customPopupAchievements.ShowCentered();
+    }
+
+    private void DungeonPressed()
+    {
+        this.levelSelector.Visible = false;
+        this.dungeonSelector.Visible = true;
+    }
+
+    private void ExitPressed()
+    {
+        this.levelSelector.Visible = true;
+        this.dungeonSelector.Visible = false;
+    }
+
+    private void LevelPressed(PackedScene levelScene)
+    {
+        this.DungeonPressed();
+
+        this.gamePosition.Visible = true;
+        this.menuPosition.Visible = false;
+        var game = levelScene.Instance<BaseLevel>();
+        game.LootTexture = this.LootTexture;
+        game.InitMap(this.MaxNumberOfTurns, this.InventorySlots, this.DigPower);
+        game.Connect(nameof(BaseLevel.ExitDungeon), this, nameof(ExitDungeon));
+        this.gamePosition.AddChild(game);
+    }
+
+    public void LoadLevel(string levelName)
+    {
+        foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            if (level.LevelName == levelName)
+            {
+                LevelPressed(level.GameToStart);
+                return;
+            }
+        }
+    }
+
+    public void OpenLevel(string levelName)
+    {
+        foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            if (level.LevelName == levelName)
+            {
+                level.Visible = true;
+                return;
+            }
+        }
+    }
+
+    private void BlacksmithPressed()
+    {
+        SpendResource(Loot.Steel, "irons", Fibonacci.Calc(this.DigPower + 5), () => this.DigPower++);
+    }
+
+    private void LeatherPressed()
+    {
+        SpendResource(Loot.Cloth, "cloth", Fibonacci.Calc(this.InventorySlots), () => this.InventorySlots++);
+    }
+
+    private async void SpendResource(Loot res, string resName, uint required, Action action)
+    {
+        var existing = this.customPopupInventory.GetItemCount((int)res);
+        if (existing >= required)
+        {
+            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} {resName}.";
+            this.customConfirmPopup.ShowCentered();
+            var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+            if (decision)
+            {
+                existing = this.customPopupInventory.GetItemCount((int)res);
+                if (existing >= required)
+                {
+                    this.customPopupInventory.TryRemoveItems((int)res, required);
+                    action();
+                }
+            }
+        }
+        else
+        {
+            this.customTextPopup.ContentText = $"Not enough {resName}.\n{required} {resName} required.";
+            this.customTextPopup.ShowCentered();
+        }
+    }
+
+    public string GetNextLevel(int stairsType, string fromLevel)
+    {
+        foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
+        {
+            if (!(child is LevelButton level))
+            {
+                continue;
+            }
+
+            if (level.LevelName == fromLevel)
+            {
+                return level.NextLevelButton.IsEmpty() ? null : level.GetNextLevel().LevelName;
+            }
+        }
+        
+        return null;
     }
 }
