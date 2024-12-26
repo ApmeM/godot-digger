@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://Presentation/assets/floor.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -10,6 +10,7 @@
 [ext_resource path="res://gd-popups/CustomPopupInventory.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Presentation/Stamina.tscn" type="PackedScene" id=9]
 [ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=10]
+[ext_resource path="res://gd-draggableCamera/DraggableCamera.tscn" type="PackedScene" id=11]
 
 [sub_resource type="TileSet" id=1]
 0/name = "floor.png 0"
@@ -108,7 +109,7 @@ flags = 4
 atlas = ExtResource( 6 )
 region = Rect2( 48, 16, 16, 16 )
 
-[node name="BaseLevel" type="CanvasLayer"]
+[node name="BaseLevel" type="Node2D"]
 script = ExtResource( 2 )
 
 [node name="Floor" type="TileMap" parent="."]
@@ -137,9 +138,7 @@ format = 1
 
 [node name="AchievementNotifications" parent="." instance=ExtResource( 10 )]
 
-[node name="Header" type="HBoxContainer" parent="."]
-margin_right = 284.0
-margin_bottom = 80.0
+[node name="Header" type="CanvasLayer" parent="."]
 
 [node name="Stamina" parent="Header" instance=ExtResource( 9 )]
 margin_right = 200.0
@@ -168,5 +167,10 @@ ItemIndex = -1
 
 [node name="CustomPopupInentorySlot3" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/VBoxContainer/SlotContainer" index="2" instance=ExtResource( 7 )]
 ItemIndex = -1
+
+[node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
+position = Vector2( 241, 400 )
+minimumZoom = 1.0
+maximumZoom = 2.0
 
 [editable path="CustomPopupInventory"]

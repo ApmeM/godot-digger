@@ -34,6 +34,11 @@ public partial class BaseLevel
         this.FillMembers();
         this.FillCurrentMapFromDesign();
 
+        this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
+        this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
+        this.draggableCamera.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
+        this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
+
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
@@ -58,7 +63,8 @@ public partial class BaseLevel
             return;
         }
 
-        var pos = this.floor.WorldToMap(this.floor.ToLocal(eventMouseButton.Position));
+        var newPos = this.GetViewport().CanvasTransform.AffineInverse() * eventMouseButton.Position;
+        var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
 
         var result =
             TryPassFog(pos) &&
