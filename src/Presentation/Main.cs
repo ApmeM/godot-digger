@@ -18,10 +18,8 @@ public partial class Main
         this.menuPosition.Visible = true;
 
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
-        this.dungeon.Connect(CommonSignals.Pressed, this, nameof(DungeonPressed));
         this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
         this.leather.Connect(CommonSignals.Pressed, this, nameof(LeatherPressed));
-        this.exit.Connect(CommonSignals.Pressed, this, nameof(ExitPressed));
         this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
         var number = LootTexture.GetWidth() / 16;
         for (var i = 0; i < number; i++)
@@ -49,7 +47,7 @@ public partial class Main
         this.gamePosition.ClearChildren();
         this.ResourcesAdded(resources);
 
-        if ((Blocks)stairsType == Blocks.StairsUp)
+        if ((Floor)stairsType == Floor.StairsUp)
         {
             this.gamePosition.Visible = false;
             this.menuPosition.Visible = true;
@@ -92,22 +90,8 @@ public partial class Main
         this.customPopupAchievements.ShowCentered();
     }
 
-    private void DungeonPressed()
-    {
-        this.levelSelector.Visible = false;
-        this.dungeonSelector.Visible = true;
-    }
-
-    private void ExitPressed()
-    {
-        this.levelSelector.Visible = true;
-        this.dungeonSelector.Visible = false;
-    }
-
     private void LevelPressed(PackedScene levelScene)
     {
-        this.DungeonPressed();
-
         this.gamePosition.Visible = true;
         this.menuPosition.Visible = false;
         var game = levelScene.Instance<BaseLevel>();

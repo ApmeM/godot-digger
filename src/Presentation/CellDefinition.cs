@@ -7,8 +7,6 @@ public enum Fog
 
 public enum Blocks
 {
-    StairsUp,
-    StairsDown,
     Wood,
     Steel,
     Wardrobe
@@ -21,10 +19,12 @@ public enum Loot
     Cloth
 }
 
-public enum Path
+public enum Floor
 {
     Path,
-    Wall
+    Wall,
+    StairsUp,
+    StairsDown,
 }
 
 public class CellDefinition

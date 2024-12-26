@@ -16,18 +16,23 @@ public partial class BaseLevel
     public Texture LootTexture;
 
     [Export]
-    public bool CanDig = true;
-
-    [Export]
     public uint DigPower = 1;
 
+    public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
+    {
+        this.customPopupInventory.Size = inventorySlots;
+
+        this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
+        this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
+
+        this.DigPower = digPower;
+    }
 
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
-        this.FillCurrentMap();
-
+        this.FillCurrentMapFromDesign();
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
@@ -48,74 +53,108 @@ public partial class BaseLevel
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
-        if (@event is InputEventScreenTouch eventMouseButton && !eventMouseButton.Pressed)
+        if (!(@event is InputEventScreenTouch eventMouseButton) || eventMouseButton.Pressed)
         {
-            var pos = this.floor.WorldToMap(this.floor.ToLocal(eventMouseButton.Position));
-
-            var fogCell = this.fog.GetCellv(pos);
-            var fogCellTile = this.fog.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-            if (fogCell != -1)
-            {
-                // Clicked on an unknown cell.
-                return;
-            }
-
-            var blocksCell = this.blocks.GetCellv(pos);
-            var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-            var lootCell = this.loot.GetCellv(pos);
-            var lootCellTile = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-            if (blocksCell >= 0 &&
-                ((Blocks)blocksCellTile.x == Blocks.StairsUp || (Blocks)blocksCellTile.x == Blocks.StairsDown))
-            {
-                this.ExitCellClicked((int)blocksCellTile.x);
-                return;
-            }
-
-            if (blocksCell != -1)
-            {
-                if (CanDig)
-                {
-                    if (!this.CurrentMap.ContainsKey(pos))
-                    {
-                        GD.PrintErr($"Cell at {pos} not exists in CurrentMap.");
-                        return;
-                    }
-
-                    this.stamina.CurrentNumberOfTurns--;
-                    this.CanDig = this.stamina.CurrentNumberOfTurns > 0;
-
-                    if (this.CurrentMap[pos].HP > this.DigPower)
-                    {
-                        this.CurrentMap[pos].HP -= this.DigPower;
-                        return;
-                    }
-
-                    var cellData = this.CurrentMap[pos];
-                    this.CurrentMap.Remove(pos);
-                    this.blocks.SetCellv(pos, -1);
-                    this.UnFogCell(pos);
-                }
-
-                return;
-            }
-
-            if (lootCell != -1)
-            {
-                if (this.customPopupInventory.TryAddItem((int)lootCellTile.x, 1) == 0)
-                {
-                    this.loot.SetCellv(pos, -1);
-                }
-            }
+            return;
         }
+
+        var pos = this.floor.WorldToMap(this.floor.ToLocal(eventMouseButton.Position));
+
+        var result =
+            TryPassFog(pos) &&
+            TryDigBlock(pos) &&
+            UnFogCell(pos) &&
+            TryGrabLoot(pos) &&
+            TryFindSecrets(pos) &&
+            TryChangeFloor(pos);
     }
 
-    public void FillCurrentMap()
+    private bool TryChangeFloor(Vector2 pos)
     {
-        foreach (Vector2 cell in this.floor.GetUsedCells())
+        var floorsCell = this.floor.GetCellv(pos);
+        var floorsCellTile = this.floor.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+        if (floorsCell >= 0 &&
+            ((Floor)floorsCellTile.x == Floor.StairsUp || (Floor)floorsCellTile.x == Floor.StairsDown))
         {
-            this.fog.SetCell((int)cell.x, (int)cell.y, 0, autotileCoord: Vector2.Zero);
+            var resources = this.customPopupInventory.GetItems().Select(a => (Loot)a.Item1).ToList();
+            this.customPopupInventory.ClearItems();
+            this.EmitSignal(nameof(ExitDungeon), (int)floorsCellTile.x, this.Name, resources);
+            return false;
         }
 
+        return true;
+    }
+
+    private bool TryFindSecrets(Vector2 pos)
+    {
+        return true;
+    }
+
+    private bool TryGrabLoot(Vector2 pos)
+    {
+        var lootCell = this.loot.GetCellv(pos);
+        var lootCellTile = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+
+        if (lootCell == -1)
+        {
+            return true;
+        }
+
+        if (this.customPopupInventory.TryAddItem((int)lootCellTile.x, 1) != 0)
+        {
+            return false;
+        }
+
+        this.loot.SetCellv(pos, -1);
+        return true;
+    }
+
+    private bool TryDigBlock(Vector2 pos)
+    {
+        var blocksCell = this.blocks.GetCellv(pos);
+        var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+
+        if (blocksCell == -1)
+        {
+            return true;
+        }
+
+        if (this.stamina.CurrentNumberOfTurns == 0)
+        {
+            return false;
+        }
+
+        if (!this.CurrentMap.ContainsKey(pos))
+        {
+            GD.PrintErr($"Cell at {pos} not exists in CurrentMap.");
+            return false;
+        }
+
+        this.stamina.CurrentNumberOfTurns--;
+
+        if (this.CurrentMap[pos].HP > this.DigPower)
+        {
+            this.CurrentMap[pos].HP -= this.DigPower;
+            return false;
+        }
+
+        var cellData = this.CurrentMap[pos];
+        this.CurrentMap.Remove(pos);
+        this.blocks.SetCellv(pos, -1);
+        this.UnFogCell(pos);
+
+        return false;
+    }
+
+    private bool TryPassFog(Vector2 pos)
+    {
+        var fogCell = this.fog.GetCellv(pos);
+        var fogCellTile = this.fog.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+        return fogCell == -1;
+    }
+
+    private void FillCurrentMapFromDesign()
+    {
         foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
             var blocksCell = this.blocks.GetCellv(cell);
@@ -123,22 +162,11 @@ public partial class BaseLevel
 
             if (!CellDefinition.KnownBlocks.ContainsKey((Blocks)blocksCellTile.x))
             {
-                GD.PrintErr($"Unkonwn cell: {blocksCellTile}");
+                GD.PrintErr($"Unkonwn block type: {blocksCellTile}");
                 continue;
             }
 
             this.CurrentMap[cell] = CellDefinition.KnownBlocks[(Blocks)blocksCellTile.x].Clone();
-        }
-
-        foreach (Vector2 cell in this.blocks.GetUsedCells())
-        {
-            var set = this.blocks.GetCellv(cell);
-            var tile = this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y);
-
-            if ((Blocks)tile.x == Blocks.StairsUp)
-            {
-                UnFogCell(cell);
-            }
         }
     }
 
@@ -147,47 +175,48 @@ public partial class BaseLevel
         this.customPopupInventory.ShowCentered();
     }
 
-    public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
+    private bool UnFogCell(Vector2 cell)
     {
-        this.customPopupInventory.Size = inventorySlots;
-
-        this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
-        this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
-
-        this.CanDig = true;
-        this.DigPower = digPower;
-    }
-
-    private void ExitCellClicked(int stairsType)
-    {
-        var resources = this.customPopupInventory.GetItems().Select(a => (Loot)a.Item1).ToList();
-        this.customPopupInventory.ClearItems();
-        this.EmitSignal(nameof(ExitDungeon), stairsType, this.Name, resources);
-    }
-
-    private Vector2[] unfogDirections = new[]{
-        Vector2.Left,
-        Vector2.Right,
-        Vector2.Up,
-        Vector2.Down,
-    };
-
-    private void UnFogCell(Vector2 cell)
-    {
-        this.fog.SetCellv(cell, -1);
-        foreach (var dir in unfogDirections)
+        if (
+            this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
+            this.blocks.GetCellv(cell) != -1 ||  // Can start unfog if the block is not yet removed
+            this.floor.GetCellAutotileCoord((int)cell.x, (int)cell.y).x == 1) // Cant start unfog from the wall
         {
-            var dirCell = cell + dir;
-            if (this.fog.GetCellv(dirCell) == -1)
+            return true;
+        }
+
+        this.fog.SetCellv(cell, -1);
+
+        var queue = new Queue<Vector2>();
+        queue.Enqueue(cell + Vector2.Down);
+        queue.Enqueue(cell + Vector2.Left);
+        queue.Enqueue(cell + Vector2.Up);
+        queue.Enqueue(cell + Vector2.Right);
+
+        while (queue.Any())
+        {
+            cell = queue.Dequeue();
+
+            if (this.fog.GetCellv(cell) == -1)
             {
                 continue;
             }
 
-            this.fog.SetCellv(dirCell, -1);
-            if (this.blocks.GetCellv(dirCell) == -1 && this.floor.GetCellAutotileCoord((int)dirCell.x, (int)dirCell.y).x != 1)
+            this.fog.SetCellv(cell, -1);
+
+            if (
+                this.blocks.GetCellv(cell) != -1 ||  // Blocks are not removed from the cell
+                this.floor.GetCellAutotileCoord((int)cell.x, (int)cell.y).x == 1) // The floor is the wall
             {
-                UnFogCell(dirCell);
+                continue;
             }
+
+            queue.Enqueue(cell + Vector2.Down);
+            queue.Enqueue(cell + Vector2.Left);
+            queue.Enqueue(cell + Vector2.Up);
+            queue.Enqueue(cell + Vector2.Right);
         }
+
+        return true;
     }
 }
