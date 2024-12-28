@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
-[SceneReference("CustomPopupInventory.tscn")]
+[SceneReference("Inventory.tscn")]
 [Tool]
-public partial class CustomPopupInventory
+public partial class Inventory
 {
     [Export]
     public PackedScene InventorySlot;
@@ -30,7 +29,7 @@ public partial class CustomPopupInventory
                 this.slotContainer.ClearChildren();
                 for (var i = 0; i < value; i++)
                 {
-                    var slot = this.InventorySlot.Instance<CustomPopupInventorySlot>();
+                    var slot = this.InventorySlot.Instance<InventorySlot>();
                     this.slotContainer.AddChild(slot);
                 }
             }
@@ -77,7 +76,7 @@ public partial class CustomPopupInventory
             return count;
         }
 
-        foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren().Cast<CustomPopupInventorySlot>().Reverse())
+        foreach (var slot in this.slotContainer.GetChildren().Cast<InventorySlot>().Reverse())
         {
             if (!slot.HasItem())
             {
@@ -126,7 +125,7 @@ public partial class CustomPopupInventory
             Texture = Resources[itemIndex]
         };
 
-        foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren())
+        foreach (InventorySlot slot in this.slotContainer.GetChildren())
         {
             if (!slot.HasItem())
             {
@@ -155,7 +154,7 @@ public partial class CustomPopupInventory
 
     public void ClearItems()
     {
-        foreach (CustomPopupInventorySlot slot in this.slotContainer.GetChildren())
+        foreach (InventorySlot slot in this.slotContainer.GetChildren())
         {
             if (!slot.HasItem())
             {
@@ -169,7 +168,7 @@ public partial class CustomPopupInventory
     public IEnumerable<(int, int)> GetItems()
     {
         return this.slotContainer.GetChildren()
-            .OfType<CustomPopupInventorySlot>()
+            .OfType<InventorySlot>()
             .Where(a => a.HasItem())
             .Select(a => a.GetItem());
     }
@@ -178,7 +177,7 @@ public partial class CustomPopupInventory
     public int GetItemCount(int item)
     {
         return this.slotContainer.GetChildren()
-            .OfType<CustomPopupInventorySlot>()
+            .OfType<InventorySlot>()
             .Where(a => a.HasItem())
             .Select(a => a.GetItem())
             .Where(a => a.Item1 == item)

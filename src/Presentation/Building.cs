@@ -30,7 +30,7 @@ public partial class Building
     private async void BuildingPressed()
     {
         var requirements = this.getRequirements();
-        var inventory = this.GetNode<CustomPopupInventory>(InventoryPath);
+        var inventory = this.GetNode<Inventory>(InventoryPath);
 
         this.requirementsList.ClearChildren();
 

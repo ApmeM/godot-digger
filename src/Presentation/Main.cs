@@ -18,7 +18,7 @@ public partial class Main
         this.menuPosition.Visible = true;
 
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
-        this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
         var number = LootTexture.GetWidth() / 16;
         for (var i = 0; i < number; i++)
         {
@@ -28,7 +28,7 @@ public partial class Main
                 Region = new Rect2(i * 16, 0, 16, 16)
             };
 
-            this.customPopupInventory.Resources.Add(lootItem);
+            this.inventory.Resources.Add(lootItem);
         }
 
         this.buildingBlacksmith.Initialize(() => new List<Tuple<Loot, uint>> { new Tuple<Loot, uint>(Loot.Steel, Fibonacci.Calc(this.DigPower + 5)) }, () => this.DigPower++);
@@ -83,7 +83,7 @@ public partial class Main
     {
         foreach (var res in newResources)
         {
-            this.customPopupInventory.TryAddItem((int)res, 1);
+            this.inventory.TryAddItem((int)res, 1);
         }
     }
 

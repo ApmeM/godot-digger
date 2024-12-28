@@ -20,7 +20,7 @@ public partial class BaseLevel
 
     public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
-        this.customPopupInventory.Size = inventorySlots;
+        this.inventory.Size = inventorySlots;
 
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
@@ -41,11 +41,11 @@ public partial class BaseLevel
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
         var number = LootTexture.GetWidth() / 16;
         for (var i = 0; i < number; i++)
         {
-            this.customPopupInventory.Resources.Add(new AtlasTexture
+            this.inventory.Resources.Add(new AtlasTexture
             {
                 Atlas = LootTexture,
                 Region = new Rect2(i * 16, 0, 16, 16)
@@ -82,8 +82,8 @@ public partial class BaseLevel
         if (floorsCell >= 0 &&
             ((Floor)floorsCellTile.x == Floor.StairsUp || (Floor)floorsCellTile.x == Floor.StairsDown))
         {
-            var resources = this.customPopupInventory.GetItems().Select(a => (Loot)a.Item1).ToList();
-            this.customPopupInventory.ClearItems();
+            var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
+            this.inventory.ClearItems();
             this.EmitSignal(nameof(ExitDungeon), (int)floorsCellTile.x, this.Name, resources);
             return false;
         }
@@ -106,7 +106,7 @@ public partial class BaseLevel
             return true;
         }
 
-        if (this.customPopupInventory.TryAddItem((int)lootCellTile.x, 1) != 0)
+        if (this.inventory.TryAddItem((int)lootCellTile.x, 1) != 0)
         {
             return false;
         }

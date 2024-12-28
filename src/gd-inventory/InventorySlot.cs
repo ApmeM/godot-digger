@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
-[SceneReference("CustomPopupInventorySlot.tscn")]
+[SceneReference("InventorySlot.tscn")]
 [Tool]
-public partial class CustomPopupInventorySlot
+public partial class InventorySlot
 {
     [Export]
     public int ItemIndex;

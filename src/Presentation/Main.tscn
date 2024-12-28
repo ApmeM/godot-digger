@@ -8,9 +8,9 @@
 [ext_resource path="res://Presentation/Building.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Presentation/assets/Buildings/Leather Shop.png" type="Texture" id=7]
 [ext_resource path="res://Presentation/levels/Woodcutter.tscn" type="PackedScene" id=8]
+[ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=9]
 [ext_resource path="res://gd-levelSelector/LevelButton.tscn" type="PackedScene" id=10]
 [ext_resource path="res://gd-googlePlay/GodotPlayGameService.tscn" type="PackedScene" id=11]
-[ext_resource path="res://gd-popups/CustomPopupInventory.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Presentation/assets/Buildings/Woodcutter.png" type="Texture" id=17]
 [ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=18]
@@ -69,7 +69,7 @@ margin_left = 48.0
 margin_top = 118.0
 margin_right = 1072.0
 margin_bottom = 1142.0
-InventoryPath = NodePath("../CustomPopupInventory")
+InventoryPath = NodePath("../CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/Inventory")
 
 [node name="BuildingLeather" parent="MenuPosition" instance=ExtResource( 6 )]
 margin_left = 60.0
@@ -77,7 +77,7 @@ margin_top = 320.0
 margin_right = 1084.0
 margin_bottom = 1344.0
 texture_normal = ExtResource( 7 )
-InventoryPath = NodePath("../CustomPopupInventory")
+InventoryPath = NodePath("../CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/Inventory")
 
 [node name="INN" type="TextureButton" parent="MenuPosition"]
 margin_left = 31.0
@@ -87,7 +87,7 @@ margin_bottom = 1384.0
 rect_scale = Vector2( 0.15, 0.15 )
 texture_normal = ExtResource( 4 )
 
-[node name="Inventory" type="TextureButton" parent="MenuPosition"]
+[node name="InventoryButton" type="TextureButton" parent="MenuPosition"]
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = 248.0
@@ -109,15 +109,55 @@ rect_min_size = Vector2( 80, 80 )
 texture_normal = SubResource( 3 )
 expand = true
 
-[node name="CustomPopupInventory" parent="MenuPosition" instance=ExtResource( 13 )]
+[node name="CustomPopupInventory" parent="MenuPosition" instance=ExtResource( 3 )]
 visible = false
-scale = Vector2( 2, 2 )
-transform = Transform2D( 2, 0, 0, 2, 0, 0 )
-MaxCountPerSlot = 10
+
+[node name="CustomPopupContainer" parent="MenuPosition/CustomPopupInventory" index="0"]
+margin_left = 224.0
+margin_top = 368.0
+margin_right = 352.0
+margin_bottom = 490.0
+
+[node name="HeaderCenter" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer" index="0"]
+margin_right = 128.0
+
+[node name="HeaderMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 37.0
+margin_right = 90.0
+
+[node name="PopupContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer" index="1"]
+margin_right = 128.0
+margin_bottom = 122.0
+
+[node name="MarginContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer" index="0"]
+margin_right = 128.0
+margin_bottom = 101.0
+
+[node name="InventoryFrame" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+margin_right = 128.0
+margin_bottom = 101.0
+
+[node name="OuterInventoryMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+margin_right = 128.0
+margin_bottom = 101.0
+
+[node name="InventoryBackground" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
+margin_right = 119.0
+margin_bottom = 92.0
+
+[node name="ContentMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
+margin_right = 119.0
+margin_bottom = 92.0
+
+[node name="Inventory" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 9 )]
+margin_bottom = 74.0
+Size = 8
+SizePerRow = 4
 
 [node name="VBoxContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer" index="1"]
 margin_left = 98.0
 margin_right = 128.0
+margin_bottom = 101.0
 
 [node name="CustomPopupAchievements" parent="MenuPosition" instance=ExtResource( 3 )]
 visible = false

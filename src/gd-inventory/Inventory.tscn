@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://gd-popups/resources/sprites/bar.png" type="Texture" id=1]
+[ext_resource path="res://gd-inventory/InventorySlot.tscn" type="PackedScene" id=2]
+[ext_resource path="res://gd-theme/Fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://gd-inventory/Inventory.cs" type="Script" id=4]
+
+[sub_resource type="DynamicFont" id=1]
+size = 8
+font_data = ExtResource( 3 )
+
+[node name="Inventory" type="VBoxContainer"]
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 101.0
+margin_bottom = 79.0
+script = ExtResource( 4 )
+InventorySlot = ExtResource( 2 )
+
+[node name="InventoreNameLabel" type="Label" parent="."]
+margin_right = 92.0
+margin_bottom = 11.0
+custom_colors/font_color = Color( 0.423529, 0.247059, 0.121569, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "- Inventory name -"
+align = 1
+valign = 1
+
+[node name="InventoreNameSplitter" type="TextureRect" parent="."]
+margin_top = 15.0
+margin_right = 92.0
+margin_bottom = 17.0
+texture = ExtResource( 1 )
+stretch_mode = 6
+
+[node name="SlotContainer" type="GridContainer" parent="."]
+margin_top = 21.0
+margin_right = 92.0
+margin_bottom = 21.0
+columns = 4
