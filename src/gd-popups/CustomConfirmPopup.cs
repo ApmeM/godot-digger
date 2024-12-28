@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -14,7 +15,21 @@ public partial class CustomConfirmPopup
     [Signal]
     public delegate void ChoiceMade(bool isYes);
 
-    public bool IsLastSelectedYes;
+    private bool allowYes;
+
+    [Export]
+    public bool AllowYes
+    {
+        get => allowYes;
+        set
+        {
+            allowYes = value;
+            if (IsInsideTree())
+            {
+                this.buttonYes.Disabled = !value;
+            }
+        }
+    }
 
     public override void _Ready()
     {
@@ -25,21 +40,27 @@ public partial class CustomConfirmPopup
         this.buttonNo.Connect(CommonSignals.Pressed, this, nameof(NoButtonClicked));
 
         this.ShowCloseButton = false;
+        this.AllowYes = this.allowYes;
+    }
+
+    protected override void Close()
+    {
+        this.EmitSignal(nameof(NoClicked));
+        this.EmitSignal(nameof(ChoiceMade), false);
+        base.Close();
     }
 
     private void NoButtonClicked()
     {
-        IsLastSelectedYes = false;
         this.EmitSignal(nameof(NoClicked));
-        this.EmitSignal(nameof(ChoiceMade), IsLastSelectedYes);
-        this.Close();
+        this.EmitSignal(nameof(ChoiceMade), false);
+        base.Close();
     }
 
     private void YesButtonClicked()
     {
-        IsLastSelectedYes = true;
         this.EmitSignal(nameof(YesClicked));
-        this.EmitSignal(nameof(ChoiceMade), IsLastSelectedYes);
-        this.Close();
+        this.EmitSignal(nameof(ChoiceMade), true);
+        base.Close();
     }
 }

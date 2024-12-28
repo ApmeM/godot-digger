@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Presentation/assets/floor.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -6,7 +6,6 @@
 [ext_resource path="res://Presentation/assets/blocks.png" type="Texture" id=4]
 [ext_resource path="res://Presentation/assets/fog.png" type="Texture" id=5]
 [ext_resource path="res://Presentation/assets/items.png" type="Texture" id=6]
-[ext_resource path="res://gd-popups/CustomPopupInventorySlot.tscn" type="PackedScene" id=7]
 [ext_resource path="res://gd-popups/CustomPopupInventory.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Presentation/Stamina.tscn" type="PackedScene" id=9]
 [ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=10]
@@ -158,15 +157,6 @@ scale = Vector2( 2, 2 )
 transform = Transform2D( 2, 0, 0, 2, 0, 0 )
 Size = 3
 MaxCountPerSlot = 1
-
-[node name="CustomPopupInentorySlot" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/VBoxContainer/SlotContainer" index="0" instance=ExtResource( 7 )]
-ItemIndex = -1
-
-[node name="CustomPopupInentorySlot2" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/VBoxContainer/SlotContainer" index="1" instance=ExtResource( 7 )]
-ItemIndex = -1
-
-[node name="CustomPopupInentorySlot3" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/VBoxContainer/SlotContainer" index="2" instance=ExtResource( 7 )]
-ItemIndex = -1
 
 [node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
 position = Vector2( 241, 400 )

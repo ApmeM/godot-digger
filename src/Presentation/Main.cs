@@ -18,18 +18,21 @@ public partial class Main
         this.menuPosition.Visible = true;
 
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
-        this.blacksmith.Connect(CommonSignals.Pressed, this, nameof(BlacksmithPressed));
-        this.leather.Connect(CommonSignals.Pressed, this, nameof(LeatherPressed));
         this.inventory.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
         var number = LootTexture.GetWidth() / 16;
         for (var i = 0; i < number; i++)
         {
-            this.customPopupInventory.Resources.Add(new AtlasTexture
+            var lootItem = new AtlasTexture
             {
                 Atlas = LootTexture,
                 Region = new Rect2(i * 16, 0, 16, 16)
-            });
+            };
+
+            this.customPopupInventory.Resources.Add(lootItem);
         }
+
+        this.buildingBlacksmith.Initialize(() => new List<Tuple<Loot, uint>> { new Tuple<Loot, uint>(Loot.Steel, Fibonacci.Calc(this.DigPower + 5)) }, () => this.DigPower++);
+        this.buildingLeather.Initialize(() => new List<Tuple<Loot, uint>> { new Tuple<Loot, uint>(Loot.Cloth, Fibonacci.Calc(this.InventorySlots)) }, () => this.InventorySlots++);
 
         foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
         {
@@ -135,41 +138,6 @@ public partial class Main
         }
     }
 
-    private void BlacksmithPressed()
-    {
-        SpendResource(Loot.Steel, "irons", Fibonacci.Calc(this.DigPower + 5), () => this.DigPower++);
-    }
-
-    private void LeatherPressed()
-    {
-        SpendResource(Loot.Cloth, "cloth", Fibonacci.Calc(this.InventorySlots), () => this.InventorySlots++);
-    }
-
-    private async void SpendResource(Loot res, string resName, uint required, Action action)
-    {
-        var existing = this.customPopupInventory.GetItemCount((int)res);
-        if (existing >= required)
-        {
-            this.customConfirmPopup.ContentText = $"Increase pickaxe power?\nIt requires {required} {resName}.";
-            this.customConfirmPopup.ShowCentered();
-            var decision = (bool)(await ToSignal(this.customConfirmPopup, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
-            if (decision)
-            {
-                existing = this.customPopupInventory.GetItemCount((int)res);
-                if (existing >= required)
-                {
-                    this.customPopupInventory.TryRemoveItems((int)res, required);
-                    action();
-                }
-            }
-        }
-        else
-        {
-            this.customTextPopup.ContentText = $"Not enough {resName}.\n{required} {resName} required.";
-            this.customTextPopup.ShowCentered();
-        }
-    }
-
     public string GetNextLevel(int stairsType, string fromLevel)
     {
         foreach (var child in this.GetTree().GetNodesInGroup(Groups.LevelButton))
@@ -184,7 +152,7 @@ public partial class Main
                 return level.NextLevelButton.IsEmpty() ? null : level.GetNextLevel().LevelName;
             }
         }
-        
+
         return null;
     }
 }

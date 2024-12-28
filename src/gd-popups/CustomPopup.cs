@@ -55,7 +55,7 @@ public partial class CustomPopup
 #endif
     }
 
-    protected void Close()
+    protected virtual void Close()
     {
         this.Hide();
         this.EmitSignal(nameof(PopupClosed));
