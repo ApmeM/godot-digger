@@ -154,55 +154,70 @@ expand = true
 
 [node name="CustomPopupInventory" parent="." instance=ExtResource( 7 )]
 visible = false
+Title = "Inventory"
 
 [node name="CustomPopupContainer" parent="CustomPopupInventory" index="0"]
-margin_left = 174.0
-margin_top = 21.0
-margin_right = 297.0
-margin_bottom = 119.0
+margin_left = 112.0
+margin_top = 78.0
+margin_right = 216.0
+margin_bottom = 176.0
+rect_scale = Vector2( 2, 2 )
 
 [node name="HeaderCenter" parent="CustomPopupInventory/CustomPopupContainer" index="0"]
-margin_right = 123.0
+margin_right = 131.0
 
 [node name="HeaderMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 35.0
-margin_right = 88.0
+margin_left = 0.0
+margin_right = 131.0
+
+[node name="TitleBackground" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 131.0
+
+[node name="TitleMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 131.0
+
+[node name="TitleContainer" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 121.0
+
+[node name="TitleLabel" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin/TitleContainer" index="0"]
+margin_right = 71.0
+text = "Inventory"
+
+[node name="CloseButton" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin/TitleContainer" index="1"]
+margin_left = 93.0
+margin_right = 111.0
 
 [node name="PopupContainer" parent="CustomPopupInventory/CustomPopupContainer" index="1"]
-margin_right = 123.0
+margin_right = 131.0
 margin_bottom = 98.0
 
 [node name="MarginContainer" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 123.0
+margin_right = 131.0
 margin_bottom = 77.0
 
 [node name="InventoryFrame" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 123.0
+margin_right = 131.0
 margin_bottom = 77.0
 
 [node name="OuterInventoryMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 123.0
+margin_right = 131.0
 margin_bottom = 77.0
 
 [node name="InventoryBackground" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
-margin_right = 114.0
+margin_right = 122.0
 margin_bottom = 68.0
 
 [node name="ContentMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
-margin_right = 114.0
+margin_right = 122.0
 margin_bottom = 68.0
 
 [node name="Inventory" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 8 )]
-margin_right = 96.0
+margin_right = 104.0
 margin_bottom = 50.0
 Size = 3
-SizePerRow = 4
 MaxCountPerSlot = 1
-
-[node name="VBoxContainer" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer" index="1"]
-margin_left = 93.0
-margin_right = 123.0
-margin_bottom = 77.0
+SizePerRow = 4
+Title = "Bag"
 
 [node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
 position = Vector2( 241, 400 )

@@ -30,6 +30,8 @@ public partial class Inventory
                 for (var i = 0; i < value; i++)
                 {
                     var slot = this.InventorySlot.Instance<InventorySlot>();
+                    slot.Resources = Resources;
+                    slot.MaxCount = this.MaxCountPerSlot;
                     this.slotContainer.AddChild(slot);
                 }
             }
@@ -37,8 +39,24 @@ public partial class Inventory
         }
     }
 
+    private int maxCountPerSlot;
+
     [Export]
-    public int MaxCountPerSlot = 10;
+    public int MaxCountPerSlot
+    {
+        get => maxCountPerSlot;
+        set
+        {
+            maxCountPerSlot = value;
+            if (IsInsideTree())
+            {
+                foreach (InventorySlot slot in this.slotContainer.GetChildren())
+                {
+                    slot.MaxCount = value;
+                }
+            }
+        }
+    }
 
     private int sizePerRow;
     [Export]
@@ -55,12 +73,30 @@ public partial class Inventory
         }
     }
 
+    private string title;
+
+    [Export]
+    public string Title
+    {
+        get => this.title;
+        set
+        {
+            if (IsInsideTree())
+            {
+                this.inventoreNameLabel.Text = value;
+            }
+            this.title = value;
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
         this.SizePerRow = this.sizePerRow;
         this.Size = size;
+        this.Title = this.title;
+        this.MaxCountPerSlot = this.maxCountPerSlot;
     }
 
     public uint TryRemoveItems(int itemIndex, uint count)
@@ -76,29 +112,11 @@ public partial class Inventory
             return count;
         }
 
+        var diff = -(int)count;
         foreach (var slot in this.slotContainer.GetChildren().Cast<InventorySlot>().Reverse())
         {
-            if (!slot.HasItem())
-            {
-                continue;
-            }
-
-            if (slot.GetItem().Item1 != itemIndex)
-            {
-                continue;
-            }
-
-            var currentCount = slot.GetItem().Item2;
-            if (currentCount > count)
-            {
-                slot.UpdateCount(-(int)count);
-                return 0;
-            }
-
-            slot.RemoveItem();
-            count -= (uint)currentCount;
-            
-            if (count == 0)
+            diff = slot.TryAddItem(itemIndex, diff);
+            if (diff == 0)
             {
                 return 0;
             }
@@ -120,36 +138,17 @@ public partial class Inventory
             return count;
         }
 
-        var loot = new TextureRect
-        {
-            Texture = Resources[itemIndex]
-        };
-
+        var diff = (int)count;
         foreach (InventorySlot slot in this.slotContainer.GetChildren())
         {
-            if (!slot.HasItem())
+            diff = slot.TryAddItem(itemIndex, diff);
+            if (diff == 0)
             {
-                slot.SetItem(loot, itemIndex);
-            }
-
-            if (slot.GetItem().Item1 != itemIndex)
-            {
-                continue;
-            }
-
-            var currentCount = slot.GetItem().Item2;
-            var spaceLeft = this.MaxCountPerSlot - currentCount;
-            if (spaceLeft >= count)
-            {
-                slot.UpdateCount((int)count);
                 return 0;
             }
-
-            slot.UpdateCount(spaceLeft);
-            count -= (uint)spaceLeft;
         }
 
-        return count;
+        return (uint)diff;
     }
 
     public void ClearItems()

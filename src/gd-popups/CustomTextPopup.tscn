@@ -42,6 +42,3 @@ text = "Content text"
 align = 1
 valign = 1
 autowrap = true
-
-[node name="CloseButton" parent="CustomPopupContainer/PopupContainer" index="1"]
-margin_bottom = 88.0

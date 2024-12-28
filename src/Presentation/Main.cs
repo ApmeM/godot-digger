@@ -76,7 +76,7 @@ public partial class Main
 
     private void ShowInventoryPopup()
     {
-        this.customPopupInventory.ShowCentered();
+        this.customPopupInventory.Show();
     }
 
     public void ResourcesAdded(List<Loot> newResources)
@@ -90,7 +90,7 @@ public partial class Main
     private void AchievementsPressed()
     {
         this.achievementList.ReloadList();
-        this.customPopupAchievements.ShowCentered();
+        this.customPopupAchievements.Show();
     }
 
     private void LevelPressed(PackedScene levelScene)
