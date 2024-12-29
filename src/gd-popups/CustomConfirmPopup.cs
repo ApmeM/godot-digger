@@ -1,4 +1,3 @@
-using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -39,7 +38,6 @@ public partial class CustomConfirmPopup
         this.buttonYes.Connect(CommonSignals.Pressed, this, nameof(YesButtonClicked));
         this.buttonNo.Connect(CommonSignals.Pressed, this, nameof(NoButtonClicked));
 
-        this.ShowCloseButton = false;
         this.AllowYes = this.allowYes;
     }
 

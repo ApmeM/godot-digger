@@ -54,14 +54,14 @@ public partial class Building
         }
 
         this.confirmation.AllowYes = isEnough;
-        this.confirmation.ShowCentered();
+        this.confirmation.Show();
 
         if (!isEnough)
         {
             return;
         }
 
-        this.confirmation.ShowCentered();
+        this.confirmation.Show();
         var decision = (bool)(await ToSignal(this.confirmation, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
         if (decision)
         {

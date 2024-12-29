@@ -178,7 +178,7 @@ public partial class BaseLevel
 
     private void ShowInventoryPopup()
     {
-        this.customPopupInventory.ShowCentered();
+        this.customPopupInventory.Show();
     }
 
     private bool UnFogCell(Vector2 cell)

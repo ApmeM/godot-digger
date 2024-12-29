@@ -19,11 +19,7 @@ script = ExtResource( 1 )
 
 [node name="Confirmation" parent="." instance=ExtResource( 5 )]
 visible = false
-Title = "Are you sure"
-ShowCloseButton = false
-ContentText = "Increase pickaxe power.
-Requirements:"
-AllowYes = false
+Title = "Are you sure?"
 
 [node name="CustomPopupContainer" parent="Confirmation" index="0"]
 margin_left = 76.0
@@ -32,61 +28,55 @@ margin_right = 384.0
 margin_bottom = 315.0
 
 [node name="HeaderMargin" parent="Confirmation/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 96.0
-margin_right = 211.0
+margin_left = 91.0
+margin_right = 217.0
 
 [node name="TitleBackground" parent="Confirmation/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 115.0
+margin_right = 126.0
 
 [node name="TitleMargin" parent="Confirmation/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 115.0
+margin_right = 126.0
 
 [node name="TitleLabel" parent="Confirmation/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 105.0
-text = "Are you sure"
+margin_right = 116.0
+text = "Are you sure?"
 
 [node name="PopupContainer" parent="Confirmation/CustomPopupContainer" index="1"]
 margin_bottom = 178.0
 
 [node name="MarginContainer" parent="Confirmation/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 338.0
 margin_bottom = 157.0
 
 [node name="InventoryFrame" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 338.0
 margin_bottom = 157.0
 
 [node name="OuterInventoryMargin" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 338.0
 margin_bottom = 157.0
 
 [node name="InventoryBackground" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
-margin_right = 329.0
 margin_bottom = 148.0
 
 [node name="ContentMargin" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
-margin_right = 329.0
 margin_bottom = 148.0
 
 [node name="ContentContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
-margin_right = 311.0
 margin_bottom = 130.0
 
 [node name="ContentText" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="0"]
-margin_right = 302.0
-margin_bottom = 31.0
 text = "Increase pickaxe power.
 Requirements:"
 
 [node name="CenterContainer" type="CenterContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="1"]
-margin_top = 58.0
-margin_right = 302.0
-margin_bottom = 74.0
+margin_top = 50.0
+margin_right = 272.0
+margin_bottom = 91.0
+size_flags_vertical = 3
 
 [node name="RequirementsList" type="HBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/CenterContainer"]
-margin_left = 129.0
-margin_right = 172.0
-margin_bottom = 16.0
+margin_left = 114.0
+margin_top = 12.0
+margin_right = 157.0
+margin_bottom = 28.0
 
 [node name="Item1" type="TextureRect" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/CenterContainer/RequirementsList"]
 margin_right = 16.0
@@ -102,18 +92,9 @@ text = "x10"
 
 [node name="HBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="2"]
 margin_top = 101.0
-margin_right = 302.0
 margin_bottom = 121.0
 
 [node name="ButtonYes" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/HBoxContainer" index="0"]
-margin_right = 126.0
-
-[node name="ButtonNo" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/HBoxContainer" index="1"]
-margin_left = 176.0
-margin_right = 302.0
-
-[node name="VBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer" index="1"]
-margin_left = 308.0
-margin_bottom = 157.0
+disabled = true
 
 [editable path="Confirmation"]

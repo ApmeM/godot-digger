@@ -1,5 +1,4 @@
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("CustomPopup.tscn")]
 [Tool]
@@ -24,31 +23,12 @@ public partial class CustomPopup
         }
     }
 
-    private bool showCloseButton = true;
-
-    [Export]
-    public bool ShowCloseButton
-    {
-        get => showCloseButton;
-        set
-        {
-            if (IsInsideTree())
-            {
-                this.closeButton.Visible = value;
-            }
-            showCloseButton = value;
-        }
-    }
-
-
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
 
-        this.closeButton.Connect(CommonSignals.Pressed, this, nameof(Close));
         Title = title;
-        ShowCloseButton = showCloseButton;
 #if DEBUG
         this.GetTree().EditedSceneRoot?.SetEditableInstance(this, true);
         this.SetDisplayFolded(true);
@@ -61,19 +41,6 @@ public partial class CustomPopup
         this.EmitSignal(nameof(PopupClosed));
     }
 
-    public void ShowAt(Vector2 rectPosition)
-    {
-        this.customPopupContainer.RectPosition = rectPosition + Vector2.Left * this.customPopupContainer.RectSize / 2;
-        this.Show();
-    }
-
-    public void ShowCentered()
-    {
-        var rectPosition = this.GetViewport().Size / 2 / this.Scale;
-        this.customPopupContainer.RectPosition = rectPosition - this.customPopupContainer.RectSize / 2;
-        this.Show();
-    }
-
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
@@ -83,6 +50,10 @@ public partial class CustomPopup
         }
 
         if (@event is InputEventMouse mouse && ((ButtonList)mouse.ButtonMask & ButtonList.Left) == ButtonList.Left)
+        {
+            Close();
+        }
+        if (@event is InputEventKey key && ((KeyList)key.Scancode & KeyList.Escape) == KeyList.Escape)
         {
             Close();
         }
