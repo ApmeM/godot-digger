@@ -9,7 +9,8 @@ public enum Blocks
 {
     Wood,
     Steel,
-    Wardrobe
+    Wardrobe,
+    Grass
 }
 
 public enum Loot
