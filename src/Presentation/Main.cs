@@ -98,7 +98,7 @@ public partial class Main
         this.gamePosition.Visible = true;
         this.menuPosition.Visible = false;
         var game = levelScene.Instance<BaseLevel>();
-        game.LootTexture = this.LootTexture;
+        game.Resources = this.inventory.Resources;
         game.InitMap(this.MaxNumberOfTurns, this.InventorySlots, this.DigPower);
         game.Connect(nameof(BaseLevel.ExitDungeon), this, nameof(ExitDungeon));
         this.gamePosition.AddChild(game);

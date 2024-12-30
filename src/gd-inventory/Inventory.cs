@@ -8,10 +8,13 @@ using GodotDigger.Presentation.Utils;
 public partial class Inventory
 {
     [Export]
-    public PackedScene InventorySlot;
+    public PackedScene InventorySlotScene;
 
     [Export]
     public List<Texture> Resources = new List<Texture>();
+
+    [Signal]
+    public delegate void UseItem(InventorySlot slot);
 
     private uint size;
 
@@ -29,14 +32,20 @@ public partial class Inventory
                 this.slotContainer.ClearChildren();
                 for (var i = 0; i < value; i++)
                 {
-                    var slot = this.InventorySlot.Instance<InventorySlot>();
+                    var slot = this.InventorySlotScene.Instance<InventorySlot>();
                     slot.Resources = Resources;
                     slot.MaxCount = this.MaxCountPerSlot;
                     this.slotContainer.AddChild(slot);
+                    slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
                 }
             }
             this.size = value;
         }
+    }
+
+    private void SlotUseItem(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(UseItem), slot);
     }
 
     private int maxCountPerSlot;

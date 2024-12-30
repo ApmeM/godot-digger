@@ -124,19 +124,17 @@ rect_scale = Vector2( 2, 2 )
 margin_right = 152.0
 
 [node name="HeaderMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 10.0
-margin_right = 141.0
-
-[node name="TitleBackground" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 131.0
-
-[node name="TitleMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 131.0
-
-[node name="TitleContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_left = 30.0
 margin_right = 121.0
 
-[node name="TitleLabel" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin/TitleContainer" index="0"]
+[node name="TitleBackground" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 91.0
+
+[node name="TitleMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 91.0
+
+[node name="TitleLabel" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 81.0
 text = "Inventory"
 
 [node name="PopupContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer" index="1"]
@@ -184,19 +182,17 @@ margin_bottom = 672.0
 margin_right = 383.0
 
 [node name="HeaderMargin" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 108.0
-margin_right = 275.0
+margin_left = 128.0
+margin_right = 255.0
 
 [node name="TitleBackground" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 167.0
+margin_right = 127.0
 
 [node name="TitleMargin" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 167.0
+margin_right = 127.0
 
-[node name="TitleContainer" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 157.0
-
-[node name="TitleLabel" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin/TitleContainer" index="0"]
+[node name="TitleLabel" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 117.0
 text = "Achievements"
 
 [node name="PopupContainer" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer" index="1"]

@@ -15,14 +15,13 @@ margin_top = 9.0
 margin_right = 101.0
 margin_bottom = 79.0
 script = ExtResource( 4 )
-InventorySlot = ExtResource( 2 )
+InventorySlotScene = ExtResource( 2 )
 
 [node name="InventoreNameLabel" type="Label" parent="."]
 margin_right = 92.0
 margin_bottom = 11.0
 custom_colors/font_color = Color( 0.423529, 0.247059, 0.121569, 1 )
 custom_fonts/font = SubResource( 1 )
-text = "- Inventory name -"
 align = 1
 valign = 1
 

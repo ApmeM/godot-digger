@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -13,13 +14,14 @@ public partial class BaseLevel
     public delegate void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources);
 
     [Export]
-    public Texture LootTexture;
+    public List<Texture> Resources = new List<Texture>();
 
     [Export]
     public uint DigPower = 1;
 
     public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
+        this.inventory.Resources = Resources;
         this.inventory.Size = inventorySlots;
 
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
@@ -42,17 +44,23 @@ public partial class BaseLevel
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
-        var number = LootTexture.GetWidth() / 16;
-        for (var i = 0; i < number; i++)
-        {
-            this.inventory.Resources.Add(new AtlasTexture
-            {
-                Atlas = LootTexture,
-                Region = new Rect2(i * 16, 0, 16, 16)
-            });
-        }
+        this.inventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
 
         this.AddToGroup(Groups.LevelScene);
+    }
+
+    private void InventoryUseItem(InventorySlot slot)
+    {
+        switch ((Loot)slot.ItemIndex)
+        {
+            case Loot.Wood:
+                this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
+                break;
+            default:
+                break;
+        }
+
+        slot.TryAddItem(slot.ItemIndex, -1);
     }
 
     public override void _UnhandledInput(InputEvent @event)

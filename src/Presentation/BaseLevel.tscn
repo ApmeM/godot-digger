@@ -167,25 +167,18 @@ rect_scale = Vector2( 2, 2 )
 margin_right = 131.0
 
 [node name="HeaderMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 0.0
-margin_right = 131.0
+margin_left = 20.0
+margin_right = 111.0
 
 [node name="TitleBackground" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 131.0
+margin_right = 91.0
 
 [node name="TitleMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 131.0
+margin_right = 91.0
 
-[node name="TitleContainer" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 121.0
-
-[node name="TitleLabel" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin/TitleContainer" index="0"]
-margin_right = 71.0
+[node name="TitleLabel" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 81.0
 text = "Inventory"
-
-[node name="CloseButton" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin/TitleContainer" index="1"]
-margin_left = 93.0
-margin_right = 111.0
 
 [node name="PopupContainer" parent="CustomPopupInventory/CustomPopupContainer" index="1"]
 margin_right = 131.0

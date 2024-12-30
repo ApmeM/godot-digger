@@ -32,6 +32,9 @@ public partial class InventorySlot
         }
     }
 
+    [Signal]
+    public delegate void UseItem();
+
     public override void _Ready()
     {
         base._Ready();
@@ -110,6 +113,25 @@ public partial class InventorySlot
         this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
         this.ItemsCount = 0;
         this.ItemIndex = -1;
+    }
+
+    public override void _GuiInput(InputEvent @event)
+    {
+        base._GuiInput(@event);
+        if (!HasItem())
+        {
+            return;
+        }
+
+        if (!(@event is InputEventMouseButton mouse))
+        {
+            return;
+        }
+
+        if (mouse.Doubleclick)
+        {
+            this.EmitSignal(nameof(UseItem));
+        }
     }
 
     public override object GetDragData(Vector2 position)
