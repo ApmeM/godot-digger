@@ -1,31 +1,22 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://Presentation/Main.cs" type="Script" id=1]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=2]
 [ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Presentation/assets/Buildings/Inn.png" type="Texture" id=4]
-[ext_resource path="res://Presentation/assets/items.png" type="Texture" id=5]
+[ext_resource path="res://Presentation/assets/Buildings/Stash.png" type="Texture" id=5]
 [ext_resource path="res://Presentation/Building.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Presentation/assets/Buildings/Leather Shop.png" type="Texture" id=7]
 [ext_resource path="res://Presentation/levels/Woodcutter.tscn" type="PackedScene" id=8]
 [ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=9]
 [ext_resource path="res://gd-levelSelector/LevelButton.tscn" type="PackedScene" id=10]
 [ext_resource path="res://gd-googlePlay/GodotPlayGameService.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Presentation/assets/Buildings/Library.png" type="Texture" id=12]
 [ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Presentation/assets/Buildings/Woodcutter.png" type="Texture" id=17]
 [ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=18]
 [ext_resource path="res://Presentation/assets/Buildings/Cave.png" type="Texture" id=20]
-[ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=21]
-
-[sub_resource type="AtlasTexture" id=2]
-flags = 4
-atlas = ExtResource( 5 )
-region = Rect2( 48, 16, 16, 16 )
-
-[sub_resource type="AtlasTexture" id=3]
-flags = 4
-atlas = ExtResource( 5 )
-region = Rect2( 32, 160, 16, 16 )
+[ext_resource path="res://Presentation/assets/TileSets/loot.png" type="Texture" id=21]
 
 [node name="Main" type="Node"]
 script = ExtResource( 1 )
@@ -95,7 +86,7 @@ margin_top = 385.0
 margin_right = 328.0
 margin_bottom = 465.0
 rect_min_size = Vector2( 80, 80 )
-texture_normal = SubResource( 2 )
+texture_normal = ExtResource( 5 )
 expand = true
 
 [node name="Achievements" type="TextureButton" parent="MenuPosition"]
@@ -106,7 +97,7 @@ margin_top = 622.0
 margin_right = 291.0
 margin_bottom = 702.0
 rect_min_size = Vector2( 80, 80 )
-texture_normal = SubResource( 3 )
+texture_normal = ExtResource( 12 )
 expand = true
 
 [node name="CustomPopupInventory" parent="MenuPosition" instance=ExtResource( 3 )]

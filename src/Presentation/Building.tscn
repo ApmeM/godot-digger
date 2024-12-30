@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Presentation/Building.cs" type="Script" id=1]
 [ext_resource path="res://Presentation/assets/Buildings/Working forge.png" type="Texture" id=2]
-[ext_resource path="res://Presentation/assets/loot.png" type="Texture" id=3]
+[ext_resource path="res://Presentation/assets/TileSets/loot.png" type="Texture" id=3]
 [ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=5]
 
 [sub_resource type="AtlasTexture" id=1]
