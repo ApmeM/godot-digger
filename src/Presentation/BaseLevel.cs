@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -8,8 +7,6 @@ using GodotDigger.Presentation.Utils;
 [SceneReference("BaseLevel.tscn")]
 public partial class BaseLevel
 {
-    private Dictionary<Vector2, CellDefinition> CurrentMap = new Dictionary<Vector2, CellDefinition>();
-
     [Signal]
     public delegate void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources);
 
@@ -18,6 +15,8 @@ public partial class BaseLevel
 
     [Export]
     public uint DigPower = 1;
+
+    public Stamina Stamina => this.stamina;
 
     public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
@@ -51,15 +50,7 @@ public partial class BaseLevel
 
     private void InventoryUseItem(InventorySlot slot)
     {
-        switch ((Loot)slot.ItemIndex)
-        {
-            case Loot.Wood:
-                this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
-                break;
-            default:
-                break;
-        }
-
+        LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction(this);
         slot.TryAddItem(slot.ItemIndex, -1);
     }
 
@@ -138,22 +129,17 @@ public partial class BaseLevel
             return false;
         }
 
-        if (!this.CurrentMap.ContainsKey(pos))
-        {
-            GD.PrintErr($"Cell at {pos} not exists in CurrentMap.");
-            return false;
-        }
-
         this.stamina.CurrentNumberOfTurns--;
 
-        if (this.CurrentMap[pos].HP > this.DigPower)
+        var currentHp = (int)this.blocks.GetMeta($"HP_{pos}");
+
+        if (currentHp > this.DigPower)
         {
-            this.CurrentMap[pos].HP -= this.DigPower;
+            this.blocks.SetMeta($"HP_{pos}", currentHp - this.DigPower);
             return false;
         }
 
-        var cellData = this.CurrentMap[pos];
-        this.CurrentMap.Remove(pos);
+        this.blocks.SetMeta($"HP_{pos}", null);
         this.blocks.SetCellv(pos, -1);
         this.UnFogCell(pos);
 
@@ -174,13 +160,7 @@ public partial class BaseLevel
             var blocksCell = this.blocks.GetCellv(cell);
             var blocksCellTile = this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y);
 
-            if (!CellDefinition.KnownBlocks.ContainsKey((Blocks)blocksCellTile.x))
-            {
-                GD.PrintErr($"Unkonwn block type: {blocksCellTile}");
-                continue;
-            }
-
-            this.CurrentMap[cell] = CellDefinition.KnownBlocks[(Blocks)blocksCellTile.x].Clone();
+            this.blocks.SetMeta($"HP_{cell}", BlocksDefinition.KnownBlocks[(Blocks)blocksCellTile.x].HP);
         }
     }
 
