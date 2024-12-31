@@ -19,13 +19,13 @@ public partial class Main
 
         this.achievements.Connect(CommonSignals.Pressed, this, nameof(AchievementsPressed));
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
-        var number = LootTexture.GetWidth() / 16;
+        var number = LootTexture.GetWidth() / 48;
         for (var i = 0; i < number; i++)
         {
             var lootItem = new AtlasTexture
             {
                 Atlas = LootTexture,
-                Region = new Rect2(i * 16, 0, 16, 16)
+                Region = new Rect2(i * 48, 0, 48, 48)
             };
 
             this.inventory.Resources.Add(lootItem);

@@ -17,10 +17,10 @@
 0/texture = ExtResource( 1 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 64, 16 )
+0/region = Rect2( 0, 0, 192, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
-0/autotile/tile_size = Vector2( 16, 16 )
+0/autotile/tile_size = Vector2( 48, 48 )
 0/autotile/spacing = 0
 0/autotile/occluder_map = [  ]
 0/autotile/navpoly_map = [  ]
@@ -40,10 +40,10 @@
 0/texture = ExtResource( 3 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 48, 16 )
+0/region = Rect2( 0, 0, 144, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
-0/autotile/tile_size = Vector2( 16, 16 )
+0/autotile/tile_size = Vector2( 48, 48 )
 0/autotile/spacing = 0
 0/autotile/occluder_map = [  ]
 0/autotile/navpoly_map = [  ]
@@ -63,10 +63,10 @@
 0/texture = ExtResource( 4 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 64, 16 )
+0/region = Rect2( 0, 0, 192, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
-0/autotile/tile_size = Vector2( 16, 16 )
+0/autotile/tile_size = Vector2( 48, 48 )
 0/autotile/spacing = 0
 0/autotile/occluder_map = [  ]
 0/autotile/navpoly_map = [  ]
@@ -86,10 +86,10 @@
 0/texture = ExtResource( 5 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 16, 16 )
+0/region = Rect2( 0, 0, 48, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
-0/autotile/tile_size = Vector2( 16, 16 )
+0/autotile/tile_size = Vector2( 48, 48 )
 0/autotile/spacing = 0
 0/autotile/occluder_map = [  ]
 0/autotile/navpoly_map = [  ]
@@ -108,27 +108,23 @@
 script = ExtResource( 2 )
 
 [node name="Floor" type="TileMap" parent="."]
-scale = Vector2( 3, 3 )
 tile_set = SubResource( 1 )
-cell_size = Vector2( 16, 16 )
+cell_size = Vector2( 48, 48 )
 format = 1
 
 [node name="Loot" type="TileMap" parent="."]
-scale = Vector2( 3, 3 )
 tile_set = SubResource( 3 )
-cell_size = Vector2( 16, 16 )
+cell_size = Vector2( 48, 48 )
 format = 1
 
 [node name="Blocks" type="TileMap" parent="."]
-scale = Vector2( 3, 3 )
 tile_set = SubResource( 4 )
-cell_size = Vector2( 16, 16 )
+cell_size = Vector2( 48, 48 )
 format = 1
 
 [node name="Fog" type="TileMap" parent="."]
-scale = Vector2( 3, 3 )
 tile_set = SubResource( 5 )
-cell_size = Vector2( 16, 16 )
+cell_size = Vector2( 48, 48 )
 format = 1
 
 [node name="AchievementNotifications" parent="." instance=ExtResource( 10 )]
@@ -156,7 +152,6 @@ margin_left = 112.0
 margin_top = 78.0
 margin_right = 216.0
 margin_bottom = 176.0
-rect_scale = Vector2( 2, 2 )
 
 [node name="HeaderCenter" parent="CustomPopupInventory/CustomPopupContainer" index="0"]
 margin_right = 131.0

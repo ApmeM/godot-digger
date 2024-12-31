@@ -8,7 +8,7 @@ using GodotDigger.Presentation.Utils;
 public partial class InventorySlot
 {
     [Export]
-    public int ItemIndex;
+    public int ItemIndex = -1;
 
     [Export]
     public List<Texture> Resources = new List<Texture>();

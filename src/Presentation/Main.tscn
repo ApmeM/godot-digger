@@ -109,7 +109,6 @@ margin_left = 89.0
 margin_top = 46.0
 margin_right = 241.0
 margin_bottom = 168.0
-rect_scale = Vector2( 2, 2 )
 
 [node name="HeaderCenter" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer" index="0"]
 margin_right = 152.0
