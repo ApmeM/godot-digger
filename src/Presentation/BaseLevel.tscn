@@ -17,7 +17,7 @@
 0/texture = ExtResource( 1 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 192, 48 )
+0/region = Rect2( 0, 0, 240, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
 0/autotile/tile_size = Vector2( 48, 48 )
@@ -40,7 +40,7 @@
 0/texture = ExtResource( 3 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 144, 48 )
+0/region = Rect2( 0, 0, 192, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
 0/autotile/tile_size = Vector2( 48, 48 )
@@ -179,24 +179,24 @@ margin_right = 131.0
 margin_bottom = 77.0
 
 [node name="InventoryFrame" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 131.0
-margin_bottom = 77.0
+margin_right = 188.0
+margin_bottom = 105.0
 
 [node name="OuterInventoryMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 131.0
-margin_bottom = 77.0
+margin_right = 188.0
+margin_bottom = 105.0
 
 [node name="InventoryBackground" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
-margin_right = 122.0
-margin_bottom = 68.0
+margin_right = 179.0
+margin_bottom = 96.0
 
 [node name="ContentMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
-margin_right = 122.0
-margin_bottom = 68.0
+margin_right = 179.0
+margin_bottom = 96.0
 
 [node name="Inventory" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 8 )]
-margin_right = 104.0
-margin_bottom = 50.0
+margin_right = 161.0
+margin_bottom = 78.0
 Size = 3
 MaxCountPerSlot = 1
 SizePerRow = 4
@@ -207,4 +207,31 @@ position = Vector2( 241, 400 )
 minimumZoom = 1.0
 maximumZoom = 2.0
 
+[node name="CustomPopup" parent="." instance=ExtResource( 7 )]
+Title = "Sign"
+
+[node name="HeaderMargin" parent="CustomPopup/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 126.0
+margin_right = 181.0
+
+[node name="TitleBackground" parent="CustomPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 55.0
+
+[node name="TitleMargin" parent="CustomPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 55.0
+
+[node name="TitleLabel" parent="CustomPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 45.0
+text = "Sign"
+
+[node name="SignLabel" type="Label" parent="CustomPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 37.0
+margin_right = 281.0
+margin_bottom = 51.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Text"
+align = 1
+
 [editable path="CustomPopupInventory"]
+[editable path="CustomPopup"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://Presentation/Main.cs" type="Script" id=1]
 [ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://gd-levelSelector/LevelButton.tscn" type="PackedScene" id=10]
 [ext_resource path="res://gd-googlePlay/GodotPlayGameService.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/assets/Buildings/Library.png" type="Texture" id=12]
+[ext_resource path="res://Presentation/levels/Level3.tscn" type="PackedScene" id=13]
 [ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Presentation/assets/Buildings/Woodcutter.png" type="Texture" id=17]
 [ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=18]
@@ -26,6 +27,16 @@ LootTexture = ExtResource( 21 )
 
 [node name="MenuPosition" type="Node2D" parent="."]
 
+[node name="Level3" parent="MenuPosition" instance=ExtResource( 10 )]
+visible = false
+margin_left = 330.0
+margin_top = 14.0
+margin_right = 1354.0
+margin_bottom = 1038.0
+rect_scale = Vector2( 0.15, 0.15 )
+texture_normal = ExtResource( 20 )
+GameToStart = ExtResource( 13 )
+
 [node name="Level2" parent="MenuPosition" instance=ExtResource( 10 )]
 visible = false
 margin_left = 356.0
@@ -35,6 +46,7 @@ margin_bottom = 1167.0
 rect_scale = Vector2( 0.15, 0.15 )
 texture_normal = ExtResource( 20 )
 GameToStart = ExtResource( 14 )
+NextLevelButton = NodePath("../Level3")
 
 [node name="Level1" parent="MenuPosition" instance=ExtResource( 10 )]
 margin_left = 254.0
@@ -136,24 +148,24 @@ margin_right = 152.0
 margin_bottom = 101.0
 
 [node name="InventoryFrame" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 152.0
-margin_bottom = 101.0
+margin_right = 292.0
+margin_bottom = 157.0
 
 [node name="OuterInventoryMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 152.0
-margin_bottom = 101.0
+margin_right = 292.0
+margin_bottom = 157.0
 
 [node name="InventoryBackground" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
-margin_right = 143.0
-margin_bottom = 92.0
+margin_right = 283.0
+margin_bottom = 148.0
 
 [node name="ContentMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
-margin_right = 143.0
-margin_bottom = 92.0
+margin_right = 283.0
+margin_bottom = 148.0
 
 [node name="Inventory" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 9 )]
-margin_right = 125.0
-margin_bottom = 74.0
+margin_right = 265.0
+margin_bottom = 130.0
 Size = 10
 MaxCountPerSlot = 10
 SizePerRow = 5

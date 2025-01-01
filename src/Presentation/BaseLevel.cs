@@ -78,16 +78,21 @@ public partial class BaseLevel
     {
         var floorsCell = this.floor.GetCellv(pos);
         var floorsCellTile = this.floor.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-        if (floorsCell >= 0 &&
-            ((Floor)floorsCellTile.x == Floor.StairsUp || (Floor)floorsCellTile.x == Floor.StairsDown))
+
+        if (floorsCell == -1)
         {
-            var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
-            this.inventory.ClearItems();
-            this.EmitSignal(nameof(ExitDungeon), (int)floorsCellTile.x, this.Name, resources);
-            return false;
+            return true;
         }
 
+        FloorDefinition.KnownFloors[(Floor)floorsCellTile.x].ClickAction?.Invoke(this, pos);
         return true;
+    }
+
+    public void ExitDungeonClicked(Floor floorClicked)
+    {
+        var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
+        this.inventory.ClearItems();
+        this.EmitSignal(nameof(ExitDungeon), (int)floorClicked, this.Name, resources);
     }
 
     private bool TryFindSecrets(Vector2 pos)
@@ -212,5 +217,10 @@ public partial class BaseLevel
         }
 
         return true;
+    }
+
+    public virtual void ShowPopup(Vector2 pos)
+    {
+        GD.PrintErr($"Clicked on a sign with no text at {pos} for {this.Name}");
     }
 }

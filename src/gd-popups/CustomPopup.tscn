@@ -15,9 +15,9 @@ script = ExtResource( 3 )
 Title = "Title"
 
 [node name="CustomPopupContainer" type="VBoxContainer" parent="."]
-margin_left = 117.0
+margin_left = 83.0
 margin_top = 38.0
-margin_right = 425.0
+margin_right = 391.0
 margin_bottom = 165.0
 custom_constants/separation = -7
 
