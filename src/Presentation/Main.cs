@@ -45,18 +45,19 @@ public partial class Main
         }
     }
 
-    public void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources)
+    public void ExitDungeon(List<Loot> resources)
     {
         this.gamePosition.ClearChildren();
         this.ResourcesAdded(resources);
 
-        if ((Floor)stairsType == Floor.StairsUp)
-        {
-            this.gamePosition.Visible = false;
-            this.menuPosition.Visible = true;
-            return;
-        }
-        var nextLevel = this.GetNextLevel(stairsType, fromLevel);
+        this.gamePosition.Visible = false;
+        this.menuPosition.Visible = true;
+    }
+
+    public void ChangeLevel(string nextLevel, List<Loot> resources)
+    {
+        this.gamePosition.ClearChildren();
+        this.ResourcesAdded(resources);
 
         this.OpenLevel(nextLevel);
         this.LoadLevel(nextLevel);
@@ -101,6 +102,7 @@ public partial class Main
         game.Resources = this.inventory.Resources;
         game.InitMap(this.MaxNumberOfTurns, this.InventorySlots, this.DigPower);
         game.Connect(nameof(BaseLevel.ExitDungeon), this, nameof(ExitDungeon));
+        game.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
         this.gamePosition.AddChild(game);
     }
 

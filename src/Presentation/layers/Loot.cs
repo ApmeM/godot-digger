@@ -12,9 +12,9 @@ public enum Loot
 public class LootDefinition
 {
     public static Dictionary<Loot, LootDefinition> KnownLoot = new Dictionary<Loot, LootDefinition>{
-        { Loot.Wood, new LootDefinition{UseAction = (level)=>{ }} },
-        { Loot.Steel, new LootDefinition{UseAction = (level)=>{}} },
-        { Loot.Cloth, new LootDefinition{UseAction = (level)=>{}} },
+        { Loot.Wood, new LootDefinition{} },
+        { Loot.Steel, new LootDefinition{} },
+        { Loot.Cloth, new LootDefinition{} },
         { Loot.StaminaPlant, new LootDefinition{UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 2; }} },
     };
 

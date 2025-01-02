@@ -208,6 +208,7 @@ minimumZoom = 1.0
 maximumZoom = 2.0
 
 [node name="CustomPopup" parent="." instance=ExtResource( 7 )]
+visible = false
 Title = "Sign"
 
 [node name="HeaderMargin" parent="CustomPopup/CustomPopupContainer/HeaderCenter" index="0"]

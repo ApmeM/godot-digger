@@ -8,7 +8,10 @@ using GodotDigger.Presentation.Utils;
 public partial class BaseLevel
 {
     [Signal]
-    public delegate void ExitDungeon(int stairsType, string fromLevel, List<Loot> resources);
+    public delegate void ExitDungeon(List<Loot> resources);
+
+    [Signal]
+    public delegate void ChangeLevel(string nextLevel, List<Loot> resources);
 
     [Export]
     public List<Texture> Resources = new List<Texture>();
@@ -33,7 +36,6 @@ public partial class BaseLevel
     {
         base._Ready();
         this.FillMembers();
-        this.FillCurrentMapFromDesign();
 
         this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
         this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
@@ -50,8 +52,11 @@ public partial class BaseLevel
 
     private void InventoryUseItem(InventorySlot slot)
     {
-        LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction(this);
-        slot.TryAddItem(slot.ItemIndex, -1);
+        if (LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction != null)
+        {
+            LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction(this);
+            slot.TryAddItem(slot.ItemIndex, -1);
+        }
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -70,7 +75,6 @@ public partial class BaseLevel
             TryDigBlock(pos) &&
             UnFogCell(pos) &&
             TryGrabLoot(pos) &&
-            TryFindSecrets(pos) &&
             TryChangeFloor(pos);
     }
 
@@ -88,16 +92,11 @@ public partial class BaseLevel
         return true;
     }
 
-    public void ExitDungeonClicked(Floor floorClicked)
+    public void ExitDungeonClicked()
     {
         var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
         this.inventory.ClearItems();
-        this.EmitSignal(nameof(ExitDungeon), (int)floorClicked, this.Name, resources);
-    }
-
-    private bool TryFindSecrets(Vector2 pos)
-    {
-        return true;
+        this.EmitSignal(nameof(ExitDungeon), resources);
     }
 
     private bool TryGrabLoot(Vector2 pos)
@@ -136,15 +135,22 @@ public partial class BaseLevel
 
         this.stamina.CurrentNumberOfTurns--;
 
-        var currentHp = (int)this.blocks.GetMeta($"HP_{pos}");
+        var metaName = $"HP_{pos}";
+
+        if (!this.blocks.HasMeta(metaName))
+        {
+            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(Blocks)blocksCellTile.x].HP);
+        }
+
+        var currentHp = (int)this.blocks.GetMeta(metaName);
 
         if (currentHp > this.DigPower)
         {
-            this.blocks.SetMeta($"HP_{pos}", currentHp - this.DigPower);
+            this.blocks.SetMeta(metaName, currentHp - this.DigPower);
             return false;
         }
 
-        this.blocks.SetMeta($"HP_{pos}", null);
+        this.blocks.SetMeta(metaName, null);
         this.blocks.SetCellv(pos, -1);
         this.UnFogCell(pos);
 
@@ -156,17 +162,6 @@ public partial class BaseLevel
         var fogCell = this.fog.GetCellv(pos);
         var fogCellTile = this.fog.GetCellAutotileCoord((int)pos.x, (int)pos.y);
         return fogCell == -1;
-    }
-
-    private void FillCurrentMapFromDesign()
-    {
-        foreach (Vector2 cell in this.blocks.GetUsedCells())
-        {
-            var blocksCell = this.blocks.GetCellv(cell);
-            var blocksCellTile = this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y);
-
-            this.blocks.SetMeta($"HP_{cell}", BlocksDefinition.KnownBlocks[(Blocks)blocksCellTile.x].HP);
-        }
     }
 
     private void ShowInventoryPopup()
@@ -222,5 +217,10 @@ public partial class BaseLevel
     public virtual void ShowPopup(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a sign with no text at {pos} for {this.Name}");
+    }
+
+    public virtual void ChangeLevelClicked(Vector2 pos)
+    {
+        GD.PrintErr($"Clicked on a change level with no level set at {pos} for {this.Name}");
     }
 }

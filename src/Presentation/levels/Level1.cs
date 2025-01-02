@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 
 [SceneReference("Level1.tscn")]
 public partial class Level1
@@ -18,13 +19,20 @@ public partial class Level1
             customPopup.Show();
             return;
         }
+
         if (pos == new Vector2(6, 7))
         {
             signLabel.Text = "Very good, see you on the next level.";
             customPopup.Show();
             return;
-
         }
         base.ShowPopup(pos);
+    }
+
+    public override void ChangeLevelClicked(Vector2 pos)
+    {
+        var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
+        this.EmitSignal(nameof(ChangeLevel), "Level2", resources);
+        base.ChangeLevelClicked(pos);
     }
 }
