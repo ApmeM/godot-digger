@@ -1,22 +1,10 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Presentation/Main.cs" type="Script" id=1]
-[ext_resource path="res://gd-achievements/AchievementList.tscn" type="PackedScene" id=2]
 [ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Presentation/assets/Buildings/Inn.png" type="Texture" id=4]
-[ext_resource path="res://Presentation/assets/Buildings/Stash.png" type="Texture" id=5]
-[ext_resource path="res://Presentation/Building.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Presentation/assets/Buildings/Leather Shop.png" type="Texture" id=7]
-[ext_resource path="res://Presentation/levels/Woodcutter.tscn" type="PackedScene" id=8]
 [ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=9]
-[ext_resource path="res://gd-levelSelector/LevelButton.tscn" type="PackedScene" id=10]
 [ext_resource path="res://gd-googlePlay/GodotPlayGameService.tscn" type="PackedScene" id=11]
-[ext_resource path="res://Presentation/assets/Buildings/Library.png" type="Texture" id=12]
-[ext_resource path="res://Presentation/levels/Level3.tscn" type="PackedScene" id=13]
-[ext_resource path="res://Presentation/levels/Level2.tscn" type="PackedScene" id=14]
-[ext_resource path="res://Presentation/assets/Buildings/Woodcutter.png" type="Texture" id=17]
 [ext_resource path="res://Presentation/levels/Level1.tscn" type="PackedScene" id=18]
-[ext_resource path="res://Presentation/assets/Buildings/Cave.png" type="Texture" id=20]
 [ext_resource path="res://Presentation/assets/TileSets/loot.png" type="Texture" id=21]
 
 [node name="Main" type="Node"]
@@ -25,145 +13,60 @@ LootTexture = ExtResource( 21 )
 
 [node name="GamePosition" type="Node2D" parent="."]
 
-[node name="MenuPosition" type="Node2D" parent="."]
+[node name="Level1" parent="GamePosition" instance=ExtResource( 18 )]
 
-[node name="Level3" parent="MenuPosition" instance=ExtResource( 10 )]
-visible = false
-margin_left = 330.0
-margin_top = 14.0
-margin_right = 1354.0
-margin_bottom = 1038.0
-rect_scale = Vector2( 0.15, 0.15 )
-texture_normal = ExtResource( 20 )
-GameToStart = ExtResource( 13 )
-
-[node name="Level2" parent="MenuPosition" instance=ExtResource( 10 )]
-visible = false
-margin_left = 356.0
-margin_top = 143.0
-margin_right = 1380.0
-margin_bottom = 1167.0
-rect_scale = Vector2( 0.15, 0.15 )
-texture_normal = ExtResource( 20 )
-GameToStart = ExtResource( 14 )
-NextLevelButton = NodePath("../Level3")
-
-[node name="Level1" parent="MenuPosition" instance=ExtResource( 10 )]
-margin_left = 254.0
-margin_top = 166.0
-margin_right = 1278.0
-margin_bottom = 1190.0
-rect_scale = Vector2( 0.15, 0.15 )
-texture_normal = ExtResource( 20 )
-GameToStart = ExtResource( 18 )
-NextLevelButton = NodePath("../Level2")
-
-[node name="WoodCutter" parent="MenuPosition" instance=ExtResource( 10 )]
-margin_left = 277.0
-margin_top = 474.0
-margin_right = 1301.0
-margin_bottom = 1498.0
-rect_scale = Vector2( 0.15, 0.15 )
-texture_normal = ExtResource( 17 )
-GameToStart = ExtResource( 8 )
-
-[node name="BuildingBlacksmith" parent="MenuPosition" instance=ExtResource( 6 )]
-margin_left = 48.0
-margin_top = 118.0
-margin_right = 1072.0
-margin_bottom = 1142.0
-InventoryPath = NodePath("../CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/Inventory")
-
-[node name="BuildingLeather" parent="MenuPosition" instance=ExtResource( 6 )]
-margin_left = 60.0
-margin_top = 320.0
-margin_right = 1084.0
-margin_bottom = 1344.0
-texture_normal = ExtResource( 7 )
-InventoryPath = NodePath("../CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/Inventory")
-
-[node name="INN" type="TextureButton" parent="MenuPosition"]
-margin_left = 31.0
-margin_top = 496.0
-margin_right = 919.0
-margin_bottom = 1384.0
-rect_scale = Vector2( 0.15, 0.15 )
-texture_normal = ExtResource( 4 )
-
-[node name="InventoryButton" type="TextureButton" parent="MenuPosition"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = 248.0
-margin_top = 385.0
-margin_right = 328.0
-margin_bottom = 465.0
-rect_min_size = Vector2( 80, 80 )
-texture_normal = ExtResource( 5 )
-expand = true
-
-[node name="Achievements" type="TextureButton" parent="MenuPosition"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = 211.0
-margin_top = 622.0
-margin_right = 291.0
-margin_bottom = 702.0
-rect_min_size = Vector2( 80, 80 )
-texture_normal = ExtResource( 12 )
-expand = true
-
-[node name="CustomPopupInventory" parent="MenuPosition" instance=ExtResource( 3 )]
+[node name="CustomPopupInventory" parent="." instance=ExtResource( 3 )]
 visible = false
 Title = "Inventory"
 
-[node name="CustomPopupContainer" parent="MenuPosition/CustomPopupInventory" index="0"]
+[node name="CustomPopupContainer" parent="CustomPopupInventory" index="0"]
 margin_left = 89.0
 margin_top = 46.0
 margin_right = 241.0
 margin_bottom = 168.0
 
-[node name="HeaderCenter" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer" index="0"]
+[node name="HeaderCenter" parent="CustomPopupInventory/CustomPopupContainer" index="0"]
 margin_right = 152.0
 
-[node name="HeaderMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
+[node name="HeaderMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
 margin_left = 30.0
 margin_right = 121.0
 
-[node name="TitleBackground" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+[node name="TitleBackground" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
 margin_right = 91.0
 
-[node name="TitleMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+[node name="TitleMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
 margin_right = 91.0
 
-[node name="TitleLabel" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+[node name="TitleLabel" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
 margin_right = 81.0
 text = "Inventory"
 
-[node name="PopupContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer" index="1"]
+[node name="PopupContainer" parent="CustomPopupInventory/CustomPopupContainer" index="1"]
 margin_right = 152.0
 margin_bottom = 122.0
 
-[node name="MarginContainer" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer" index="0"]
+[node name="MarginContainer" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer" index="0"]
 margin_right = 152.0
 margin_bottom = 101.0
 
-[node name="InventoryFrame" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+[node name="InventoryFrame" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 292.0
 margin_bottom = 157.0
 
-[node name="OuterInventoryMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+[node name="OuterInventoryMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 292.0
 margin_bottom = 157.0
 
-[node name="InventoryBackground" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
+[node name="InventoryBackground" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
 margin_right = 283.0
 margin_bottom = 148.0
 
-[node name="ContentMargin" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
+[node name="ContentMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
 margin_right = 283.0
 margin_bottom = 148.0
 
-[node name="Inventory" parent="MenuPosition/CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 9 )]
+[node name="Inventory" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 9 )]
 margin_right = 265.0
 margin_bottom = 130.0
 Size = 10
@@ -171,67 +74,7 @@ MaxCountPerSlot = 10
 SizePerRow = 5
 Title = "Stash"
 
-[node name="CustomPopupAchievements" parent="MenuPosition" instance=ExtResource( 3 )]
-visible = false
-Title = "Achievements"
-
-[node name="CustomPopupContainer" parent="MenuPosition/CustomPopupAchievements" index="0"]
-margin_left = 50.0
-margin_right = 433.0
-margin_bottom = 672.0
-
-[node name="HeaderCenter" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer" index="0"]
-margin_right = 383.0
-
-[node name="HeaderMargin" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 128.0
-margin_right = 255.0
-
-[node name="TitleBackground" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 127.0
-
-[node name="TitleMargin" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 127.0
-
-[node name="TitleLabel" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 117.0
-text = "Achievements"
-
-[node name="PopupContainer" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer" index="1"]
-margin_right = 383.0
-margin_bottom = 634.0
-
-[node name="MarginContainer" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 383.0
-margin_bottom = 613.0
-
-[node name="InventoryFrame" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 383.0
-margin_bottom = 613.0
-
-[node name="OuterInventoryMargin" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 383.0
-margin_bottom = 613.0
-
-[node name="InventoryBackground" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
-margin_right = 374.0
-margin_bottom = 604.0
-
-[node name="ContentMargin" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
-margin_right = 374.0
-margin_bottom = 604.0
-
-[node name="AchievementList" parent="MenuPosition/CustomPopupAchievements/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 2 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_left = 9.0
-margin_top = 9.0
-margin_right = 356.0
-margin_bottom = 586.0
-GodotPlayGameServicePath = NodePath("../../../../../../../../GodotPlayGameService")
-
 [node name="GodotPlayGameService" parent="." instance=ExtResource( 11 )]
 margin_bottom = 20.0
 
-[editable path="MenuPosition/CustomPopupInventory"]
-[editable path="MenuPosition/CustomPopupAchievements"]
+[editable path="CustomPopupInventory"]

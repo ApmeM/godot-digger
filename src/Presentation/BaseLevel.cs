@@ -8,9 +8,6 @@ using GodotDigger.Presentation.Utils;
 public partial class BaseLevel
 {
     [Signal]
-    public delegate void ExitDungeon(List<Loot> resources);
-
-    [Signal]
     public delegate void ChangeLevel(string nextLevel, List<Loot> resources);
 
     [Export]
@@ -75,28 +72,21 @@ public partial class BaseLevel
             TryDigBlock(pos) &&
             UnFogCell(pos) &&
             TryGrabLoot(pos) &&
-            TryChangeFloor(pos);
+            TryActWithContruction(pos);
     }
 
-    private bool TryChangeFloor(Vector2 pos)
+    private bool TryActWithContruction(Vector2 pos)
     {
-        var floorsCell = this.floor.GetCellv(pos);
-        var floorsCellTile = this.floor.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+        var constructionsCell = this.constructions.GetCellv(pos);
+        var constructionsCellTile = this.constructions.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (floorsCell == -1)
+        if (constructionsCell == -1)
         {
             return true;
         }
 
-        FloorDefinition.KnownFloors[(Floor)floorsCellTile.x].ClickAction?.Invoke(this, pos);
+        ConstructionsDefinition.KnownConstructions[(Constructions)constructionsCellTile.x].ClickAction.Invoke(this, pos);
         return true;
-    }
-
-    public void ExitDungeonClicked()
-    {
-        var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
-        this.inventory.ClearItems();
-        this.EmitSignal(nameof(ExitDungeon), resources);
     }
 
     private bool TryGrabLoot(Vector2 pos)
@@ -164,11 +154,6 @@ public partial class BaseLevel
         return fogCell == -1;
     }
 
-    private void ShowInventoryPopup()
-    {
-        this.customPopupInventory.Show();
-    }
-
     private bool UnFogCell(Vector2 cell)
     {
         if (
@@ -212,6 +197,11 @@ public partial class BaseLevel
         }
 
         return true;
+    }
+
+    private void ShowInventoryPopup()
+    {
+        this.customPopupInventory.Show();
     }
 
     public virtual void ShowPopup(Vector2 pos)
