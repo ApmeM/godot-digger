@@ -7,14 +7,14 @@
 script = ExtResource( 2 )
 AllowYes = false
 
-[node name="ContentContainer" type="VBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
+[node name="ContentContainer" type="VBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_left = 9.0
 margin_top = 9.0
 margin_right = 281.0
 margin_bottom = 79.0
 custom_constants/separation = 10
 
-[node name="ContentText" type="Label" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="0"]
+[node name="ContentText" type="Label" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="0"]
 margin_right = 272.0
 margin_bottom = 40.0
 size_flags_vertical = 7
@@ -23,20 +23,20 @@ align = 1
 valign = 1
 autowrap = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="1"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="1"]
 margin_top = 50.0
 margin_right = 272.0
 margin_bottom = 70.0
 size_flags_horizontal = 3
 custom_constants/separation = 50
 
-[node name="ButtonYes" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/HBoxContainer" index="0"]
+[node name="ButtonYes" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/HBoxContainer" index="0"]
 margin_right = 111.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "Yes"
 
-[node name="ButtonNo" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/HBoxContainer" index="1"]
+[node name="ButtonNo" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/HBoxContainer" index="1"]
 margin_left = 161.0
 margin_right = 272.0
 margin_bottom = 20.0

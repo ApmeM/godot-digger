@@ -1,4 +1,5 @@
 using Godot;
+using GodotDigger.Presentation.Utils;
 
 [SceneReference("CustomPopup.tscn")]
 [Tool]
@@ -7,7 +8,25 @@ public partial class CustomPopup
     [Signal]
     public delegate void PopupClosed();
 
+    [Export]
+    public bool CloseOnClickOutside = true;
+
+    [Export]
+    public bool CloseOnClickButton
+    {
+        get => closeOnClickButton;
+        set
+        {
+            closeOnClickButton = value;
+            if (IsInsideTree())
+            {
+                this.closeButtonContainer.Visible = value;
+            }
+        }
+    }
+
     private string title;
+    private bool closeOnClickButton;
 
     [Export]
     public string Title
@@ -28,7 +47,11 @@ public partial class CustomPopup
         base._Ready();
         this.FillMembers();
 
-        Title = title;
+        this.Title = this.title;
+        this.CloseOnClickButton = this.closeOnClickButton;
+
+        this.closeButton.Connect(CommonSignals.Pressed, this, nameof(Close));
+
 #if DEBUG
         this.GetTree().EditedSceneRoot?.SetEditableInstance(this, true);
         this.SetDisplayFolded(true);
@@ -49,10 +72,11 @@ public partial class CustomPopup
             return;
         }
 
-        if (@event is InputEventMouse mouse && ((ButtonList)mouse.ButtonMask & ButtonList.Left) == ButtonList.Left)
+        if (@event is InputEventMouse mouse && ((ButtonList)mouse.ButtonMask & ButtonList.Left) == ButtonList.Left && CloseOnClickOutside)
         {
             Close();
         }
+
         if (@event is InputEventKey key && ((KeyList)key.Scancode & KeyList.Escape) == KeyList.Escape)
         {
             Close();

@@ -14,6 +14,9 @@ tile_data = PoolIntArray( 65532, 0, 1, 65533, 0, 0, 65534, 0, 0, 65535, 0, 0, 0,
 [node name="Constructions" parent="." index="1"]
 tile_data = PoolIntArray( 131075, 0, 8, 196618, 0, 7, 262145, 0, 10, 262150, 0, 9, 393212, 0, 3, 327696, 0, 3, 393232, 0, 3, 524284, 0, 3, 524285, 0, 3, 458766, 0, 3, 458768, 0, 3, 589820, 0, 3, 589821, 0, 3, 589823, 0, 3, 524288, 0, 3, 524292, 0, 6, 524294, 0, 3, 524296, 0, 3, 524297, 0, 3, 524299, 0, 3, 524300, 0, 3, 524302, 0, 3, 524303, 0, 3, 524304, 0, 3, 655357, 0, 3, 655358, 0, 3, 655359, 0, 3, 589824, 0, 3, 589825, 0, 3, 589827, 0, 4, 589829, 0, 5, 589831, 0, 3, 589834, 0, 3, 589836, 0, 3, 589837, 0, 3, 589838, 0, 3, 589839, 0, 3, 589840, 0, 3, 655360, 0, 3, 655361, 0, 3, 655362, 0, 3, 655363, 0, 3, 655366, 0, 3, 655367, 0, 3, 655368, 0, 3, 655369, 0, 3, 655370, 0, 3, 655371, 0, 3, 655372, 0, 3, 655373, 0, 3, 655374, 0, 3, 655375, 0, 3, 655376, 0, 3, 786428, 0, 3, 786429, 0, 3, 786430, 0, 3, 720897, 0, 3, 720898, 0, 3, 720899, 0, 4, 720901, 0, 5, 720902, 0, 3, 720903, 0, 3, 720904, 0, 3, 720905, 0, 3, 720906, 0, 3, 720907, 0, 3, 720912, 0, 1, 851964, 0, 3, 851965, 0, 3, 851966, 0, 3, 851967, 0, 3, 786432, 0, 3, 786436, 0, 2, 786445, 0, 3, 786446, 0, 3, 786447, 0, 3, 786448, 0, 3, 917500, 0, 3, 917501, 0, 3, 917502, 0, 3, 917503, 0, 3, 851968, 0, 3, 851969, 0, 3, 851970, 0, 3, 851971, 0, 3, 851973, 0, 3, 851974, 0, 3, 851975, 0, 3, 851976, 0, 3, 851977, 0, 3, 851978, 0, 3, 851981, 0, 3, 851982, 0, 3, 983036, 0, 3, 983037, 0, 3, 983038, 0, 3, 983039, 0, 3, 917504, 0, 3, 917505, 0, 3, 917509, 0, 3, 917510, 0, 3, 917511, 0, 3, 917516, 0, 3, 917517, 0, 3, 1048573, 0, 3, 1048574, 0, 3, 1048575, 0, 3, 983040, 0, 3, 983041, 0, 3, 983043, 0, 3, 983044, 0, 3, 983045, 0, 3, 983046, 0, 3, 983047, 0, 3, 983048, 0, 3, 983050, 0, 3, 983052, 0, 3, 983053, 0, 3, 983054, 0, 3, 983055, 0, 3, 1114108, 0, 3, 1114109, 0, 3, 1114110, 0, 3, 1114111, 0, 3, 1048580, 0, 3, 1048582, 0, 3, 1048583, 0, 3, 1048584, 0, 3, 1048586, 0, 3, 1048587, 0, 3, 1048588, 0, 3, 1048590, 0, 3, 1048591, 0, 3, 1179645, 0, 3, 1179646, 0, 3, 1179647, 0, 3, 1114112, 0, 3, 1114113, 0, 3, 1114114, 0, 3, 1114115, 0, 3, 1114116, 0, 3, 1114117, 0, 3, 1114118, 0, 3, 1114119, 0, 3, 1114120, 0, 3, 1114123, 0, 3, 1114124, 0, 3, 1114125, 0, 3, 1114126, 0, 3, 1114127, 0, 3, 1114128, 0, 3, 1245181, 0, 3, 1179648, 0, 2, 1179649, 0, 3, 1179650, 0, 3, 1179654, 0, 3, 1179655, 0, 3, 1179658, 0, 3, 1179659, 0, 3, 1179660, 0, 3, 1179661, 0, 3, 1179662, 0, 3, 1179663, 0, 3, 1179664, 0, 3, 1310717, 0, 3, 1245185, 0, 3, 1245186, 0, 3, 1245187, 0, 3, 1245188, 0, 3, 1245189, 0, 3, 1245190, 0, 3, 1245191, 0, 3, 1245193, 0, 3, 1245194, 0, 3, 1245195, 0, 3, 1245196, 0, 3, 1245197, 0, 3, 1245199, 0, 3, 1376253, 0, 3, 1376254, 0, 3, 1376255, 0, 3, 1310721, 0, 3, 1310722, 0, 3, 1310723, 0, 3, 1310724, 0, 3, 1310725, 0, 3, 1310726, 0, 3, 1310727, 0, 3, 1310730, 0, 3, 1310731, 0, 3, 1310732, 0, 3, 1310733, 0, 3, 1310734, 0, 3, 1310735, 0, 3, 1310736, 0, 3, 1441788, 0, 3, 1441789, 0, 3, 1441790, 0, 3, 1441791, 0, 3, 1376257, 0, 3, 1376258, 0, 3, 1376259, 0, 3, 1376260, 0, 3, 1376261, 0, 3, 1376262, 0, 3, 1376263, 0, 3, 1376264, 0, 3, 1376266, 0, 3, 1376270, 0, 3, 1376271, 0, 3, 1376272, 0, 3 )
 
+[node name="Loot" parent="." index="2"]
+tile_data = PoolIntArray( 524292, 0, 0 )
+
 [node name="Blocks" parent="." index="3"]
 tile_data = PoolIntArray( 393212, 0, 3, 327696, 0, 3, 393232, 0, 3, 524284, 0, 3, 524285, 0, 3, 458766, 0, 3, 458768, 0, 3, 589820, 0, 3, 589821, 0, 3, 589823, 0, 3, 524288, 0, 3, 524292, 0, 0, 524294, 0, 3, 524296, 0, 3, 524297, 0, 3, 524299, 0, 3, 524300, 0, 3, 524302, 0, 3, 524303, 0, 3, 524304, 0, 3, 655357, 0, 3, 655358, 0, 3, 655359, 0, 3, 589824, 0, 3, 589825, 0, 3, 589831, 0, 3, 589834, 0, 3, 589836, 0, 3, 589837, 0, 3, 589838, 0, 3, 589839, 0, 3, 589840, 0, 3, 655360, 0, 3, 655361, 0, 3, 655362, 0, 3, 655363, 0, 3, 655366, 0, 3, 655367, 0, 3, 655368, 0, 3, 655369, 0, 3, 655370, 0, 3, 655371, 0, 3, 655372, 0, 3, 655373, 0, 3, 655374, 0, 3, 655375, 0, 3, 655376, 0, 3, 786428, 0, 3, 786429, 0, 3, 786430, 0, 3, 720897, 0, 3, 720898, 0, 3, 720902, 0, 3, 720903, 0, 3, 720904, 0, 3, 720905, 0, 3, 720906, 0, 3, 720907, 0, 3, 851964, 0, 3, 851965, 0, 3, 851966, 0, 3, 851967, 0, 3, 786432, 0, 3, 786440, 0, 3, 786445, 0, 3, 786446, 0, 3, 786447, 0, 3, 786448, 0, 3, 917500, 0, 3, 917501, 0, 3, 917502, 0, 3, 917503, 0, 3, 851968, 0, 3, 851969, 0, 3, 851970, 0, 3, 851971, 0, 3, 851973, 0, 3, 851974, 0, 3, 851975, 0, 3, 851976, 0, 3, 851977, 0, 3, 851978, 0, 3, 851981, 0, 3, 851982, 0, 3, 983036, 0, 3, 983037, 0, 3, 983038, 0, 3, 983039, 0, 3, 917504, 0, 3, 917505, 0, 3, 917509, 0, 3, 917510, 0, 3, 917511, 0, 3, 917516, 0, 3, 917517, 0, 3, 1048573, 0, 3, 1048574, 0, 3, 1048575, 0, 3, 983040, 0, 3, 983041, 0, 3, 983043, 0, 3, 983044, 0, 3, 983045, 0, 3, 983046, 0, 3, 983047, 0, 3, 983048, 0, 3, 983050, 0, 3, 983052, 0, 3, 983053, 0, 3, 983054, 0, 3, 983055, 0, 3, 1114108, 0, 3, 1114109, 0, 3, 1114110, 0, 3, 1114111, 0, 3, 1048580, 0, 3, 1048582, 0, 3, 1048583, 0, 3, 1048584, 0, 3, 1048586, 0, 3, 1048587, 0, 3, 1048588, 0, 3, 1048590, 0, 3, 1048591, 0, 3, 1179645, 0, 3, 1179646, 0, 3, 1179647, 0, 3, 1114112, 0, 3, 1114113, 0, 3, 1114114, 0, 3, 1114115, 0, 3, 1114116, 0, 3, 1114117, 0, 3, 1114118, 0, 3, 1114119, 0, 3, 1114120, 0, 3, 1114123, 0, 3, 1114124, 0, 3, 1114125, 0, 3, 1114126, 0, 3, 1114127, 0, 3, 1114128, 0, 3, 1245181, 0, 3, 1179649, 0, 3, 1179650, 0, 3, 1179654, 0, 3, 1179655, 0, 3, 1179658, 0, 3, 1179659, 0, 3, 1179660, 0, 3, 1179661, 0, 3, 1179662, 0, 3, 1179663, 0, 3, 1179664, 0, 3, 1310717, 0, 3, 1245185, 0, 3, 1245186, 0, 3, 1245187, 0, 3, 1245188, 0, 3, 1245189, 0, 3, 1245190, 0, 3, 1245191, 0, 3, 1245193, 0, 3, 1245194, 0, 3, 1245195, 0, 3, 1245196, 0, 3, 1245197, 0, 3, 1245199, 0, 3, 1376253, 0, 3, 1376254, 0, 3, 1376255, 0, 3, 1310721, 0, 3, 1310722, 0, 3, 1310723, 0, 3, 1310724, 0, 3, 1310725, 0, 3, 1310726, 0, 3, 1310727, 0, 3, 1310730, 0, 3, 1310731, 0, 3, 1310732, 0, 3, 1310733, 0, 3, 1310734, 0, 3, 1310735, 0, 3, 1310736, 0, 3, 1441788, 0, 3, 1441789, 0, 3, 1441790, 0, 3, 1441791, 0, 3, 1376257, 0, 3, 1376258, 0, 3, 1376259, 0, 3, 1376260, 0, 3, 1376261, 0, 3, 1376262, 0, 3, 1376263, 0, 3, 1376264, 0, 3, 1376266, 0, 3, 1376270, 0, 3, 1376271, 0, 3, 1376272, 0, 3 )
 
@@ -43,12 +46,34 @@ margin_bottom = 126.0
 margin_right = 188.0
 margin_bottom = 105.0
 
+[node name="PopupOuterBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+margin_right = 188.0
+margin_bottom = 105.0
+
+[node name="PopupOuterMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+margin_right = 188.0
+margin_bottom = 105.0
+
+[node name="PopupInnerBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
+margin_right = 179.0
+margin_bottom = 96.0
+
+[node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
+margin_right = 179.0
+margin_bottom = 96.0
+
+[node name="CloseButtonContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+margin_right = 179.0
+margin_bottom = 96.0
+
 [node name="DraggableCamera" parent="." index="9"]
 position = Vector2( 57, 659 )
 
 [node name="StashInventoryPopup" parent="." index="10" instance=ExtResource( 3 )]
 visible = false
+CloseOnClickButton = true
 Title = "Stash"
+CloseOnClickOutside = false
 
 [node name="CustomPopupContainer" parent="StashInventoryPopup" index="0"]
 anchor_left = 0.5
@@ -85,28 +110,43 @@ margin_bottom = 179.0
 margin_right = 292.0
 margin_bottom = 158.0
 
-[node name="InventoryFrame" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+[node name="PopupOuterBackground" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 292.0
 margin_bottom = 158.0
 
-[node name="OuterInventoryMargin" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+[node name="PopupOuterMargin" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 292.0
 margin_bottom = 158.0
 
-[node name="InventoryBackground" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
+[node name="PopupInnerBackground" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
 margin_right = 283.0
 margin_bottom = 149.0
 
-[node name="ContentMargin" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
+[node name="ContentMargin" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
 margin_right = 283.0
 margin_bottom = 149.0
 
-[node name="StashInventory" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 4 )]
+[node name="StashInventory" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0" instance=ExtResource( 4 )]
 margin_right = 265.0
 margin_bottom = 131.0
 Size = 10
 MaxCountPerSlot = 10
 SizePerRow = 5
+
+[node name="CloseButtonContainer" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+margin_right = 283.0
+margin_bottom = 149.0
+
+[node name="CloseButtonMarginRight" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="0"]
+margin_right = 223.0
+
+[node name="CloseButton" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="1"]
+margin_left = 227.0
+margin_right = 274.0
+
+[node name="CloseButtonMaringBottom" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="2"]
+margin_right = 223.0
+margin_bottom = 140.0
 
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]

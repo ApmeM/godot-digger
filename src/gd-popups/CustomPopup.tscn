@@ -72,7 +72,7 @@ margin_bottom = 106.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="InventoryFrame" type="NinePatchRect" parent="CustomPopupContainer/PopupContainer/MarginContainer"]
+[node name="PopupOuterBackground" type="NinePatchRect" parent="CustomPopupContainer/PopupContainer/MarginContainer"]
 margin_right = 308.0
 margin_bottom = 106.0
 texture = ExtResource( 5 )
@@ -81,7 +81,7 @@ patch_margin_top = 10
 patch_margin_right = 9
 patch_margin_bottom = 10
 
-[node name="OuterInventoryMargin" type="MarginContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer"]
+[node name="PopupOuterMargin" type="MarginContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer"]
 margin_right = 308.0
 margin_bottom = 106.0
 custom_constants/margin_right = 9
@@ -89,7 +89,7 @@ custom_constants/margin_top = 9
 custom_constants/margin_left = 9
 custom_constants/margin_bottom = 9
 
-[node name="InventoryBackground" type="NinePatchRect" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin"]
+[node name="PopupInnerBackground" type="NinePatchRect" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin"]
 margin_left = 9.0
 margin_top = 9.0
 margin_right = 299.0
@@ -100,7 +100,7 @@ patch_margin_top = 8
 patch_margin_right = 8
 patch_margin_bottom = 8
 
-[node name="ContentMargin" type="MarginContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin"]
+[node name="ContentMargin" type="MarginContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin"]
 margin_left = 9.0
 margin_top = 9.0
 margin_right = 299.0
@@ -109,3 +109,31 @@ custom_constants/margin_right = 9
 custom_constants/margin_top = 9
 custom_constants/margin_left = 9
 custom_constants/margin_bottom = 9
+
+[node name="CloseButtonContainer" type="GridContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin"]
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 299.0
+margin_bottom = 97.0
+mouse_filter = 2
+columns = 2
+
+[node name="CloseButtonMarginRight" type="Control" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer"]
+margin_right = 239.0
+margin_bottom = 20.0
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer"]
+margin_left = 243.0
+margin_right = 290.0
+margin_bottom = 20.0
+text = "Close"
+
+[node name="CloseButtonMaringBottom" type="Control" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer"]
+margin_top = 24.0
+margin_right = 239.0
+margin_bottom = 88.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
