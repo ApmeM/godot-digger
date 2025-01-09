@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -7,6 +8,7 @@ public partial class Main
 {
     [Export]
     public Texture LootTexture;
+    private List<Texture> resources;
 
     public override void _Ready()
     {
@@ -17,27 +19,20 @@ public partial class Main
         // this.di.localAchievementRepository.ResetAchievements();
 
         var number = LootTexture.GetWidth() / 48;
-        for (var i = 0; i < number; i++)
-        {
-            var lootItem = new AtlasTexture
-            {
-                Atlas = LootTexture,
-                Region = new Rect2(i * 48, 0, 48, 48)
-            };
+        this.resources = Enumerable.Range(0, number)
+            .Select(i => new AtlasTexture { Atlas = LootTexture, Region = new Rect2(i * 48, 0, 48, 48) })
+            .Cast<Texture>()
+            .ToList();
 
-            this.inventory.Resources.Add(lootItem);
-            ChangeLevel("Level1", new List<Loot>());
-        }
+        ChangeLevel("Level1");
     }
 
-    public void ChangeLevel(string nextLevel, List<Loot> resources)
+    public void ChangeLevel(string nextLevel)
     {
-        this.ResourcesAdded(resources);
-
         this.gamePosition.ClearChildren();
         var levelScene = ResourceLoader.Load<PackedScene>($"res://Presentation/levels/{nextLevel}.tscn");
         var game = levelScene.Instance<BaseLevel>();
-        game.Resources = this.inventory.Resources;
+        game.Resources = this.resources;
         game.InitMap(this.MaxNumberOfTurns, this.InventorySlots, this.DigPower);
         game.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
         this.gamePosition.AddChild(game);
@@ -51,12 +46,4 @@ public partial class Main
 
     [Export]
     public uint MaxNumberOfTurns = 10;
-
-    public void ResourcesAdded(List<Loot> newResources)
-    {
-        foreach (var res in newResources)
-        {
-            this.inventory.TryAddItem((int)res, 1);
-        }
-    }
 }

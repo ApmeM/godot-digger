@@ -12,15 +12,14 @@ public partial class Level2
 
     public override void ChangeLevelClicked(Vector2 pos)
     {
-        var resources = this.inventory.GetItems().Select(a => (Loot)a.Item1).ToList();
         if (pos == new Vector2(8, 15))
         {
-            this.EmitSignal(nameof(ChangeLevel), "Level1", resources);
+            this.EmitSignal(nameof(ChangeLevel), "Level1");
             return;
         }
         if (pos == new Vector2(6, 1))
         {
-            this.EmitSignal(nameof(ChangeLevel), "Level3", resources);
+            this.EmitSignal(nameof(ChangeLevel), "Level3");
             return;
         }
         base.ChangeLevelClicked(pos);

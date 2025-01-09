@@ -14,6 +14,7 @@ public enum Constructions
     Woodcutter,
     Blacksmith,
     Inn,
+    Stash,
 }
 
 public class ConstructionsDefinition
@@ -31,6 +32,7 @@ public class ConstructionsDefinition
         { Constructions.Woodcutter, new ConstructionsDefinition{ClickAction = (level, pos)=>{level.ChangeLevelClicked(pos);}} },
         { Constructions.Blacksmith, new ConstructionsDefinition{ClickAction = (level, pos)=>{level.ChangeLevelClicked(pos);}} },
         { Constructions.Inn, new ConstructionsDefinition{ClickAction = (level, pos)=>{level.ChangeLevelClicked(pos);}} },
+        { Constructions.Stash, new ConstructionsDefinition{ClickAction = (level, pos)=>{level.CustomConstructionClicked(pos);}} },
     };
 
 

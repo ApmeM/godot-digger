@@ -41,7 +41,7 @@
 0/texture = ExtResource( 12 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 480, 48 )
+0/region = Rect2( 0, 0, 528, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
 0/autotile/tile_size = Vector2( 48, 48 )
@@ -172,58 +172,58 @@ rect_min_size = Vector2( 80, 80 )
 texture_normal = ExtResource( 6 )
 expand = true
 
-[node name="CustomPopupInventory" parent="." instance=ExtResource( 7 )]
+[node name="BagInventoryPopup" parent="." instance=ExtResource( 7 )]
 visible = false
 Title = "Inventory"
 
-[node name="CustomPopupContainer" parent="CustomPopupInventory" index="0"]
+[node name="CustomPopupContainer" parent="BagInventoryPopup" index="0"]
 margin_left = 112.0
 margin_top = 78.0
 margin_right = 216.0
 margin_bottom = 176.0
 
-[node name="HeaderCenter" parent="CustomPopupInventory/CustomPopupContainer" index="0"]
+[node name="HeaderCenter" parent="BagInventoryPopup/CustomPopupContainer" index="0"]
 margin_right = 131.0
 
-[node name="HeaderMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter" index="0"]
+[node name="HeaderMargin" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter" index="0"]
 margin_left = 20.0
 margin_right = 111.0
 
-[node name="TitleBackground" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+[node name="TitleBackground" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
 margin_right = 91.0
 
-[node name="TitleMargin" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+[node name="TitleMargin" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
 margin_right = 91.0
 
-[node name="TitleLabel" parent="CustomPopupInventory/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+[node name="TitleLabel" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
 margin_right = 81.0
 text = "Inventory"
 
-[node name="PopupContainer" parent="CustomPopupInventory/CustomPopupContainer" index="1"]
+[node name="PopupContainer" parent="BagInventoryPopup/CustomPopupContainer" index="1"]
 margin_right = 131.0
 margin_bottom = 98.0
 
-[node name="MarginContainer" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer" index="0"]
+[node name="MarginContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer" index="0"]
 margin_right = 131.0
 margin_bottom = 77.0
 
-[node name="InventoryFrame" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+[node name="InventoryFrame" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 188.0
 margin_bottom = 105.0
 
-[node name="OuterInventoryMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+[node name="OuterInventoryMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 188.0
 margin_bottom = 105.0
 
-[node name="InventoryBackground" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
+[node name="InventoryBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
 margin_right = 179.0
 margin_bottom = 96.0
 
-[node name="ContentMargin" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
+[node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
 margin_right = 179.0
 margin_bottom = 96.0
 
-[node name="Inventory" parent="CustomPopupInventory/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 8 )]
+[node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0" instance=ExtResource( 8 )]
 margin_right = 161.0
 margin_bottom = 78.0
 Size = 3
@@ -231,30 +231,25 @@ MaxCountPerSlot = 1
 SizePerRow = 4
 Title = "Bag"
 
-[node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
-position = Vector2( 241, 400 )
-minimumZoom = 1.0
-maximumZoom = 2.0
-
-[node name="CustomPopup" parent="." instance=ExtResource( 7 )]
+[node name="SignPopup" parent="." instance=ExtResource( 7 )]
 visible = false
 Title = "Sign"
 
-[node name="HeaderMargin" parent="CustomPopup/CustomPopupContainer/HeaderCenter" index="0"]
+[node name="HeaderMargin" parent="SignPopup/CustomPopupContainer/HeaderCenter" index="0"]
 margin_left = 126.0
 margin_right = 181.0
 
-[node name="TitleBackground" parent="CustomPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+[node name="TitleBackground" parent="SignPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
 margin_right = 55.0
 
-[node name="TitleMargin" parent="CustomPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+[node name="TitleMargin" parent="SignPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
 margin_right = 55.0
 
-[node name="TitleLabel" parent="CustomPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+[node name="TitleLabel" parent="SignPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
 margin_right = 45.0
 text = "Sign"
 
-[node name="SignLabel" type="Label" parent="CustomPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
+[node name="SignLabel" type="Label" parent="SignPopup/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
 margin_left = 9.0
 margin_top = 37.0
 margin_right = 281.0
@@ -263,5 +258,10 @@ custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Text"
 align = 1
 
-[editable path="CustomPopupInventory"]
-[editable path="CustomPopup"]
+[node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
+position = Vector2( 241, 400 )
+minimumZoom = 1.0
+maximumZoom = 2.0
+
+[editable path="BagInventoryPopup"]
+[editable path="SignPopup"]

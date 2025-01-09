@@ -8,7 +8,7 @@ using GodotDigger.Presentation.Utils;
 public partial class BaseLevel
 {
     [Signal]
-    public delegate void ChangeLevel(string nextLevel, List<Loot> resources);
+    public delegate void ChangeLevel(string nextLevel);
 
     [Export]
     public List<Texture> Resources = new List<Texture>();
@@ -18,10 +18,10 @@ public partial class BaseLevel
 
     public Stamina Stamina => this.stamina;
 
-    public void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
+    public virtual void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
-        this.inventory.Resources = Resources;
-        this.inventory.Size = inventorySlots;
+        this.bagInventory.Resources = Resources;
+        this.bagInventory.Size = inventorySlots;
 
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
@@ -42,12 +42,12 @@ public partial class BaseLevel
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
-        this.inventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
+        this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
 
         this.AddToGroup(Groups.LevelScene);
     }
 
-    private void InventoryUseItem(InventorySlot slot)
+    protected void InventoryUseItem(InventorySlot slot)
     {
         if (LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction != null)
         {
@@ -99,7 +99,7 @@ public partial class BaseLevel
             return true;
         }
 
-        if (this.inventory.TryAddItem((int)lootCellTile.x, 1) != 0)
+        if (this.bagInventory.TryAddItem((int)lootCellTile.x, 1) != 0)
         {
             return false;
         }
@@ -201,7 +201,7 @@ public partial class BaseLevel
 
     private void ShowInventoryPopup()
     {
-        this.customPopupInventory.Show();
+        this.bagInventoryPopup.Show();
     }
 
     public virtual void ShowPopup(Vector2 pos)
@@ -212,5 +212,10 @@ public partial class BaseLevel
     public virtual void ChangeLevelClicked(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a change level with no level set at {pos} for {this.Name}");
+    }
+
+    public virtual void CustomConstructionClicked(Vector2 pos)
+    {
+        GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
     }
 }
