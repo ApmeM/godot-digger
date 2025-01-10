@@ -9,7 +9,7 @@ public partial class Building
     [Export]
     public NodePath InventoryPath;
 
-    private Func<List<Tuple<Loot, uint>>> getRequirements;
+    private Func<List<Tuple<int, uint>>> getRequirements;
 
     private Action action;
 
@@ -21,7 +21,7 @@ public partial class Building
         this.Connect(CommonSignals.Pressed, this, nameof(BuildingPressed));
     }
 
-    public void Initialize(Func<List<Tuple<Loot, uint>>> getRequirements, Action action)
+    public void Initialize(Func<List<Tuple<int, uint>>> getRequirements, Action action)
     {
         this.getRequirements = getRequirements;
         this.action = action;

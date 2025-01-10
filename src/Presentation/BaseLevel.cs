@@ -49,9 +49,9 @@ public partial class BaseLevel
 
     protected void InventoryUseItem(InventorySlot slot)
     {
-        if (LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction != null)
+        if (LootDefinition.KnownLoot[slot.ItemIndex].UseAction != null)
         {
-            LootDefinition.KnownLoot[(Loot)slot.ItemIndex].UseAction(this);
+            LootDefinition.KnownLoot[slot.ItemIndex].UseAction(this);
             slot.TryAddItem(slot.ItemIndex, -1);
         }
     }
@@ -68,59 +68,51 @@ public partial class BaseLevel
         var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
 
         var result =
-            TryPassFog(pos) &&
-            TryDigBlock(pos) &&
-            UnFogCell(pos) &&
-            TryGrabLoot(pos) &&
-            TryActWithContruction(pos);
+            TryLayer(this.fog, pos, FogDefinition.KnownConstructions) &&
+            TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks) &&
+            TryLayer(this.loot, pos, LootDefinition.KnownLoot) &&
+            TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions) &&
+            TryLayer(this.floor, pos, FloorDefinition.KnownFloors);
+
+        if (result)
+        {
+            throw new Exception($"Something goes wrong at {pos}.");
+        }
     }
 
-    private bool TryActWithContruction(Vector2 pos)
+    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<int, T> knownActions) where T : IActionDefinition
     {
-        var constructionsCell = this.constructions.GetCellv(pos);
-        var constructionsCellTile = this.constructions.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+        var cell = map.GetCellv(pos);
+        var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (constructionsCell == -1)
+        if (cell == -1)
         {
             return true;
         }
 
-        ConstructionsDefinition.KnownConstructions[(Constructions)constructionsCellTile.x].ClickAction.Invoke(this, pos);
-        return true;
+        knownActions[(int)cellTile.x].ClickAction.Invoke(this, pos);
+        return false;
     }
 
-    private bool TryGrabLoot(Vector2 pos)
+    public void TryGrabLoot(Vector2 pos)
     {
         var lootCell = this.loot.GetCellv(pos);
         var lootCellTile = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (lootCell == -1)
+        if (this.bagInventory.TryAddItem((int)lootCellTile.x, 1) == 0)
         {
-            return true;
+            this.loot.SetCellv(pos, -1);
         }
-
-        if (this.bagInventory.TryAddItem((int)lootCellTile.x, 1) != 0)
-        {
-            return false;
-        }
-
-        this.loot.SetCellv(pos, -1);
-        return true;
     }
 
-    private bool TryDigBlock(Vector2 pos)
+    public void TryDigBlock(Vector2 pos)
     {
         var blocksCell = this.blocks.GetCellv(pos);
         var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (blocksCell == -1)
-        {
-            return true;
-        }
-
         if (this.stamina.CurrentNumberOfTurns == 0)
         {
-            return false;
+            return;
         }
 
         this.stamina.CurrentNumberOfTurns--;
@@ -129,7 +121,7 @@ public partial class BaseLevel
 
         if (!this.blocks.HasMeta(metaName))
         {
-            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(Blocks)blocksCellTile.x].HP);
+            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(int)blocksCellTile.x].HP);
         }
 
         var currentHp = (int)this.blocks.GetMeta(metaName);
@@ -137,21 +129,12 @@ public partial class BaseLevel
         if (currentHp > this.DigPower)
         {
             this.blocks.SetMeta(metaName, currentHp - this.DigPower);
-            return false;
+            return;
         }
 
         this.blocks.SetMeta(metaName, null);
         this.blocks.SetCellv(pos, -1);
         this.UnFogCell(pos);
-
-        return false;
-    }
-
-    private bool TryPassFog(Vector2 pos)
-    {
-        var fogCell = this.fog.GetCellv(pos);
-        var fogCellTile = this.fog.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-        return fogCell == -1;
     }
 
     private bool UnFogCell(Vector2 cell)

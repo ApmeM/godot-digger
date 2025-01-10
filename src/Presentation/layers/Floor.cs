@@ -1,17 +1,23 @@
+using System;
 using System.Collections.Generic;
+using Godot;
 
-public enum Floor
+public static class Floor
 {
-    Tiles,
-    Wall,
-    Ground,
+    public static int Tiles = 0;
+    public static int Wall = 1;
+    public static int Ground = 2;
 }
 
-public class FloorDefinition
+public class FloorDefinition : IActionDefinition
 {
-    public static Dictionary<Floor, FloorDefinition> KnownFloors = new Dictionary<Floor, FloorDefinition>{
-        { Floor.Wall, new FloorDefinition() },
-        { Floor.Tiles, new FloorDefinition() },
-        { Floor.Ground, new FloorDefinition() },
+    private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
+
+    public static Dictionary<int, FloorDefinition> KnownFloors = new Dictionary<int, FloorDefinition>{
+        { Floor.Wall, new FloorDefinition{ClickAction = DoNothing} },
+        { Floor.Tiles, new FloorDefinition{ClickAction = DoNothing} },
+        { Floor.Ground, new FloorDefinition{ClickAction = DoNothing} },
     };
+
+    public Action<BaseLevel, Vector2> ClickAction { get; set; }
 }

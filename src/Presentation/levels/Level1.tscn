@@ -46,26 +46,6 @@ margin_bottom = 126.0
 margin_right = 188.0
 margin_bottom = 105.0
 
-[node name="PopupOuterBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 188.0
-margin_bottom = 105.0
-
-[node name="PopupOuterMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 188.0
-margin_bottom = 105.0
-
-[node name="PopupInnerBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
-margin_right = 179.0
-margin_bottom = 96.0
-
-[node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
-margin_right = 179.0
-margin_bottom = 96.0
-
-[node name="CloseButtonContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
-margin_right = 179.0
-margin_bottom = 96.0
-
 [node name="DraggableCamera" parent="." index="9"]
 position = Vector2( 57, 659 )
 
