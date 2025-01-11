@@ -33,6 +33,12 @@ public partial class Level1
             signPopup.Show();
             return;
         }
+        if (pos == new Vector2(-2, 18))
+        {
+            signLabel.Text = "Hi stranger, I'm a shop keeper without shop.\nCan you please bring me 10 wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.";
+            signPopup.Show();
+            return;
+        }
         base.ShowPopup(pos);
     }
 

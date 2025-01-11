@@ -4,17 +4,17 @@ using Godot;
 
 public static class Constructions
 {
-    public static int StairsUp = 0;
-    public static int StairsDown = 1;
-    public static int Sign = 2;
-    public static int Grass = 3;
-    public static int StatueLeft = 4;
-    public static int StatueRight = 5;
-    public static int OpenDoor = 6;
-    public static int Woodcutter = 7;
-    public static int Blacksmith = 8;
-    public static int Inn = 9;
-    public static int Stash = 10;
+    public static ValueTuple<int, int, int> StairsUp = (0,0,0);
+    public static ValueTuple<int, int, int> StairsDown = (0,1,0);
+    public static ValueTuple<int, int, int> Sign = (0,2,0);
+    public static ValueTuple<int, int, int> Grass = (0,3,0);
+    public static ValueTuple<int, int, int> StatueLeft = (0,4,0);
+    public static ValueTuple<int, int, int> StatueRight = (0,5,0);
+    public static ValueTuple<int, int, int> OpenDoor = (0,6,0);
+    public static ValueTuple<int, int, int> Woodcutter = (0,7,0);
+    public static ValueTuple<int, int, int> Blacksmith = (0,8,0);
+    public static ValueTuple<int, int, int> Inn = (0,9,0);
+    public static ValueTuple<int, int, int> Stash = (0,10,0);
 }
 
 public class ConstructionsDefinition : IActionDefinition
@@ -24,7 +24,7 @@ public class ConstructionsDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> ShowPopup = (level, pos) => { level.ShowPopup(pos); };
     private static Action<BaseLevel, Vector2> CustomConstruction = (level, pos) => { level.CustomConstructionClicked(pos); };
 
-    public static Dictionary<int, ConstructionsDefinition> KnownConstructions = new Dictionary<int, ConstructionsDefinition>{
+    public static Dictionary<ValueTuple<int, int, int>, ConstructionsDefinition> KnownConstructions = new Dictionary<ValueTuple<int, int, int>, ConstructionsDefinition>{
         { Constructions.StairsUp, new ConstructionsDefinition{ClickAction = ChangeLevel} },
         { Constructions.StairsDown, new ConstructionsDefinition{ClickAction = ChangeLevel} },
         { Constructions.Sign, new ConstructionsDefinition{ClickAction = ShowPopup} },

@@ -49,9 +49,9 @@ public partial class BaseLevel
 
     protected void InventoryUseItem(InventorySlot slot)
     {
-        if (LootDefinition.KnownLoot[slot.ItemIndex].UseAction != null)
+        if (LootDefinition.KnownLoot[(0, slot.ItemIndex, 0)].UseAction != null)
         {
-            LootDefinition.KnownLoot[slot.ItemIndex].UseAction(this);
+            LootDefinition.KnownLoot[(0, slot.ItemIndex, 0)].UseAction(this);
             slot.TryAddItem(slot.ItemIndex, -1);
         }
     }
@@ -80,7 +80,7 @@ public partial class BaseLevel
         }
     }
 
-    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<int, T> knownActions) where T : IActionDefinition
+    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions) where T : IActionDefinition
     {
         var cell = map.GetCellv(pos);
         var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
@@ -90,7 +90,7 @@ public partial class BaseLevel
             return true;
         }
 
-        knownActions[(int)cellTile.x].ClickAction.Invoke(this, pos);
+        knownActions[(cell, (int)cellTile.x, (int)cellTile.y)].ClickAction.Invoke(this, pos);
         return false;
     }
 
@@ -121,7 +121,7 @@ public partial class BaseLevel
 
         if (!this.blocks.HasMeta(metaName))
         {
-            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(int)blocksCellTile.x].HP);
+            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
         }
 
         var currentHp = (int)this.blocks.GetMeta(metaName);

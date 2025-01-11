@@ -4,10 +4,10 @@ using Godot;
 
 public static class Loot
 {
-    public static int Wood = 0;
-    public static int Steel = 1;
-    public static int Cloth = 2;
-    public static int StaminaPlant = 3;
+    public static ValueTuple<int, int, int> Wood = (0,0,0);
+    public static ValueTuple<int, int, int> Steel = (0,1,0);
+    public static ValueTuple<int, int, int> Cloth = (0,2,0);
+    public static ValueTuple<int, int, int> StaminaPlant = (0,3,0);
 }
 
 public class LootDefinition : IActionDefinition
@@ -15,7 +15,7 @@ public class LootDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
     private static Action<BaseLevel, Vector2> PutToBag = (level, pos) => { level.TryGrabLoot(pos); };
 
-    public static Dictionary<int, LootDefinition> KnownLoot = new Dictionary<int, LootDefinition>{
+    public static Dictionary<ValueTuple<int, int, int>, LootDefinition> KnownLoot = new Dictionary<ValueTuple<int, int, int>, LootDefinition>{
         { Loot.Wood, new LootDefinition{ClickAction = PutToBag} },
         { Loot.Steel, new LootDefinition{ClickAction = PutToBag} },
         { Loot.Cloth, new LootDefinition{ClickAction = PutToBag} },

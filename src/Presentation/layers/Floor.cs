@@ -4,16 +4,16 @@ using Godot;
 
 public static class Floor
 {
-    public static int Tiles = 0;
-    public static int Wall = 1;
-    public static int Ground = 2;
+    public static ValueTuple<int, int, int> Tiles = (0, 0, 0);
+    public static ValueTuple<int, int, int> Wall = (0, 1, 0);
+    public static ValueTuple<int, int, int> Ground = (0, 2, 0);
 }
 
 public class FloorDefinition : IActionDefinition
 {
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
 
-    public static Dictionary<int, FloorDefinition> KnownFloors = new Dictionary<int, FloorDefinition>{
+    public static Dictionary<ValueTuple<int, int, int>, FloorDefinition> KnownFloors = new Dictionary<ValueTuple<int, int, int>, FloorDefinition>{
         { Floor.Wall, new FloorDefinition{ClickAction = DoNothing} },
         { Floor.Tiles, new FloorDefinition{ClickAction = DoNothing} },
         { Floor.Ground, new FloorDefinition{ClickAction = DoNothing} },
