@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://Presentation/assets/TileSets/floor.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -13,6 +13,8 @@
 [ext_resource path="res://gd-draggableCamera/DraggableCamera.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/assets/TileSets/constructions.png" type="Texture" id=12]
 [ext_resource path="res://Presentation/assets/NPC/Shopkeeper.tres" type="Texture" id=13]
+[ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=14]
+[ext_resource path="res://gd-popups/Xolonium-Regular.ttf" type="DynamicFontData" id=15]
 
 [sub_resource type="TileSet" id=1]
 0/name = "floor.png 0"
@@ -142,6 +144,15 @@
 0/shape_one_way_margin = 0.0
 0/shapes = [  ]
 0/z_index = 0
+
+[sub_resource type="DynamicFont" id=8]
+size = 14
+font_data = ExtResource( 15 )
+
+[sub_resource type="AtlasTexture" id=7]
+flags = 4
+atlas = ExtResource( 3 )
+region = Rect2( 48, 0, 48, 48 )
 
 [node name="BaseLevel" type="Node2D"]
 script = ExtResource( 2 )
@@ -287,5 +298,67 @@ position = Vector2( 241, 400 )
 minimumZoom = 1.0
 maximumZoom = 2.0
 
+[node name="QuestRequirements" parent="." instance=ExtResource( 14 )]
+visible = false
+Content = null
+
+[node name="TitleLabel" parent="QuestRequirements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+custom_fonts/font = SubResource( 8 )
+
+[node name="PopupContainer" parent="QuestRequirements/CustomPopupContainer" index="1"]
+margin_bottom = 159.0
+
+[node name="MarginContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer" index="0"]
+margin_bottom = 138.0
+
+[node name="PopupOuterBackground" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+margin_bottom = 138.0
+
+[node name="PopupOuterMargin" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+margin_bottom = 138.0
+
+[node name="PopupInnerBackground" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
+margin_bottom = 129.0
+
+[node name="ContentMargin" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
+margin_bottom = 129.0
+
+[node name="ContentContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_bottom = 111.0
+
+[node name="ContentText" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="0"]
+margin_bottom = 14.0
+
+[node name="RequirementsContainer" type="CenterContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="1"]
+margin_top = 24.0
+margin_right = 272.0
+margin_bottom = 72.0
+
+[node name="RequirementsList" type="HBoxContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/RequirementsContainer"]
+margin_left = 91.0
+margin_right = 180.0
+margin_bottom = 48.0
+
+[node name="Item1" type="TextureRect" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/RequirementsContainer/RequirementsList"]
+margin_right = 48.0
+margin_bottom = 48.0
+texture = SubResource( 7 )
+
+[node name="Label1" type="Label" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/RequirementsContainer/RequirementsList"]
+margin_left = 52.0
+margin_top = 17.0
+margin_right = 89.0
+margin_bottom = 31.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "0 / 10"
+
+[node name="HBoxContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="2"]
+margin_top = 82.0
+margin_bottom = 102.0
+
+[node name="CloseButtonContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+margin_bottom = 129.0
+
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]
+[editable path="QuestRequirements"]

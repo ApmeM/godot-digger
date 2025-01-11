@@ -1,14 +1,19 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Presentation/Building.cs" type="Script" id=1]
 [ext_resource path="res://Presentation/assets/Buildings/Working forge.png" type="Texture" id=2]
 [ext_resource path="res://Presentation/assets/TileSets/loot.png" type="Texture" id=3]
+[ext_resource path="res://gd-popups/Xolonium-Regular.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=5]
 
-[sub_resource type="AtlasTexture" id=1]
+[sub_resource type="DynamicFont" id=8]
+size = 14
+font_data = ExtResource( 4 )
+
+[sub_resource type="AtlasTexture" id=7]
 flags = 4
 atlas = ExtResource( 3 )
-region = Rect2( 16, 0, 16, 16 )
+region = Rect2( 48, 0, 48, 48 )
 
 [node name="Building" type="TextureButton"]
 margin_right = 1024.0
@@ -18,8 +23,8 @@ texture_normal = ExtResource( 2 )
 script = ExtResource( 1 )
 
 [node name="Confirmation" parent="." instance=ExtResource( 5 )]
-visible = false
 Title = "Are you sure?"
+Content = null
 
 [node name="CustomPopupContainer" parent="Confirmation" index="0"]
 margin_left = 76.0
@@ -39,6 +44,7 @@ margin_right = 126.0
 
 [node name="TitleLabel" parent="Confirmation/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
 margin_right = 116.0
+custom_fonts/font = SubResource( 8 )
 text = "Are you sure?"
 
 [node name="PopupContainer" parent="Confirmation/CustomPopupContainer" index="1"]
@@ -47,54 +53,52 @@ margin_bottom = 178.0
 [node name="MarginContainer" parent="Confirmation/CustomPopupContainer/PopupContainer" index="0"]
 margin_bottom = 157.0
 
-[node name="InventoryFrame" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+[node name="PopupOuterBackground" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_bottom = 157.0
 
-[node name="OuterInventoryMargin" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+[node name="PopupOuterMargin" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_bottom = 157.0
 
-[node name="InventoryBackground" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="0"]
+[node name="PopupInnerBackground" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
 margin_bottom = 148.0
 
-[node name="ContentMargin" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin" index="1"]
+[node name="ContentMargin" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
 margin_bottom = 148.0
 
-[node name="ContentContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin" index="0"]
+[node name="ContentContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_bottom = 130.0
 
-[node name="ContentText" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="0"]
-text = "Increase pickaxe power.
-Requirements:"
+[node name="ContentText" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="0"]
+margin_bottom = 33.0
 
-[node name="CenterContainer" type="CenterContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="1"]
-margin_top = 50.0
+[node name="CenterContainer" type="CenterContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="1"]
+margin_top = 43.0
 margin_right = 272.0
 margin_bottom = 91.0
 size_flags_vertical = 3
 
-[node name="RequirementsList" type="HBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/CenterContainer"]
-margin_left = 114.0
-margin_top = 12.0
-margin_right = 157.0
-margin_bottom = 28.0
+[node name="RequirementsList" type="HBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/CenterContainer"]
+margin_left = 98.0
+margin_right = 173.0
+margin_bottom = 48.0
 
-[node name="Item1" type="TextureRect" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/CenterContainer/RequirementsList"]
-margin_right = 16.0
-margin_bottom = 16.0
-texture = SubResource( 1 )
+[node name="Item1" type="TextureRect" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/CenterContainer/RequirementsList"]
+margin_right = 48.0
+margin_bottom = 48.0
+texture = SubResource( 7 )
 
-[node name="Label1" type="Label" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/CenterContainer/RequirementsList"]
-margin_left = 20.0
-margin_top = 1.0
-margin_right = 43.0
-margin_bottom = 15.0
+[node name="Label1" type="Label" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/CenterContainer/RequirementsList"]
+margin_left = 52.0
+margin_top = 17.0
+margin_right = 75.0
+margin_bottom = 31.0
 text = "x10"
 
-[node name="HBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer" index="2"]
+[node name="HBoxContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="2"]
 margin_top = 101.0
 margin_bottom = 121.0
 
-[node name="ButtonYes" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/OuterInventoryMargin/ContentMargin/ContentContainer/HBoxContainer" index="0"]
-disabled = true
+[node name="CloseButtonContainer" parent="Confirmation/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+margin_bottom = 148.0
 
 [editable path="Confirmation"]

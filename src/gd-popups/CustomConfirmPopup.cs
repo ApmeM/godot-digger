@@ -15,6 +15,7 @@ public partial class CustomConfirmPopup
     public delegate void ChoiceMade(bool isYes);
 
     private bool allowYes;
+    private string content;
 
     [Export]
     public bool AllowYes
@@ -30,6 +31,20 @@ public partial class CustomConfirmPopup
         }
     }
 
+    [Export]
+    public string Content
+    {
+        get => content;
+        set
+        {
+            content = value;
+            if (IsInsideTree())
+            {
+                this.contentText.Text = value;
+            }
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();
@@ -39,6 +54,7 @@ public partial class CustomConfirmPopup
         this.buttonNo.Connect(CommonSignals.Pressed, this, nameof(NoButtonClicked));
 
         this.AllowYes = this.allowYes;
+        this.Content = this.content;
     }
 
     protected override void Close()

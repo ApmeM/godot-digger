@@ -33,7 +33,7 @@ public class ConstructionsDefinition : IActionDefinition
         { Constructions.StatueRight, new ConstructionsDefinition{ClickAction = DoNothing} },
         { Constructions.OpenDoor, new ConstructionsDefinition{ClickAction = DoNothing} },
         { Constructions.Woodcutter, new ConstructionsDefinition{ClickAction = ChangeLevel} },
-        { Constructions.Blacksmith, new ConstructionsDefinition{ClickAction = ChangeLevel} },
+        { Constructions.Blacksmith, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Inn, new ConstructionsDefinition{ClickAction = ChangeLevel} },
         { Constructions.Stash, new ConstructionsDefinition{ClickAction = CustomConstruction} },
     };

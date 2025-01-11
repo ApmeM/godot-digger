@@ -14,13 +14,13 @@ public static class Blocks
 public class BlocksDefinition : IActionDefinition
 {
     private static Action<BaseLevel, Vector2> DigBlock = (level, pos) => { level.TryDigBlock(pos); };
-    private static Action<BaseLevel, Vector2> ShowPopup = (level, pos) => { level.ShowPopup(pos); };
+    private static Action<BaseLevel, Vector2> CustomClicked = (level, pos) => { level.CustomBlockClicked(pos); };
     public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
         { Blocks.Wood, new BlocksDefinition{HP = 2, ClickAction=DigBlock } },
         { Blocks.Steel, new BlocksDefinition{HP = 3, ClickAction=DigBlock} },
         { Blocks.Wardrobe, new BlocksDefinition{HP = 4, ClickAction=DigBlock} },
         { Blocks.Grass, new BlocksDefinition{HP = 1, ClickAction=DigBlock} },
-        { Blocks.Shopkeeper, new BlocksDefinition{HP = 0, ClickAction=ShowPopup} },
+        { Blocks.Shopkeeper, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }

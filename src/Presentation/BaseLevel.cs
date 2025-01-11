@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -187,6 +188,58 @@ public partial class BaseLevel
         this.bagInventoryPopup.Show();
     }
 
+    public async Task<bool> ShowQuestPopup(string description, List<Tuple<int, uint>> requirements)
+    {
+        var inventory = this.bagInventory;
+
+        this.questRequirements.Content = description;
+        this.requirementsList.ClearChildren();
+
+        var isEnough = true;
+        foreach (var req in requirements)
+        {
+            this.requirementsList.AddChild(new TextureRect
+            {
+                Texture = inventory.Resources[(int)req.Item1]
+            });
+
+            var existing = inventory.GetItemCount((int)req.Item1);
+
+            this.requirementsList.AddChild(new Label
+            {
+                Text = $"x {existing} / {req.Item2}"
+            });
+
+
+            isEnough = isEnough && existing >= req.Item2;
+        }
+
+        this.questRequirements.AllowYes = isEnough;
+        this.questRequirements.Show();
+
+        if (!isEnough)
+        {
+            return false;
+        }
+
+        this.questRequirements.Show();
+        var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+        if (decision)
+        {
+            foreach (var req in requirements)
+            {
+                var existing = inventory.GetItemCount((int)req.Item1);
+                if (existing >= req.Item2)
+                {
+                    inventory.TryRemoveItems((int)req.Item1, req.Item2);
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
     public virtual void ShowPopup(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a sign with no text at {pos} for {this.Name}");
@@ -200,5 +253,10 @@ public partial class BaseLevel
     public virtual void CustomConstructionClicked(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
+    }
+
+    public virtual void CustomBlockClicked(Vector2 pos)
+    {
+        GD.PrintErr($"Clicked on a custom block with no action set at {pos} for {this.Name}");
     }
 }

@@ -6,6 +6,7 @@
 [node name="CustomConfirmPopup" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 AllowYes = false
+Content = null
 
 [node name="ContentContainer" type="VBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_left = 9.0
@@ -18,6 +19,7 @@ custom_constants/separation = 10
 margin_right = 272.0
 margin_bottom = 40.0
 size_flags_vertical = 7
+custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Content text"
 align = 1
 valign = 1
@@ -34,6 +36,7 @@ custom_constants/separation = 50
 margin_right = 111.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
+disabled = true
 text = "Yes"
 
 [node name="ButtonNo" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/HBoxContainer" index="1"]
@@ -42,3 +45,6 @@ margin_right = 272.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "No"
+
+[node name="CloseButtonContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+visible = false

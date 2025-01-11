@@ -1,4 +1,6 @@
 using Godot;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 [SceneReference("Level1.tscn")]
@@ -15,7 +17,7 @@ public partial class Level1
     public override void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
         base.InitMap(maxNumberOfTurns, inventorySlots, digPower);
-        
+
         this.stashInventory.Resources = Resources;
     }
 
@@ -30,12 +32,6 @@ public partial class Level1
         if (pos == new Vector2(0, 18))
         {
             signLabel.Text = "Tutorial: Click on the grass above to open the road.";
-            signPopup.Show();
-            return;
-        }
-        if (pos == new Vector2(-2, 18))
-        {
-            signLabel.Text = "Hi stranger, I'm a shop keeper without shop.\nCan you please bring me 10 wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.";
             signPopup.Show();
             return;
         }
@@ -57,13 +53,44 @@ public partial class Level1
         base.ChangeLevelClicked(pos);
     }
 
-    public override void CustomConstructionClicked(Vector2 pos)
+    public override async void CustomConstructionClicked(Vector2 pos)
     {
         if (pos == new Vector2(1, 4))
         {
             this.stashInventoryPopup.Show();
             return;
         }
+        if (pos == new Vector2(4, 2))
+        {
+            var result = await ShowQuestPopup("Do you want to forge a better instrument?", new List<Tuple<int, uint>>{
+                new Tuple<int, uint>(1, Fibonacci.Calc(this.DigPower + 5))
+            });
+            if (result)
+            {
+                this.DigPower++;
+            }
+            return;
+        }
+
         base.CustomConstructionClicked(pos);
+    }
+
+    public override async void CustomBlockClicked(Vector2 pos)
+    {
+        if (pos == new Vector2(4, 2))
+        {
+            var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.", new List<Tuple<int, uint>>{
+                new Tuple<int, uint>(0, 1)
+            });
+            if (result)
+            {
+                signLabel.Text = "Thanks.";
+                signPopup.Show();
+                this.blocks.SetCellv(pos, -1);
+                this.constructions.SetCellv(pos, Constructions.Blacksmith.Item1, autotileCoord: new Vector2(Constructions.Blacksmith.Item2, Constructions.Blacksmith.Item3));
+            }
+            return;
+        }
+        base.CustomBlockClicked(pos);
     }
 }
