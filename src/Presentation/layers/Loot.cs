@@ -8,6 +8,8 @@ public static class Loot
     public static ValueTuple<int, int, int> Steel = (0,1,0);
     public static ValueTuple<int, int, int> Cloth = (0,2,0);
     public static ValueTuple<int, int, int> StaminaPlant = (0,3,0);
+    public static ValueTuple<int, int, int> Bread = (0,4,0);
+    public static ValueTuple<int, int, int> WolfSkin = (0,5,0);
 }
 
 public class LootDefinition : IActionDefinition
@@ -20,6 +22,8 @@ public class LootDefinition : IActionDefinition
         { Loot.Steel, new LootDefinition{ClickAction = PutToBag} },
         { Loot.Cloth, new LootDefinition{ClickAction = PutToBag} },
         { Loot.StaminaPlant, new LootDefinition{ClickAction = PutToBag, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 2; }} },
+        { Loot.Bread, new LootDefinition{ClickAction = PutToBag, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 10; }} },
+        { Loot.WolfSkin, new LootDefinition{ClickAction = PutToBag} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }

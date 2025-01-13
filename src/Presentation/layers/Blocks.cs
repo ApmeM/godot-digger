@@ -9,6 +9,10 @@ public static class Blocks
     public static ValueTuple<int, int, int> Wardrobe = (0, 2, 0);
     public static ValueTuple<int, int, int> Grass = (0, 3, 0);
     public static ValueTuple<int, int, int> Shopkeeper = (1, 0, 0);
+    public static ValueTuple<int, int, int> Blacksmith = (2, 0, 0);
+    public static ValueTuple<int, int, int> RedHat = (3, 0, 0);
+    public static ValueTuple<int, int, int> Tree = (4, 0, 0);
+    public static ValueTuple<int, int, int> Wolf = (5, 0, 0);
 }
 
 public class BlocksDefinition : IActionDefinition
@@ -21,6 +25,10 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Wardrobe, new BlocksDefinition{HP = 4, ClickAction=DigBlock} },
         { Blocks.Grass, new BlocksDefinition{HP = 1, ClickAction=DigBlock} },
         { Blocks.Shopkeeper, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
+        { Blocks.Blacksmith, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
+        { Blocks.RedHat, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
+        { Blocks.Tree, new BlocksDefinition{HP = 3, ClickAction=DigBlock} },
+        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=DigBlock} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }

@@ -7,6 +7,7 @@ public static class Floor
     public static ValueTuple<int, int, int> Tiles = (0, 0, 0);
     public static ValueTuple<int, int, int> Wall = (0, 1, 0);
     public static ValueTuple<int, int, int> Ground = (0, 2, 0);
+    public static ValueTuple<int, int, int> Water = (1, 0, 0);
 }
 
 public class FloorDefinition : IActionDefinition
@@ -17,6 +18,7 @@ public class FloorDefinition : IActionDefinition
         { Floor.Wall, new FloorDefinition{ClickAction = DoNothing} },
         { Floor.Tiles, new FloorDefinition{ClickAction = DoNothing} },
         { Floor.Ground, new FloorDefinition{ClickAction = DoNothing} },
+        { Floor.Water, new FloorDefinition{ClickAction = DoNothing} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }

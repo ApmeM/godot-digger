@@ -77,7 +77,7 @@ public partial class BaseLevel
 
         if (result)
         {
-            throw new Exception($"Something goes wrong at {pos}.");
+            GD.Print($"Clicked outside of the map at {pos}.");
         }
     }
 
@@ -90,8 +90,12 @@ public partial class BaseLevel
         {
             return true;
         }
-
-        knownActions[(cell, (int)cellTile.x, (int)cellTile.y)].ClickAction.Invoke(this, pos);
+        var key = (cell, (int)cellTile.x, (int)cellTile.y);
+        if (!knownActions.ContainsKey(key))
+        {
+            GD.PrintErr($"Unknown key {key} in knownActions.");
+        }
+        knownActions[key].ClickAction.Invoke(this, pos);
         return false;
     }
 
@@ -236,7 +240,7 @@ public partial class BaseLevel
                 }
             }
         }
-        
+
         return false;
     }
 

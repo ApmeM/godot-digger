@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://Presentation/assets/TileSets/floor.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -12,9 +12,17 @@
 [ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=10]
 [ext_resource path="res://gd-draggableCamera/DraggableCamera.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/assets/TileSets/constructions.png" type="Texture" id=12]
-[ext_resource path="res://Presentation/assets/NPC/Shopkeeper.tres" type="Texture" id=13]
+[ext_resource path="res://Presentation/assets/NPC/shopkeeper.tres" type="Texture" id=13]
 [ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=14]
 [ext_resource path="res://gd-popups/Xolonium-Regular.ttf" type="DynamicFontData" id=15]
+[ext_resource path="res://Presentation/assets/NPC/blacksmith.tres" type="Texture" id=16]
+[ext_resource path="res://Presentation/assets/NPC/fish.tres" type="Texture" id=17]
+[ext_resource path="res://Presentation/assets/TileSets/floor_water.png" type="Texture" id=18]
+[ext_resource path="res://Presentation/assets/NPC/redhat.tres" type="Texture" id=19]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_stump.png" type="Texture" id=20]
+[ext_resource path="res://Presentation/assets/TileSets/bocks_tree.png" type="Texture" id=21]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_wolf.png" type="Texture" id=22]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_grandma.png" type="Texture" id=23]
 
 [sub_resource type="TileSet" id=1]
 0/name = "floor.png 0"
@@ -38,6 +46,20 @@
 0/shape_one_way_margin = 0.0
 0/shapes = [  ]
 0/z_index = 0
+1/name = "floor_water.png 1"
+1/texture = ExtResource( 18 )
+1/tex_offset = Vector2( 0, 0 )
+1/modulate = Color( 1, 1, 1, 1 )
+1/region = Rect2( 0, 0, 48, 48 )
+1/tile_mode = 0
+1/occluder_offset = Vector2( 0, 0 )
+1/navigation_offset = Vector2( 0, 0 )
+1/shape_offset = Vector2( 0, 0 )
+1/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+1/shape_one_way = false
+1/shape_one_way_margin = 0.0
+1/shapes = [  ]
+1/z_index = 0
 
 [sub_resource type="TileSet" id=6]
 0/name = "constructions.png 0"
@@ -61,13 +83,55 @@
 0/shape_one_way_margin = 0.0
 0/shapes = [  ]
 0/z_index = 0
+1/name = "fish.tres 1"
+1/texture = ExtResource( 17 )
+1/tex_offset = Vector2( 0, 0 )
+1/modulate = Color( 1, 1, 1, 1 )
+1/region = Rect2( 0, 0, 48, 48 )
+1/tile_mode = 0
+1/occluder_offset = Vector2( 0, 0 )
+1/navigation_offset = Vector2( 0, 0 )
+1/shape_offset = Vector2( 0, 0 )
+1/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+1/shape_one_way = false
+1/shape_one_way_margin = 0.0
+1/shapes = [  ]
+1/z_index = 0
+2/name = "constructions_stump.png 2"
+2/texture = ExtResource( 20 )
+2/tex_offset = Vector2( 0, 0 )
+2/modulate = Color( 1, 1, 1, 1 )
+2/region = Rect2( 0, 0, 48, 48 )
+2/tile_mode = 0
+2/occluder_offset = Vector2( 0, 0 )
+2/navigation_offset = Vector2( 0, 0 )
+2/shape_offset = Vector2( 0, 0 )
+2/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+2/shape_one_way = false
+2/shape_one_way_margin = 0.0
+2/shapes = [  ]
+2/z_index = 0
+3/name = "constructions_grandma.png 3"
+3/texture = ExtResource( 23 )
+3/tex_offset = Vector2( 0, 0 )
+3/modulate = Color( 1, 1, 1, 1 )
+3/region = Rect2( 0, 0, 48, 48 )
+3/tile_mode = 0
+3/occluder_offset = Vector2( 0, 0 )
+3/navigation_offset = Vector2( 0, 0 )
+3/shape_offset = Vector2( 0, 0 )
+3/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+3/shape_one_way = false
+3/shape_one_way_margin = 0.0
+3/shapes = [  ]
+3/z_index = 0
 
 [sub_resource type="TileSet" id=3]
 0/name = "loot.png 0"
 0/texture = ExtResource( 3 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 192, 48 )
+0/region = Rect2( 0, 0, 288, 48 )
 0/tile_mode = 2
 0/autotile/icon_coordinate = Vector2( 0, 0 )
 0/autotile/tile_size = Vector2( 48, 48 )
@@ -121,6 +185,62 @@
 1/shape_one_way_margin = 0.0
 1/shapes = [  ]
 1/z_index = 0
+2/name = "blacksmith.tres 2"
+2/texture = ExtResource( 16 )
+2/tex_offset = Vector2( 0, 0 )
+2/modulate = Color( 1, 1, 1, 1 )
+2/region = Rect2( 0, 0, 48, 48 )
+2/tile_mode = 0
+2/occluder_offset = Vector2( 0, 0 )
+2/navigation_offset = Vector2( 0, 0 )
+2/shape_offset = Vector2( 0, 0 )
+2/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+2/shape_one_way = false
+2/shape_one_way_margin = 0.0
+2/shapes = [  ]
+2/z_index = 0
+3/name = "redhat.tres 3"
+3/texture = ExtResource( 19 )
+3/tex_offset = Vector2( 0, 0 )
+3/modulate = Color( 1, 1, 1, 1 )
+3/region = Rect2( 0, 0, 48, 48 )
+3/tile_mode = 0
+3/occluder_offset = Vector2( 0, 0 )
+3/navigation_offset = Vector2( 0, 0 )
+3/shape_offset = Vector2( 0, 0 )
+3/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+3/shape_one_way = false
+3/shape_one_way_margin = 0.0
+3/shapes = [  ]
+3/z_index = 0
+4/name = "bocks_tree.png 4"
+4/texture = ExtResource( 21 )
+4/tex_offset = Vector2( 0, 0 )
+4/modulate = Color( 1, 1, 1, 1 )
+4/region = Rect2( 0, 0, 48, 48 )
+4/tile_mode = 0
+4/occluder_offset = Vector2( 0, 0 )
+4/navigation_offset = Vector2( 0, 0 )
+4/shape_offset = Vector2( 0, 0 )
+4/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+4/shape_one_way = false
+4/shape_one_way_margin = 0.0
+4/shapes = [  ]
+4/z_index = 0
+5/name = "blocks_wolf.png 5"
+5/texture = ExtResource( 22 )
+5/tex_offset = Vector2( 0, 0 )
+5/modulate = Color( 1, 1, 1, 1 )
+5/region = Rect2( 0, 0, 48, 48 )
+5/tile_mode = 0
+5/occluder_offset = Vector2( 0, 0 )
+5/navigation_offset = Vector2( 0, 0 )
+5/shape_offset = Vector2( 0, 0 )
+5/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+5/shape_one_way = false
+5/shape_one_way_margin = 0.0
+5/shapes = [  ]
+5/z_index = 0
 
 [sub_resource type="TileSet" id=5]
 0/name = "fog.png 0"
@@ -173,6 +293,7 @@ cell_size = Vector2( 48, 48 )
 format = 1
 
 [node name="Blocks" type="TileMap" parent="."]
+position = Vector2( 0, 5 )
 tile_set = SubResource( 4 )
 cell_size = Vector2( 48, 48 )
 format = 1
@@ -300,7 +421,6 @@ maximumZoom = 2.0
 
 [node name="QuestRequirements" parent="." instance=ExtResource( 14 )]
 visible = false
-Content = null
 
 [node name="TitleLabel" parent="QuestRequirements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
 custom_fonts/font = SubResource( 8 )
@@ -328,6 +448,7 @@ margin_bottom = 111.0
 
 [node name="ContentText" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="0"]
 margin_bottom = 14.0
+text = ""
 
 [node name="RequirementsContainer" type="CenterContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="1"]
 margin_top = 24.0
