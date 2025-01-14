@@ -57,7 +57,10 @@ public partial class Level1
     {
         if (pos == new Vector2(1, 4))
         {
-            this.stashInventoryPopup.Show();
+            this.stashInventory.Visible = true;
+            this.bagInventoryPopup.Show();
+            await this.ToSignal(this.bagInventoryPopup, nameof(CustomPopup.PopupClosed));
+            this.stashInventory.Visible = false;
             return;
         }
         if (pos == new Vector2(4, 2))

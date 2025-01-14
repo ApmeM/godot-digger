@@ -372,9 +372,17 @@ margin_bottom = 96.0
 margin_right = 179.0
 margin_bottom = 96.0
 
-[node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0" instance=ExtResource( 8 )]
+[node name="InventoriesContainer" type="VBoxContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 9.0
 margin_right = 161.0
 margin_bottom = 78.0
+
+[node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 8 )]
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 152.0
+margin_bottom = 69.0
 Size = 3
 MaxCountPerSlot = 1
 SizePerRow = 4

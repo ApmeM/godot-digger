@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Presentation/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level1.cs" type="Script" id=2]
-[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=3]
 [ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=4]
 
 [node name="Level1" instance=ExtResource( 1 )]
@@ -46,89 +45,44 @@ margin_bottom = 126.0
 margin_right = 188.0
 margin_bottom = 105.0
 
-[node name="DraggableCamera" parent="." index="9"]
-position = Vector2( 51, 880 )
-
-[node name="StashInventoryPopup" parent="." index="10" instance=ExtResource( 3 )]
-visible = false
-CloseOnClickButton = true
-Title = "Stash"
-CloseOnClickOutside = false
-
-[node name="CustomPopupContainer" parent="StashInventoryPopup" index="0"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -146.0
-margin_top = -185.5
-margin_right = 146.0
-margin_bottom = -6.5
-
-[node name="HeaderCenter" parent="StashInventoryPopup/CustomPopupContainer" index="0"]
+[node name="PopupOuterBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 292.0
+margin_bottom = 157.0
 
-[node name="HeaderMargin" parent="StashInventoryPopup/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 114.0
-margin_right = 178.0
-
-[node name="TitleBackground" parent="StashInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 64.0
-
-[node name="TitleMargin" parent="StashInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 64.0
-
-[node name="TitleLabel" parent="StashInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 54.0
-text = "Stash"
-
-[node name="PopupContainer" parent="StashInventoryPopup/CustomPopupContainer" index="1"]
+[node name="PopupOuterMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 292.0
-margin_bottom = 179.0
+margin_bottom = 157.0
 
-[node name="MarginContainer" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 292.0
-margin_bottom = 158.0
-
-[node name="PopupOuterBackground" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 292.0
-margin_bottom = 158.0
-
-[node name="PopupOuterMargin" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 292.0
-margin_bottom = 158.0
-
-[node name="PopupInnerBackground" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
+[node name="PopupInnerBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
 margin_right = 283.0
-margin_bottom = 149.0
+margin_bottom = 148.0
 
-[node name="ContentMargin" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
+[node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
 margin_right = 283.0
-margin_bottom = 149.0
+margin_bottom = 148.0
 
-[node name="StashInventory" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0" instance=ExtResource( 4 )]
+[node name="InventoriesContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_right = 265.0
-margin_bottom = 131.0
+margin_bottom = 203.0
+
+[node name="StashInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" index="1" instance=ExtResource( 4 )]
+visible = false
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 256.0
+margin_bottom = 121.0
 Size = 10
 MaxCountPerSlot = 10
 SizePerRow = 5
+Title = "Stash"
 
-[node name="CloseButtonContainer" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+[node name="CloseButtonContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
 margin_right = 283.0
-margin_bottom = 149.0
+margin_bottom = 148.0
 
-[node name="CloseButtonMarginRight" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="0"]
-margin_right = 223.0
-
-[node name="CloseButton" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="1"]
-margin_left = 227.0
-margin_right = 274.0
-
-[node name="CloseButtonMaringBottom" parent="StashInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="2"]
-margin_right = 223.0
-margin_bottom = 140.0
+[node name="DraggableCamera" parent="." index="9"]
+position = Vector2( 51, 880 )
 
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]
-[editable path="StashInventoryPopup"]
 [editable path="QuestRequirements"]
