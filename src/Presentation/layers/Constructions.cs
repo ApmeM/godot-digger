@@ -4,17 +4,17 @@ using Godot;
 
 public static class Constructions
 {
-    public static ValueTuple<int, int, int> StairsUp = (0,0,0);
-    public static ValueTuple<int, int, int> StairsDown = (0,1,0);
-    public static ValueTuple<int, int, int> Sign = (0,2,0);
-    public static ValueTuple<int, int, int> Grass = (0,3,0);
-    public static ValueTuple<int, int, int> StatueLeft = (0,4,0);
-    public static ValueTuple<int, int, int> StatueRight = (0,5,0);
-    public static ValueTuple<int, int, int> OpenDoor = (0,6,0);
-    public static ValueTuple<int, int, int> Woodcutter = (0,7,0);
-    public static ValueTuple<int, int, int> Blacksmith = (0,8,0);
-    public static ValueTuple<int, int, int> Inn = (0,9,0);
-    public static ValueTuple<int, int, int> Stash = (0,10,0);
+    public static ValueTuple<int, int, int> StairsUp = (10,0,0);
+    public static ValueTuple<int, int, int> StairsDown = (9,0,0);
+    public static ValueTuple<int, int, int> Sign = (8,0,0);
+    public static ValueTuple<int, int, int> Grass = (6,0,0);
+    public static ValueTuple<int, int, int> StatueLeft = (12,0,0);
+    public static ValueTuple<int, int, int> StatueRight = (13,0,0);
+    public static ValueTuple<int, int, int> OpenDoor = (5,0,0);
+    public static ValueTuple<int, int, int> Woodcutter = (14,0,0);
+    public static ValueTuple<int, int, int> Blacksmith = (4,0,0);
+    public static ValueTuple<int, int, int> Inn = (7,0,0);
+    public static ValueTuple<int, int, int> Stash = (11,0,0);
     public static ValueTuple<int, int, int> Fish = (1,0,0);
     public static ValueTuple<int, int, int> Stump = (2,0,0);
     public static ValueTuple<int, int, int> Grandma = (3,0,0);
