@@ -1,7 +1,7 @@
 [gd_resource type="AnimatedTexture" load_steps=4 format=2]
 
-[ext_resource path="res://Presentation/assets/NPC/shopkeeper2.png" type="Texture" id=1]
-[ext_resource path="res://Presentation/assets/NPC/shopkeeper1.png" type="Texture" id=2]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_shopkeeper2.png" type="Texture" id=1]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_shopkeeper1.png" type="Texture" id=2]
 
 [sub_resource type="AtlasTexture" id=7]
 flags = 4

@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=2]
+[gd_scene load_steps=67 format=2]
 
 [ext_resource path="res://Presentation/assets/TileSets/constructions_stairsup.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -12,17 +12,18 @@
 [ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=10]
 [ext_resource path="res://gd-draggableCamera/DraggableCamera.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_grass.png" type="Texture" id=12]
-[ext_resource path="res://Presentation/assets/NPC/shopkeeper.tres" type="Texture" id=13]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_shopkeeper.tres" type="Texture" id=13]
 [ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=14]
 [ext_resource path="res://gd-popups/Xolonium-Regular.ttf" type="DynamicFontData" id=15]
-[ext_resource path="res://Presentation/assets/NPC/blacksmith.tres" type="Texture" id=16]
-[ext_resource path="res://Presentation/assets/NPC/fish.tres" type="Texture" id=17]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith1.png" type="Texture" id=16]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha7.png" type="Texture" id=17]
 [ext_resource path="res://Presentation/assets/TileSets/floor_water.png" type="Texture" id=18]
-[ext_resource path="res://Presentation/assets/NPC/redhat.tres" type="Texture" id=19]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_redhat3.png" type="Texture" id=19]
 [ext_resource path="res://Presentation/assets/TileSets/constructions_stump.png" type="Texture" id=20]
 [ext_resource path="res://Presentation/assets/TileSets/bocks_tree.png" type="Texture" id=21]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_wolf.png" type="Texture" id=22]
 [ext_resource path="res://Presentation/assets/TileSets/constructions_grandma.png" type="Texture" id=23]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith3.png" type="Texture" id=24]
 [ext_resource path="res://Presentation/assets/TileSets/floor_ground.png" type="Texture" id=25]
 [ext_resource path="res://Presentation/assets/TileSets/floor_road.png" type="Texture" id=26]
 [ext_resource path="res://Presentation/assets/TileSets/constructions_stairsdown.png" type="Texture" id=27]
@@ -38,6 +39,23 @@
 [ext_resource path="res://Presentation/assets/TileSets/blocks_rock.png" type="Texture" id=37]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_woodpile.png" type="Texture" id=38]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_bookshelf.png" type="Texture" id=39]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith2.png" type="Texture" id=40]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith4.png" type="Texture" id=41]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_redhat2.png" type="Texture" id=42]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_redhat1.png" type="Texture" id=43]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_redhat5.png" type="Texture" id=44]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_redhat4.png" type="Texture" id=45]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha9.png" type="Texture" id=46]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha12.png" type="Texture" id=47]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha2.png" type="Texture" id=48]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha4.png" type="Texture" id=49]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha8.png" type="Texture" id=50]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha1.png" type="Texture" id=51]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha6.png" type="Texture" id=52]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha3.png" type="Texture" id=53]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha5.png" type="Texture" id=54]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha10.png" type="Texture" id=55]
+[ext_resource path="res://Presentation/assets/TileSets/constructions_piranha11.png" type="Texture" id=56]
 
 [sub_resource type="TileSet" id=1]
 1/name = "floor_water.png 1"
@@ -83,9 +101,36 @@
 3/shapes = [  ]
 3/z_index = 0
 
+[sub_resource type="AnimatedTexture" id=11]
+flags = 4
+frames = 12
+frame_0/texture = ExtResource( 51 )
+frame_1/texture = ExtResource( 48 )
+frame_1/delay_sec = 0.0
+frame_2/texture = ExtResource( 53 )
+frame_2/delay_sec = 0.0
+frame_3/texture = ExtResource( 49 )
+frame_3/delay_sec = 0.0
+frame_4/texture = ExtResource( 54 )
+frame_4/delay_sec = 0.0
+frame_5/texture = ExtResource( 52 )
+frame_5/delay_sec = 0.0
+frame_6/texture = ExtResource( 17 )
+frame_6/delay_sec = 0.0
+frame_7/texture = ExtResource( 50 )
+frame_7/delay_sec = 0.0
+frame_8/texture = ExtResource( 46 )
+frame_8/delay_sec = 0.0
+frame_9/texture = ExtResource( 55 )
+frame_9/delay_sec = 0.0
+frame_10/texture = ExtResource( 56 )
+frame_10/delay_sec = 0.0
+frame_11/texture = ExtResource( 47 )
+frame_11/delay_sec = 0.0
+
 [sub_resource type="TileSet" id=6]
 1/name = "fish.tres 1"
-1/texture = ExtResource( 17 )
+1/texture = SubResource( 11 )
 1/tex_offset = Vector2( 0, 0 )
 1/modulate = Color( 1, 1, 1, 1 )
 1/region = Rect2( 0, 0, 48, 48 )
@@ -304,6 +349,31 @@
 0/shapes = [  ]
 0/z_index = 0
 
+[sub_resource type="AnimatedTexture" id=9]
+flags = 4
+frames = 4
+frame_0/texture = ExtResource( 16 )
+frame_1/texture = ExtResource( 40 )
+frame_1/delay_sec = 0.0
+frame_2/texture = ExtResource( 24 )
+frame_2/delay_sec = 0.0
+frame_3/texture = ExtResource( 41 )
+frame_3/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=10]
+flags = 4
+frames = 5
+fps = 1.0
+frame_0/texture = ExtResource( 43 )
+frame_1/texture = ExtResource( 42 )
+frame_1/delay_sec = 0.0
+frame_2/texture = ExtResource( 19 )
+frame_2/delay_sec = 0.0
+frame_3/texture = ExtResource( 45 )
+frame_3/delay_sec = 0.0
+frame_4/texture = ExtResource( 44 )
+frame_4/delay_sec = 0.0
+
 [sub_resource type="TileSet" id=4]
 1/name = "Shopkeeper.tres 1"
 1/texture = ExtResource( 13 )
@@ -320,7 +390,7 @@
 1/shapes = [  ]
 1/z_index = 0
 2/name = "blacksmith.tres 2"
-2/texture = ExtResource( 16 )
+2/texture = SubResource( 9 )
 2/tex_offset = Vector2( 0, 0 )
 2/modulate = Color( 1, 1, 1, 1 )
 2/region = Rect2( 0, 0, 48, 48 )
@@ -334,7 +404,7 @@
 2/shapes = [  ]
 2/z_index = 0
 3/name = "redhat.tres 3"
-3/texture = ExtResource( 19 )
+3/texture = SubResource( 10 )
 3/tex_offset = Vector2( 0, 0 )
 3/modulate = Color( 1, 1, 1, 1 )
 3/region = Rect2( 0, 0, 48, 48 )
