@@ -4,12 +4,12 @@ using Godot;
 
 public static class Loot
 {
-    public static ValueTuple<int, int, int> Wood = (0,0,0);
-    public static ValueTuple<int, int, int> Steel = (0,1,0);
-    public static ValueTuple<int, int, int> Cloth = (0,2,0);
-    public static ValueTuple<int, int, int> StaminaPlant = (0,3,0);
-    public static ValueTuple<int, int, int> Bread = (0,4,0);
-    public static ValueTuple<int, int, int> WolfSkin = (0,5,0);
+    public static ValueTuple<int, int, int> Wood = (6,0,0);
+    public static ValueTuple<int, int, int> Steel = (5,0,0);
+    public static ValueTuple<int, int, int> Cloth = (2,0,0);
+    public static ValueTuple<int, int, int> StaminaPlant = (3,0,0);
+    public static ValueTuple<int, int, int> Bread = (1,0,0);
+    public static ValueTuple<int, int, int> WolfSkin = (4,0,0);
 }
 
 public class LootDefinition : IActionDefinition

@@ -11,8 +11,9 @@ public partial class BaseLevel
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
 
-    [Export]
-    public List<Texture> Resources = new List<Texture>();
+    protected List<Texture> Resources = new List<Texture>();
+    protected Dictionary<int, int> MapTileIdToLootId = new Dictionary<int, int>();
+    protected Dictionary<int, int> MapLootIdToTileId = new Dictionary<int, int>();
 
     [Export]
     public uint DigPower = 1;
@@ -21,6 +22,14 @@ public partial class BaseLevel
 
     public virtual void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
+        foreach (int id in this.loot.TileSet.GetTilesIds())
+        {
+            var tex = this.loot.TileSet.TileGetTexture(id);
+            this.MapTileIdToLootId.Add(id, this.Resources.Count);
+            this.MapLootIdToTileId.Add(this.Resources.Count, id);
+            this.Resources.Add(tex);
+        }
+
         this.bagInventory.Resources = Resources;
         this.bagInventory.Size = inventorySlots;
 
@@ -50,9 +59,10 @@ public partial class BaseLevel
 
     protected void InventoryUseItem(InventorySlot slot)
     {
-        if (LootDefinition.KnownLoot[(0, slot.ItemIndex, 0)].UseAction != null)
+        var tileId = MapLootIdToTileId[slot.ItemIndex];
+        if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
         {
-            LootDefinition.KnownLoot[(0, slot.ItemIndex, 0)].UseAction(this);
+            LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
             slot.TryAddItem(slot.ItemIndex, -1);
         }
     }
@@ -69,7 +79,7 @@ public partial class BaseLevel
         var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
 
         var result =
-            TryLayer(this.fog, pos, FogDefinition.KnownConstructions) &&
+            TryLayer(this.fog, pos, FogDefinition.KnownFog) &&
             TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks) &&
             TryLayer(this.loot, pos, LootDefinition.KnownLoot) &&
             TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions) &&
@@ -84,13 +94,15 @@ public partial class BaseLevel
     private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions) where T : IActionDefinition
     {
         var cell = map.GetCellv(pos);
-        var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
         if (cell == -1)
         {
             return true;
         }
+
+        var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
         var key = (cell, (int)cellTile.x, (int)cellTile.y);
+
         if (!knownActions.ContainsKey(key))
         {
             GD.PrintErr($"Unknown key {key} in knownActions.");
@@ -102,9 +114,10 @@ public partial class BaseLevel
     public void TryGrabLoot(Vector2 pos)
     {
         var lootCell = this.loot.GetCellv(pos);
-        var lootCellTile = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (this.bagInventory.TryAddItem((int)lootCellTile.x, 1) == 0)
+        var lootId = MapTileIdToLootId[lootCell];
+
+        if (this.bagInventory.TryAddItem(lootId, 1) == 0)
         {
             this.loot.SetCellv(pos, -1);
         }
@@ -146,8 +159,7 @@ public partial class BaseLevel
     {
         if (
             this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
-            this.blocks.GetCellv(cell) != -1 ||  // Can start unfog if the block is not yet removed
-            this.floor.GetCellAutotileCoord((int)cell.x, (int)cell.y).x == 1) // Cant start unfog from the wall
+            this.blocks.GetCellv(cell) != -1)  // Can start unfog if the block is not yet removed
         {
             return true;
         }
@@ -171,9 +183,7 @@ public partial class BaseLevel
 
             this.fog.SetCellv(cell, -1);
 
-            if (
-                this.blocks.GetCellv(cell) != -1 ||  // Blocks are not removed from the cell
-                this.floor.GetCellAutotileCoord((int)cell.x, (int)cell.y).x == 1) // The floor is the wall
+            if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
             {
                 continue;
             }
@@ -192,7 +202,7 @@ public partial class BaseLevel
         this.bagInventoryPopup.Show();
     }
 
-    public async Task<bool> ShowQuestPopup(string description, List<Tuple<int, uint>> requirements)
+    public async Task<bool> ShowQuestPopup(string description, List<Tuple<ValueTuple<int, int, int>, uint>> requirements)
     {
         var inventory = this.bagInventory;
 
@@ -202,12 +212,14 @@ public partial class BaseLevel
         var isEnough = true;
         foreach (var req in requirements)
         {
+            var tileId = req.Item1.Item1;
+            var lootId = this.MapTileIdToLootId[tileId];
             this.requirementsList.AddChild(new TextureRect
             {
-                Texture = inventory.Resources[(int)req.Item1]
+                Texture = inventory.Resources[lootId]
             });
 
-            var existing = inventory.GetItemCount((int)req.Item1);
+            var existing = inventory.GetItemCount(lootId);
 
             this.requirementsList.AddChild(new Label
             {
@@ -232,10 +244,13 @@ public partial class BaseLevel
         {
             foreach (var req in requirements)
             {
-                var existing = inventory.GetItemCount((int)req.Item1);
+                var tileId = req.Item1.Item1;
+                var lootId = this.MapTileIdToLootId[tileId];
+
+                var existing = inventory.GetItemCount(lootId);
                 if (existing >= req.Item2)
                 {
-                    inventory.TryRemoveItems((int)req.Item1, req.Item2);
+                    inventory.TryRemoveItems(lootId, req.Item2);
                     return true;
                 }
             }

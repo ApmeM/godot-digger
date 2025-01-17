@@ -12,7 +12,7 @@ public class FogDefinition : IActionDefinition
 {
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
 
-    public static Dictionary<ValueTuple<int, int, int>, FogDefinition> KnownConstructions = new Dictionary<ValueTuple<int, int, int>, FogDefinition>{
+    public static Dictionary<ValueTuple<int, int, int>, FogDefinition> KnownFog = new Dictionary<ValueTuple<int, int, int>, FogDefinition>{
         { Fog.Basic, new FogDefinition{ClickAction = DoNothing} },
     };
 
