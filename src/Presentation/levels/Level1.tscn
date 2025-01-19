@@ -30,22 +30,7 @@ margin_top = 0.0
 margin_right = 94.0
 margin_bottom = 126.0
 
-[node name="HeaderCenter" parent="BagInventoryPopup/CustomPopupContainer" index="0"]
-margin_right = 188.0
-
-[node name="HeaderMargin" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 48.0
-margin_right = 139.0
-
-[node name="PopupContainer" parent="BagInventoryPopup/CustomPopupContainer" index="1"]
-margin_right = 188.0
-margin_bottom = 126.0
-
-[node name="MarginContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 188.0
-margin_bottom = 105.0
-
-[node name="StashInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" index="1" instance=ExtResource( 4 )]
+[node name="StashInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" index="2" instance=ExtResource( 4 )]
 visible = false
 margin_left = 0.0
 margin_top = 0.0

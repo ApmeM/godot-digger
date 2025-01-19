@@ -668,11 +668,11 @@ margin_right = 216.0
 margin_bottom = 176.0
 
 [node name="HeaderCenter" parent="BagInventoryPopup/CustomPopupContainer" index="0"]
-margin_right = 131.0
+margin_right = 188.0
 
 [node name="HeaderMargin" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 20.0
-margin_right = 111.0
+margin_left = 48.0
+margin_right = 139.0
 
 [node name="TitleBackground" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
 margin_right = 91.0
@@ -685,40 +685,46 @@ margin_right = 81.0
 text = "Inventory"
 
 [node name="PopupContainer" parent="BagInventoryPopup/CustomPopupContainer" index="1"]
-margin_right = 131.0
-margin_bottom = 98.0
+margin_right = 188.0
+margin_bottom = 144.0
 
 [node name="MarginContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 131.0
-margin_bottom = 77.0
+margin_right = 188.0
+margin_bottom = 123.0
 
 [node name="PopupOuterBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 188.0
-margin_bottom = 105.0
+margin_bottom = 123.0
 
 [node name="PopupOuterMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 188.0
-margin_bottom = 105.0
+margin_bottom = 123.0
 
 [node name="PopupInnerBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
 margin_right = 179.0
-margin_bottom = 96.0
+margin_bottom = 114.0
 
 [node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
 margin_right = 179.0
-margin_bottom = 96.0
+margin_bottom = 114.0
 
 [node name="InventoriesContainer" type="VBoxContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_left = 9.0
 margin_top = 9.0
 margin_right = 161.0
-margin_bottom = 78.0
+margin_bottom = 96.0
+
+[node name="BagMoney" type="Label" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer"]
+margin_right = 152.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "0 coins"
 
 [node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 8 )]
 margin_left = 0.0
-margin_top = 0.0
+margin_top = 18.0
 margin_right = 152.0
-margin_bottom = 69.0
+margin_bottom = 87.0
 Size = 3
 MaxCountPerSlot = 1
 SizePerRow = 4
@@ -726,7 +732,18 @@ Title = "Bag"
 
 [node name="CloseButtonContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
 margin_right = 179.0
-margin_bottom = 96.0
+margin_bottom = 114.0
+
+[node name="CloseButtonMarginRight" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="0"]
+margin_right = 119.0
+
+[node name="CloseButton" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="1"]
+margin_left = 123.0
+margin_right = 170.0
+
+[node name="CloseButtonMaringBottom" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="2"]
+margin_right = 119.0
+margin_bottom = 105.0
 
 [node name="SignPopup" parent="." instance=ExtResource( 7 )]
 visible = false

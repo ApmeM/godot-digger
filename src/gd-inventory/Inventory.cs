@@ -13,8 +13,14 @@ public partial class Inventory
     [Export]
     public List<Texture> Resources = new List<Texture>();
 
+    [Export]
+    public bool CanUseItem = true;
+
     [Signal]
     public delegate void UseItem(InventorySlot slot);
+
+    [Signal]
+    public delegate void DragAndDropComplete(InventorySlot slot);
 
     private uint size;
 
@@ -37,6 +43,7 @@ public partial class Inventory
                     slot.MaxCount = this.MaxCountPerSlot;
                     this.slotContainer.AddChild(slot);
                     slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
+                    slot.Connect(nameof(InventorySlot.DragAndDropComplete), this, nameof(SlotDragAndDropComplete), new Godot.Collections.Array { slot });
                 }
             }
             this.size = value;
@@ -45,7 +52,15 @@ public partial class Inventory
 
     private void SlotUseItem(InventorySlot slot)
     {
-        this.EmitSignal(nameof(UseItem), slot);
+        if (CanUseItem)
+        {
+            this.EmitSignal(nameof(UseItem), slot);
+        }
+    }
+
+    private void SlotDragAndDropComplete(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(DragAndDropComplete), slot);
     }
 
     private int maxCountPerSlot;

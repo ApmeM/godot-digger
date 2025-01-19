@@ -1,4 +1,5 @@
 using Godot;
+using GodotDigger.Presentation.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ public partial class Level1
         base.ShowPopup(pos);
     }
 
-    public override void ChangeLevelClicked(Vector2 pos)
+    public override async void CustomConstructionClickedAsync(Vector2 pos)
     {
         if (pos == new Vector2(17, 1))
         {
@@ -50,28 +51,17 @@ public partial class Level1
             this.EmitSignal(nameof(ChangeLevel), "Woodcutter");
             return;
         }
-        base.ChangeLevelClicked(pos);
-    }
-
-    public override async void CustomConstructionClicked(Vector2 pos)
-    {
+        if (pos == new Vector2(4, 2))
+        {
+            this.EmitSignal(nameof(ChangeLevel), "Shop");
+            return;
+        }
         if (pos == new Vector2(1, 4))
         {
             this.stashInventory.Visible = true;
             this.bagInventoryPopup.Show();
             await this.ToSignal(this.bagInventoryPopup, nameof(CustomPopup.PopupClosed));
             this.stashInventory.Visible = false;
-            return;
-        }
-        if (pos == new Vector2(4, 2))
-        {
-            var result = await ShowQuestPopup("Do you want to forge a better instrument?",new List<Tuple<ValueTuple<int, int, int>, uint>>{
-                new Tuple<ValueTuple<int,int,int>, uint>(Loot.Steel, Fibonacci.Calc(this.DigPower + 5))
-            });
-            if (result)
-            {
-                this.DigPower++;
-            }
             return;
         }
         if (pos == new Vector2(24, 17))
@@ -86,7 +76,7 @@ public partial class Level1
             return;
         }
 
-        base.CustomConstructionClicked(pos);
+        base.CustomConstructionClickedAsync(pos);
     }
 
     public override async void CustomBlockClicked(Vector2 pos)

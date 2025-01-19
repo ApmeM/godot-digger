@@ -17,6 +17,20 @@ public partial class BaseLevel
 
     [Export]
     public uint DigPower = 1;
+    private int money;
+
+    public int Money
+    {
+        get => money;
+        set
+        {
+            money = value;
+            if(this.IsInsideTree())
+            {
+                this.bagMoney.Text = $"{money} coins";
+            }
+        }
+    }
 
     public Stamina Stamina => this.stamina;
 
@@ -55,6 +69,8 @@ public partial class BaseLevel
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
 
         this.AddToGroup(Groups.LevelScene);
+
+        this.Money = this.money;
     }
 
     protected void InventoryUseItem(InventorySlot slot)
@@ -264,12 +280,7 @@ public partial class BaseLevel
         GD.PrintErr($"Clicked on a sign with no text at {pos} for {this.Name}");
     }
 
-    public virtual void ChangeLevelClicked(Vector2 pos)
-    {
-        GD.PrintErr($"Clicked on a change level with no level set at {pos} for {this.Name}");
-    }
-
-    public virtual void CustomConstructionClicked(Vector2 pos)
+    public virtual void CustomConstructionClickedAsync(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
     }

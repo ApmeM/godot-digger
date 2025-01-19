@@ -9,13 +9,13 @@ public partial class Level3
         this.FillMembers();
     }
 
-    public override void ChangeLevelClicked(Vector2 pos)
+    public override void CustomConstructionClickedAsync(Vector2 pos)
     {
         if (pos == new Vector2(2, 2))
         {
             this.EmitSignal(nameof(ChangeLevel), "Level2");
             return;
         }
-        base.ChangeLevelClicked(pos);
+        base.CustomConstructionClickedAsync(pos);
     }
 }

@@ -1,5 +1,4 @@
 using Godot;
-using System.Linq;
 
 [SceneReference("Level2.tscn")]
 public partial class Level2
@@ -10,7 +9,7 @@ public partial class Level2
         this.FillMembers();
     }
 
-    public override void ChangeLevelClicked(Vector2 pos)
+    public override void CustomConstructionClickedAsync(Vector2 pos)
     {
         if (pos == new Vector2(8, 15))
         {
@@ -22,6 +21,6 @@ public partial class Level2
             this.EmitSignal(nameof(ChangeLevel), "Level3");
             return;
         }
-        base.ChangeLevelClicked(pos);
+        base.CustomConstructionClickedAsync(pos);
     }
 }

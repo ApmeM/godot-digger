@@ -35,6 +35,9 @@ public partial class InventorySlot
     [Signal]
     public delegate void UseItem();
 
+    [Signal]
+    public delegate void DragAndDropComplete();
+
     public override void _Ready()
     {
         base._Ready();
@@ -165,5 +168,7 @@ public partial class InventorySlot
         ddata.RemoveItem();
         var diff = this.TryAddItem(item.Item1, item.Item2);
         ddata.TryAddItem(item.Item1, diff);
+        this.EmitSignal(nameof(DragAndDropComplete));
+        ddata.EmitSignal(nameof(DragAndDropComplete));
     }
 }
