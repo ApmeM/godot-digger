@@ -52,6 +52,16 @@ public partial class Shop
         return money;
     }
 
+    public override void CustomConstructionClickedAsync(Vector2 pos)
+    {
+        if (pos == new Vector2(5, 12))
+        {
+            this.EmitSignal(nameof(ChangeLevel), "Level1");
+            return;
+        }
+        base.CustomConstructionClickedAsync(pos);
+    }
+
     public override async void CustomBlockClicked(Vector2 pos)
     {
         if (pos == new Vector2(6, 10))
@@ -66,5 +76,12 @@ public partial class Shop
         }
 
         base.CustomBlockClicked(pos);
+    }
+
+    public override void CustomLootClicked(Vector2 pos)
+    {
+        //ToDo: buy!
+        return;
+        base.CustomLootClicked(pos);
     }
 }

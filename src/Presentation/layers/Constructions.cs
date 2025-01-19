@@ -22,24 +22,22 @@ public static class Constructions
 
 public class ConstructionsDefinition : IActionDefinition
 {
-    private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
-    private static Action<BaseLevel, Vector2> ShowPopup = (level, pos) => { level.ShowPopup(pos); };
     private static Action<BaseLevel, Vector2> CustomConstruction = (level, pos) => { level.CustomConstructionClickedAsync(pos); };
 
     public static Dictionary<ValueTuple<int, int, int>, ConstructionsDefinition> KnownConstructions = new Dictionary<ValueTuple<int, int, int>, ConstructionsDefinition>{
         { Constructions.StairsUp, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.StairsDown, new ConstructionsDefinition{ClickAction = CustomConstruction} },
-        { Constructions.Sign, new ConstructionsDefinition{ClickAction = ShowPopup} },
-        { Constructions.Grass, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.StatueLeft, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.StatueRight, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.OpenDoor, new ConstructionsDefinition{ClickAction = DoNothing} },
+        { Constructions.Sign, new ConstructionsDefinition{ClickAction = CustomConstruction} },
+        { Constructions.Grass, new ConstructionsDefinition{ClickAction = CustomConstruction} },
+        { Constructions.StatueLeft, new ConstructionsDefinition{ClickAction = CustomConstruction} },
+        { Constructions.StatueRight, new ConstructionsDefinition{ClickAction = CustomConstruction} },
+        { Constructions.OpenDoor, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Woodcutter, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Blacksmith, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Inn, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Stash, new ConstructionsDefinition{ClickAction = CustomConstruction} },
-        { Constructions.Fish, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.Stump, new ConstructionsDefinition{ClickAction = DoNothing} },
+        { Constructions.Fish, new ConstructionsDefinition{ClickAction = CustomConstruction} },
+        { Constructions.Stump, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Grandma, new ConstructionsDefinition{ClickAction = CustomConstruction} },
     };
 

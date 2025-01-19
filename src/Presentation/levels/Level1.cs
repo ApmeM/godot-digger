@@ -22,7 +22,7 @@ public partial class Level1
         this.stashInventory.Resources = Resources;
     }
 
-    public override void ShowPopup(Vector2 pos)
+    public override async void CustomConstructionClickedAsync(Vector2 pos)
     {
         if (pos == new Vector2(4, 12))
         {
@@ -36,11 +36,6 @@ public partial class Level1
             signPopup.Show();
             return;
         }
-        base.ShowPopup(pos);
-    }
-
-    public override async void CustomConstructionClickedAsync(Vector2 pos)
-    {
         if (pos == new Vector2(17, 1))
         {
             this.EmitSignal(nameof(ChangeLevel), "Level2");

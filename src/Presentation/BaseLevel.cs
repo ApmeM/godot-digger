@@ -25,7 +25,7 @@ public partial class BaseLevel
         set
         {
             money = value;
-            if(this.IsInsideTree())
+            if (this.IsInsideTree())
             {
                 this.bagMoney.Text = $"{money} coins";
             }
@@ -122,21 +122,10 @@ public partial class BaseLevel
         if (!knownActions.ContainsKey(key))
         {
             GD.PrintErr($"Unknown key {key} in knownActions.");
+            return false;
         }
         knownActions[key].ClickAction.Invoke(this, pos);
         return false;
-    }
-
-    public void TryGrabLoot(Vector2 pos)
-    {
-        var lootCell = this.loot.GetCellv(pos);
-
-        var lootId = MapTileIdToLootId[lootCell];
-
-        if (this.bagInventory.TryAddItem(lootId, 1) == 0)
-        {
-            this.loot.SetCellv(pos, -1);
-        }
     }
 
     public void TryDigBlock(Vector2 pos)
@@ -275,11 +264,6 @@ public partial class BaseLevel
         return false;
     }
 
-    public virtual void ShowPopup(Vector2 pos)
-    {
-        GD.PrintErr($"Clicked on a sign with no text at {pos} for {this.Name}");
-    }
-
     public virtual void CustomConstructionClickedAsync(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
@@ -288,5 +272,18 @@ public partial class BaseLevel
     public virtual void CustomBlockClicked(Vector2 pos)
     {
         GD.PrintErr($"Clicked on a custom block with no action set at {pos} for {this.Name}");
+    }
+
+    public virtual void CustomLootClicked(Vector2 pos)
+    {
+        GD.Print($"Clicked on a loot, no handler defined, put to inventory.");
+
+        var lootCell = this.loot.GetCellv(pos);
+        var lootId = MapTileIdToLootId[lootCell];
+
+        if (this.bagInventory.TryAddItem(lootId, 1) == 0)
+        {
+            this.loot.SetCellv(pos, -1);
+        }
     }
 }
