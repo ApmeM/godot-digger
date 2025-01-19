@@ -128,80 +128,6 @@ public partial class BaseLevel
         return false;
     }
 
-    public void TryDigBlock(Vector2 pos)
-    {
-        var blocksCell = this.blocks.GetCellv(pos);
-        var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-
-        if (this.stamina.CurrentNumberOfTurns == 0)
-        {
-            return;
-        }
-
-        this.stamina.CurrentNumberOfTurns--;
-
-        var metaName = $"HP_{pos}";
-
-        if (!this.blocks.HasMeta(metaName))
-        {
-            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
-        }
-
-        var currentHp = (int)this.blocks.GetMeta(metaName);
-
-        if (currentHp > this.DigPower)
-        {
-            this.blocks.SetMeta(metaName, currentHp - this.DigPower);
-            return;
-        }
-
-        this.blocks.SetMeta(metaName, null);
-        this.blocks.SetCellv(pos, -1);
-        this.UnFogCell(pos);
-    }
-
-    private bool UnFogCell(Vector2 cell)
-    {
-        if (
-            this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
-            this.blocks.GetCellv(cell) != -1)  // Can start unfog if the block is not yet removed
-        {
-            return true;
-        }
-
-        this.fog.SetCellv(cell, -1);
-
-        var queue = new Queue<Vector2>();
-        queue.Enqueue(cell + Vector2.Down);
-        queue.Enqueue(cell + Vector2.Left);
-        queue.Enqueue(cell + Vector2.Up);
-        queue.Enqueue(cell + Vector2.Right);
-
-        while (queue.Any())
-        {
-            cell = queue.Dequeue();
-
-            if (this.fog.GetCellv(cell) == -1)
-            {
-                continue;
-            }
-
-            this.fog.SetCellv(cell, -1);
-
-            if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
-            {
-                continue;
-            }
-
-            queue.Enqueue(cell + Vector2.Down);
-            queue.Enqueue(cell + Vector2.Left);
-            queue.Enqueue(cell + Vector2.Up);
-            queue.Enqueue(cell + Vector2.Right);
-        }
-
-        return true;
-    }
-
     private void ShowInventoryPopup()
     {
         this.bagInventoryPopup.Show();
@@ -271,12 +197,86 @@ public partial class BaseLevel
 
     public virtual void CustomBlockClicked(Vector2 pos)
     {
-        GD.PrintErr($"Clicked on a custom block with no action set at {pos} for {this.Name}");
+        GD.Print($"Clicked on a block at {pos}, no custom action defined, dig it.");
+
+        var blocksCell = this.blocks.GetCellv(pos);
+        var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+
+        if (this.stamina.CurrentNumberOfTurns == 0)
+        {
+            return;
+        }
+
+        this.stamina.CurrentNumberOfTurns--;
+
+        var metaName = $"HP_{pos}";
+
+        if (!this.blocks.HasMeta(metaName))
+        {
+            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
+        }
+
+        var currentHp = (int)this.blocks.GetMeta(metaName);
+
+        if (currentHp == 0)
+        {
+            return;
+        }
+
+        if (currentHp > this.DigPower)
+        {
+            this.blocks.SetMeta(metaName, currentHp - this.DigPower);
+            return;
+        }
+
+        this.blocks.SetMeta(metaName, null);
+        this.blocks.SetCellv(pos, -1);
+        this.UnFogCell(pos);
+    }
+    
+    protected void UnFogCell(Vector2 cell)
+    {
+        if (
+            this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
+            this.blocks.GetCellv(cell) != -1)  // Can start unfog if the block is not yet removed
+        {
+            return;
+        }
+
+        this.fog.SetCellv(cell, -1);
+
+        var queue = new Queue<Vector2>();
+        queue.Enqueue(cell + Vector2.Down);
+        queue.Enqueue(cell + Vector2.Left);
+        queue.Enqueue(cell + Vector2.Up);
+        queue.Enqueue(cell + Vector2.Right);
+
+        while (queue.Any())
+        {
+            cell = queue.Dequeue();
+
+            if (this.fog.GetCellv(cell) == -1)
+            {
+                continue;
+            }
+
+            this.fog.SetCellv(cell, -1);
+
+            if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
+            {
+                continue;
+            }
+
+            queue.Enqueue(cell + Vector2.Down);
+            queue.Enqueue(cell + Vector2.Left);
+            queue.Enqueue(cell + Vector2.Up);
+            queue.Enqueue(cell + Vector2.Right);
+        }
     }
 
     public virtual void CustomLootClicked(Vector2 pos)
     {
-        GD.Print($"Clicked on a loot, no handler defined, put to inventory.");
+        GD.Print($"Clicked on a loot at {pos}, no custom action defined, put to inventory.");
 
         var lootCell = this.loot.GetCellv(pos);
         var lootId = MapTileIdToLootId[lootCell];

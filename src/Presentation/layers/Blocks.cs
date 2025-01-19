@@ -18,20 +18,18 @@ public static class Blocks
 
 public class BlocksDefinition : IActionDefinition
 {
-    private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
-    private static Action<BaseLevel, Vector2> DigBlock = (level, pos) => { level.TryDigBlock(pos); };
     private static Action<BaseLevel, Vector2> CustomClicked = (level, pos) => { level.CustomBlockClicked(pos); };
     public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
-        { Blocks.Wood, new BlocksDefinition{HP = 2, ClickAction=DigBlock } },
-        { Blocks.Steel, new BlocksDefinition{HP = 3, ClickAction=DigBlock} },
-        { Blocks.Wardrobe, new BlocksDefinition{HP = 4, ClickAction=DigBlock} },
-        { Blocks.Grass, new BlocksDefinition{HP = 1, ClickAction=DigBlock} },
+        { Blocks.Wood, new BlocksDefinition{HP = 2, ClickAction=CustomClicked } },
+        { Blocks.Steel, new BlocksDefinition{HP = 3, ClickAction=CustomClicked} },
+        { Blocks.Wardrobe, new BlocksDefinition{HP = 4, ClickAction=CustomClicked} },
+        { Blocks.Grass, new BlocksDefinition{HP = 1, ClickAction=CustomClicked} },
         { Blocks.Shopkeeper, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
         { Blocks.Blacksmith, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
         { Blocks.RedHat, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
-        { Blocks.Tree, new BlocksDefinition{HP = 3, ClickAction=DigBlock} },
-        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=DigBlock} },
-        { Blocks.Wall, new BlocksDefinition{ClickAction = DoNothing} },
+        { Blocks.Tree, new BlocksDefinition{HP = 3, ClickAction=CustomClicked} },
+        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=CustomClicked} },
+        { Blocks.Wall, new BlocksDefinition{HP = 0, ClickAction = CustomClicked} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }

@@ -1,8 +1,6 @@
 using Godot;
-using GodotDigger.Presentation.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 [SceneReference("Level1.tscn")]
 public partial class Level1
