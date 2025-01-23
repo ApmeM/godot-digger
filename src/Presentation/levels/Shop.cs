@@ -38,10 +38,10 @@ public partial class Shop
         this.shopSellButton.Text = $"Sell for {CalculatePrice()}";
     }
 
-    private int CalculatePrice()
+    private long CalculatePrice()
     {
         var items = this.shopInventory.GetItems();
-        var money = 0;
+        var money = 0l;
         foreach (var item in items)
         {
             var lootId = item.Item1;
@@ -78,10 +78,10 @@ public partial class Shop
         base.CustomBlockClicked(pos);
     }
 
-    public override void CustomLootClicked(Vector2 pos)
+    public override void CustomLootClickedAsync(Vector2 pos)
     {
         //ToDo: buy!
         return;
-        base.CustomLootClicked(pos);
+        base.CustomLootClickedAsync(pos);
     }
 }

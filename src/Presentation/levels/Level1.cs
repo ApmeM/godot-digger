@@ -59,9 +59,9 @@ public partial class Level1
         }
         if (pos == new Vector2(24, 17))
         {
-            var result = await ShowQuestPopup("Did you bring me a bread from my daughter RedHat?", new List<Tuple<ValueTuple<int, int, int>, uint>>{
-                new Tuple<ValueTuple<int,int,int>, uint>(Loot.Bread, 1)
-            });
+            var result = await ShowQuestPopup("Did you bring me a bread from my daughter RedHat?", 
+                (Loot.Bread, 1)
+            );
             if (result)
             {
                 this.DigPower++;
@@ -76,9 +76,9 @@ public partial class Level1
     {
         if (pos == new Vector2(4, 2))
         {
-            var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.", new List<Tuple<ValueTuple<int, int, int>, uint>>{
-                new Tuple<ValueTuple<int,int,int>, uint>(Loot.Wood, 1)
-            });
+            var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.", 
+                (Loot.Wood, 1)
+            );
             if (result)
             {
                 signLabel.Text = "Thanks.";
@@ -90,9 +90,9 @@ public partial class Level1
         }
         if (pos == new Vector2(9, 13))
         {
-            var result = await ShowQuestPopup("Hi strong man, I afraid to go to my grandma through the forrest. There are a lot of wolfs. For each wolf skin I'll gibe you a bread that is very tasty (doubleclick on it from the inventory).", new List<Tuple<ValueTuple<int, int, int>, uint>>{
-                new Tuple<ValueTuple<int,int,int>, uint>(Loot.WolfSkin, 1)
-            });
+            var result = await ShowQuestPopup("Hi strong man, I afraid to go to my grandma through the forrest. There are a lot of wolfs. For each wolf skin I'll gibe you a bread that is very tasty (doubleclick on it from the inventory).",
+                (Loot.WolfSkin, 1)
+            );
             if (result)
             {
                 signLabel.Text = "Thanks. Take your bread.";

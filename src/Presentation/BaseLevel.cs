@@ -17,9 +17,9 @@ public partial class BaseLevel
 
     [Export]
     public uint DigPower = 1;
-    private int money;
+    private long money;
 
-    public int Money
+    public long Money
     {
         get => money;
         set
@@ -133,7 +133,7 @@ public partial class BaseLevel
         this.bagInventoryPopup.Show();
     }
 
-    public async Task<bool> ShowQuestPopup(string description, List<Tuple<ValueTuple<int, int, int>, uint>> requirements)
+    public async Task<bool> ShowQuestPopup(string description, params ValueTuple<ValueTuple<int, int, int>, uint>[] requirements)
     {
         var inventory = this.bagInventory;
 
@@ -274,7 +274,7 @@ public partial class BaseLevel
         }
     }
 
-    public virtual void CustomLootClicked(Vector2 pos)
+    public virtual void CustomLootClickedAsync(Vector2 pos)
     {
         GD.Print($"Clicked on a loot at {pos}, no custom action defined, put to inventory.");
 

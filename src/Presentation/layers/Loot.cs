@@ -14,7 +14,7 @@ public static class Loot
 
 public class LootDefinition : IActionDefinition
 {
-    private static Action<BaseLevel, Vector2> CustomLoot = (level, pos) => { level.CustomLootClicked(pos); };
+    private static Action<BaseLevel, Vector2> CustomLoot = (level, pos) => { level.CustomLootClickedAsync(pos); };
 
     public static Dictionary<ValueTuple<int, int, int>, LootDefinition> KnownLoot = new Dictionary<ValueTuple<int, int, int>, LootDefinition>{
         { Loot.Wood, new LootDefinition{Price=10, ClickAction = CustomLoot} },
@@ -25,7 +25,7 @@ public class LootDefinition : IActionDefinition
         { Loot.WolfSkin, new LootDefinition{Price=50, ClickAction = CustomLoot} },
     };
 
-    public int Price { get; set; }
+    public uint Price { get; set; }
     public Action<BaseLevel, Vector2> ClickAction { get; set; }
     public Action<BaseLevel> UseAction { get; set; }
 }
