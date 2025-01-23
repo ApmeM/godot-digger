@@ -10,6 +10,7 @@ public static class Loot
     public static ValueTuple<int, int, int> StaminaPlant = (3, 0, 0);
     public static ValueTuple<int, int, int> Bread = (1, 0, 0);
     public static ValueTuple<int, int, int> WolfSkin = (4, 0, 0);
+    public static ValueTuple<int, int, int> Gold = (7, 0, 0);
 }
 
 public class LootDefinition : IActionDefinition
@@ -23,6 +24,7 @@ public class LootDefinition : IActionDefinition
         { Loot.StaminaPlant, new LootDefinition{Price=20, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 2; }} },
         { Loot.Bread, new LootDefinition{Price=30, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 10; }} },
         { Loot.WolfSkin, new LootDefinition{Price=50, ClickAction = CustomLoot} },
+        { Loot.Gold, new LootDefinition{Price=1, ClickAction = CustomLoot} },
     };
 
     public uint Price { get; set; }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -205,5 +206,17 @@ public partial class Inventory
             .Select(a => a.GetItem())
             .Where(a => a.Item1 == item)
             .Sum(a => a.Item2);
+    }
+
+    public IEnumerable<(int, int)> TryAddItems(IEnumerable<(int, int)> items)
+    {
+        foreach (var item in items)
+        {
+            var result = TryAddItem(item.Item1, (uint)item.Item2);
+            if (result != 0)
+            {
+                yield return (item.Item1, (int)result);
+            }
+        }
     }
 }

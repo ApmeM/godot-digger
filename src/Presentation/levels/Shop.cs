@@ -41,7 +41,7 @@ public partial class Shop
     private long CalculatePrice()
     {
         var items = this.shopInventory.GetItems();
-        var money = 0l;
+        var money = 0L;
         foreach (var item in items)
         {
             var lootId = item.Item1;
@@ -78,10 +78,23 @@ public partial class Shop
         base.CustomBlockClicked(pos);
     }
 
-    public override void CustomLootClickedAsync(Vector2 pos)
+    public override async void CustomLootClickedAsync(Vector2 pos)
     {
-        //ToDo: buy!
-        return;
+        if (pos == new Vector2(2, 9))
+        {
+            var tileId = this.loot.GetCellv(pos);
+            var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+            var lootId = MapTileIdToLootId[tileId];
+
+            var price = LootDefinition.KnownLoot[(lootId, 0, 0)].Price;
+            var result = await ShowQuestPopup("To buy:",
+                new[] { (Loot.Gold, price) },
+                new[] { ((tileId, (int)coord.x, (int)coord.y), 1u) });
+            if (!result)
+            {
+                return;
+            }
+        }
         base.CustomLootClickedAsync(pos);
     }
 }

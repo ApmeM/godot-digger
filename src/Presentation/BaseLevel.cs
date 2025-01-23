@@ -133,7 +133,7 @@ public partial class BaseLevel
         this.bagInventoryPopup.Show();
     }
 
-    public async Task<bool> ShowQuestPopup(string description, params ValueTuple<ValueTuple<int, int, int>, uint>[] requirements)
+    public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
     {
         var inventory = this.bagInventory;
 
@@ -157,7 +157,6 @@ public partial class BaseLevel
                 Text = $"x {existing} / {req.Item2}"
             });
 
-
             isEnough = isEnough && existing >= req.Item2;
         }
 
@@ -171,23 +170,48 @@ public partial class BaseLevel
 
         this.questRequirements.Show();
         var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
-        if (decision)
+        if (!decision)
         {
-            foreach (var req in requirements)
-            {
-                var tileId = req.Item1.Item1;
-                var lootId = this.MapTileIdToLootId[tileId];
+            return false;
+        }
 
-                var existing = inventory.GetItemCount(lootId);
-                if (existing >= req.Item2)
-                {
-                    inventory.TryRemoveItems(lootId, req.Item2);
-                    return true;
-                }
+        var items = inventory.GetItems().ToList();
+        var success = true;
+        foreach (var req in requirements)
+        {
+            var tileId = req.Item1.Item1;
+            var lootId = this.MapTileIdToLootId[tileId];
+
+            var result = inventory.TryRemoveItems(lootId, req.Item2);
+            if (result != 0)
+            {
+                success = false;
             }
         }
 
-        return false;
+        foreach (var reward in rewards)
+        {
+            var tileId = reward.Item1.Item1;
+            var lootId = this.MapTileIdToLootId[tileId];
+
+            var result = inventory.TryAddItem(lootId, reward.Item2);
+            if (result != 0)
+            {
+                success = false;
+            }
+        }
+
+        if (!success)
+        {
+            inventory.ClearItems();
+            var result = inventory.TryAddItems(items);
+            if (result.Any())
+            {
+                GD.PrintErr($"Cant restore inventory status!!!");
+            }
+        }
+
+        return success;
     }
 
     public virtual void CustomConstructionClickedAsync(Vector2 pos)
@@ -233,7 +257,7 @@ public partial class BaseLevel
         this.blocks.SetCellv(pos, -1);
         this.UnFogCell(pos);
     }
-    
+
     protected void UnFogCell(Vector2 cell)
     {
         if (
