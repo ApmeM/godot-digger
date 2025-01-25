@@ -17,7 +17,7 @@ public partial class Level1
     {
         base.InitMap(maxNumberOfTurns, inventorySlots, digPower);
 
-        this.stashInventory.Resources = Resources;
+        this.stashInventory.Config = Resources;
     }
 
     public override async void CustomConstructionClickedAsync(Vector2 pos)

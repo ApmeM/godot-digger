@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -8,10 +7,10 @@ using GodotDigger.Presentation.Utils;
 public partial class InventorySlot
 {
     [Export]
-    public int ItemIndex = -1;
+    public int ItemId = -1;
 
     [Export]
-    public List<Texture> Resources = new List<Texture>();
+    public Inventory.InventoryConfig Config = new Inventory.InventoryConfig();
 
     private int itemsCount = 0;
 
@@ -49,8 +48,8 @@ public partial class InventorySlot
 
     public bool HasItem()
     {
-        if ((this.lootContainer.GetChildCount() == 0 || ItemIndex == -1 || ItemsCount == 0) &&
-            (this.lootContainer.GetChildCount() != 0 || ItemIndex != -1 || ItemsCount != 0))
+        if ((this.lootContainer.GetChildCount() == 0 || ItemId == -1 || ItemsCount == 0) &&
+            (this.lootContainer.GetChildCount() != 0 || ItemId != -1 || ItemsCount != 0))
         {
             throw new Exception("Inventory slot state inconsistent.");
         }
@@ -58,9 +57,9 @@ public partial class InventorySlot
         return this.lootContainer.GetChildCount() > 0;
     }
 
-    public int TryAddItem(int itemIndex, int countDiff)
+    public int TryAddItem(int itemId, int countDiff)
     {
-        if (HasItem() && this.ItemIndex != itemIndex)
+        if (HasItem() && this.ItemId != itemId)
         {
             GD.PrintErr("Can not add loot item to the slot as it is already occupied by different resouce.");
             return countDiff;
@@ -82,10 +81,10 @@ public partial class InventorySlot
         {
             this.lootContainer.AddChild(new TextureRect
             {
-                Texture = Resources[itemIndex],
+                Texture = Config.SlotConfigs[itemId].Texture,
                 MouseFilter = MouseFilterEnum.Ignore
             });
-            this.ItemIndex = itemIndex;
+            this.ItemId = itemId;
         }
 
         this.ItemsCount = Math.Min(result, MaxCount);
@@ -97,7 +96,7 @@ public partial class InventorySlot
     {
         if (this.HasItem())
         {
-            return (this.ItemIndex, ItemsCount);
+            return (this.ItemId, ItemsCount);
         }
         else
         {
@@ -115,7 +114,7 @@ public partial class InventorySlot
         this.lootContainer.ClearChildren();
         this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
         this.ItemsCount = 0;
-        this.ItemIndex = -1;
+        this.ItemId = -1;
     }
 
     public override void _GuiInput(InputEvent @event)
@@ -152,7 +151,7 @@ public partial class InventorySlot
     public override bool CanDropData(Vector2 position, object data)
     {
         var ddata = (InventorySlot)data;
-        return !HasItem() || this.ItemIndex == ddata.ItemIndex;
+        return !HasItem() || this.ItemId == ddata.ItemId;
     }
 
     public override void DropData(Vector2 position, object data)

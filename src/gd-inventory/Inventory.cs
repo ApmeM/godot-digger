@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -8,11 +7,20 @@ using GodotDigger.Presentation.Utils;
 [Tool]
 public partial class Inventory
 {
-    [Export]
-    public PackedScene InventorySlotScene;
+    public struct InventorySlotConfig
+    {
+        public Texture Texture;
+    }
+
+    public class InventoryConfig
+    {
+        public readonly Dictionary<int, InventorySlotConfig> SlotConfigs = new Dictionary<int, InventorySlotConfig>();
+    }
+
+    public InventoryConfig Config = new InventoryConfig();
 
     [Export]
-    public List<Texture> Resources = new List<Texture>();
+    public PackedScene InventorySlotScene;
 
     [Export]
     public bool CanUseItem = true;
@@ -40,7 +48,7 @@ public partial class Inventory
                 for (var i = 0; i < value; i++)
                 {
                     var slot = this.InventorySlotScene.Instance<InventorySlot>();
-                    slot.Resources = Resources;
+                    slot.Config = Config;
                     slot.MaxCount = this.MaxCountPerSlot;
                     this.slotContainer.AddChild(slot);
                     slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
@@ -124,23 +132,23 @@ public partial class Inventory
         this.MaxCountPerSlot = this.maxCountPerSlot;
     }
 
-    public uint TryRemoveItems(int itemIndex, uint count)
+    public uint TryRemoveItems(int itemId, uint count)
     {
         if (count == 0)
         {
             return 0;
         }
 
-        if (Resources.Count <= itemIndex)
+        if (!Config.SlotConfigs.ContainsKey(itemId))
         {
-            GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");
+            GD.PrintErr($"Resource with index {itemId} is not known for this inventory.");
             return count;
         }
 
         var diff = -(int)count;
         foreach (var slot in this.slotContainer.GetChildren().Cast<InventorySlot>().Reverse())
         {
-            diff = slot.TryAddItem(itemIndex, diff);
+            diff = slot.TryAddItem(itemId, diff);
             if (diff == 0)
             {
                 return 0;
@@ -150,23 +158,23 @@ public partial class Inventory
         return count;
     }
 
-    public uint TryAddItem(int itemIndex, uint count)
+    public uint TryAddItem(int itemId, uint count)
     {
         if (count == 0)
         {
             return 0;
         }
 
-        if (Resources.Count <= itemIndex)
+        if (!Config.SlotConfigs.ContainsKey(itemId))
         {
-            GD.PrintErr($"Resource with index {itemIndex} is not known for inventory.");
+            GD.PrintErr($"Resource with index {itemId} is not known for this inventory.");
             return count;
         }
 
         var diff = (int)count;
         foreach (InventorySlot slot in this.slotContainer.GetChildren())
         {
-            diff = slot.TryAddItem(itemIndex, diff);
+            diff = slot.TryAddItem(itemId, diff);
             if (diff == 0)
             {
                 return 0;

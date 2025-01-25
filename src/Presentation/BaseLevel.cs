@@ -11,9 +11,7 @@ public partial class BaseLevel
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
 
-    protected List<Texture> Resources = new List<Texture>();
-    protected Dictionary<int, int> MapTileIdToLootId = new Dictionary<int, int>();
-    protected Dictionary<int, int> MapLootIdToTileId = new Dictionary<int, int>();
+    protected Inventory.InventoryConfig Resources = new Inventory.InventoryConfig();
 
     [Export]
     public uint DigPower = 1;
@@ -39,12 +37,11 @@ public partial class BaseLevel
         foreach (int id in this.loot.TileSet.GetTilesIds())
         {
             var tex = this.loot.TileSet.TileGetTexture(id);
-            this.MapTileIdToLootId.Add(id, this.Resources.Count);
-            this.MapLootIdToTileId.Add(this.Resources.Count, id);
-            this.Resources.Add(tex);
+            this.Resources.SlotConfigs.Add(id, new Inventory.InventorySlotConfig { Texture = tex });
+            GD.Print($"Add loot {id} to inventory.");
         }
 
-        this.bagInventory.Resources = Resources;
+        this.bagInventory.Config = Resources;
         this.bagInventory.Size = inventorySlots;
 
         this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
@@ -75,11 +72,11 @@ public partial class BaseLevel
 
     protected void InventoryUseItem(InventorySlot slot)
     {
-        var tileId = MapLootIdToTileId[slot.ItemIndex];
+        var tileId = slot.ItemId;
         if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
         {
             LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
-            slot.TryAddItem(slot.ItemIndex, -1);
+            slot.TryAddItem(slot.ItemId, -1);
         }
     }
 
@@ -143,11 +140,10 @@ public partial class BaseLevel
         var isEnough = true;
         foreach (var req in requirements)
         {
-            var tileId = req.Item1.Item1;
-            var lootId = this.MapTileIdToLootId[tileId];
+            var lootId = req.Item1.Item1;
             this.requirementsList.AddChild(new TextureRect
             {
-                Texture = inventory.Resources[lootId]
+                Texture = inventory.Config.SlotConfigs[lootId].Texture
             });
 
             var existing = inventory.GetItemCount(lootId);
@@ -179,8 +175,7 @@ public partial class BaseLevel
         var success = true;
         foreach (var req in requirements)
         {
-            var tileId = req.Item1.Item1;
-            var lootId = this.MapTileIdToLootId[tileId];
+            var lootId = req.Item1.Item1;
 
             var result = inventory.TryRemoveItems(lootId, req.Item2);
             if (result != 0)
@@ -191,8 +186,7 @@ public partial class BaseLevel
 
         foreach (var reward in rewards)
         {
-            var tileId = reward.Item1.Item1;
-            var lootId = this.MapTileIdToLootId[tileId];
+            var lootId = reward.Item1.Item1;
 
             var result = inventory.TryAddItem(lootId, reward.Item2);
             if (result != 0)
@@ -302,8 +296,7 @@ public partial class BaseLevel
     {
         GD.Print($"Clicked on a loot at {pos}, no custom action defined, put to inventory.");
 
-        var lootCell = this.loot.GetCellv(pos);
-        var lootId = MapTileIdToLootId[lootCell];
+        var lootId = this.loot.GetCellv(pos);
 
         if (this.bagInventory.TryAddItem(lootId, 1) == 0)
         {
