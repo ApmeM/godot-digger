@@ -10,6 +10,7 @@ public partial class Inventory
     public struct InventorySlotConfig
     {
         public Texture Texture;
+        public int MaxCount;
     }
 
     public class InventoryConfig
@@ -49,7 +50,6 @@ public partial class Inventory
                 {
                     var slot = this.InventorySlotScene.Instance<InventorySlot>();
                     slot.Config = Config;
-                    slot.MaxCount = this.MaxCountPerSlot;
                     this.slotContainer.AddChild(slot);
                     slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
                     slot.Connect(nameof(InventorySlot.DragAndDropComplete), this, nameof(SlotDragAndDropComplete), new Godot.Collections.Array { slot });
@@ -70,25 +70,6 @@ public partial class Inventory
     private void SlotDragAndDropComplete(InventorySlot slot)
     {
         this.EmitSignal(nameof(DragAndDropComplete), slot);
-    }
-
-    private int maxCountPerSlot;
-
-    [Export]
-    public int MaxCountPerSlot
-    {
-        get => maxCountPerSlot;
-        set
-        {
-            maxCountPerSlot = value;
-            if (IsInsideTree())
-            {
-                foreach (InventorySlot slot in this.slotContainer.GetChildren())
-                {
-                    slot.MaxCount = value;
-                }
-            }
-        }
     }
 
     private int sizePerRow;
@@ -129,7 +110,6 @@ public partial class Inventory
         this.SizePerRow = this.sizePerRow;
         this.Size = size;
         this.Title = this.title;
-        this.MaxCountPerSlot = this.maxCountPerSlot;
     }
 
     public uint TryRemoveItems(int itemId, uint count)

@@ -18,14 +18,16 @@ public class LootDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> CustomLoot = (level, pos) => { level.CustomLootClickedAsync(pos); };
 
     public static Dictionary<ValueTuple<int, int, int>, LootDefinition> KnownLoot = new Dictionary<ValueTuple<int, int, int>, LootDefinition>{
-        { Loot.Wood, new LootDefinition{Price=10, ClickAction = CustomLoot} },
-        { Loot.Steel, new LootDefinition{Price=30, ClickAction = CustomLoot} },
-        { Loot.Cloth, new LootDefinition{Price=20, ClickAction = CustomLoot} },
-        { Loot.StaminaPlant, new LootDefinition{Price=20, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 2; }} },
-        { Loot.Bread, new LootDefinition{Price=30, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 10; }} },
-        { Loot.WolfSkin, new LootDefinition{Price=50, ClickAction = CustomLoot} },
-        { Loot.Gold, new LootDefinition{Price=1, ClickAction = CustomLoot} },
+        { Loot.Wood, new LootDefinition{Price=10, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.Steel, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.Cloth, new LootDefinition{Price=20, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.StaminaPlant, new LootDefinition{Price=20, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 2; }} },
+        { Loot.Bread, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 10; }} },
+        { Loot.WolfSkin, new LootDefinition{Price=50, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.Gold, new LootDefinition{Price=1, MaxCount = 1000, ClickAction = CustomLoot} },
     };
+    
+    public int MaxCount;
 
     public uint Price { get; set; }
     public Action<BaseLevel, Vector2> ClickAction { get; set; }

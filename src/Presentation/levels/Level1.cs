@@ -1,6 +1,5 @@
+using System.Linq;
 using Godot;
-using System;
-using System.Collections.Generic;
 
 [SceneReference("Level1.tscn")]
 public partial class Level1
@@ -17,7 +16,15 @@ public partial class Level1
     {
         base.InitMap(maxNumberOfTurns, inventorySlots, digPower);
 
-        this.stashInventory.Config = Resources;
+        this.stashInventory.Config = new Inventory.InventoryConfig();
+        foreach (var slot in Resources.SlotConfigs)
+        {
+            this.stashInventory.Config.SlotConfigs.Add(slot.Key, new Inventory.InventorySlotConfig
+            {
+                MaxCount = slot.Value.MaxCount * 10,
+                Texture = slot.Value.Texture,
+            });
+        }
     }
 
     public override async void CustomConstructionClickedAsync(Vector2 pos)
@@ -59,9 +66,9 @@ public partial class Level1
         }
         if (pos == new Vector2(24, 17))
         {
-            var result = await ShowQuestPopup("Did you bring me a bread from my daughter RedHat?", 
-                new[]{(Loot.Bread, 1u)},
-                new[]{(Loot.Gold, 1u)}
+            var result = await ShowQuestPopup("Did you bring me a bread from my daughter RedHat?",
+                new[] { (Loot.Bread, 1u) },
+                new[] { (Loot.Gold, 1u) }
             );
             if (result)
             {
@@ -77,9 +84,9 @@ public partial class Level1
     {
         if (pos == new Vector2(4, 2))
         {
-            var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.", 
-                new[]{(Loot.Wood, 1u)},
-                new[]{(Loot.Gold, 1u)}
+            var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.",
+                new[] { (Loot.Wood, 1u) },
+                new[] { (Loot.Gold, 1u) }
             );
             if (result)
             {
@@ -93,8 +100,8 @@ public partial class Level1
         if (pos == new Vector2(9, 13))
         {
             var result = await ShowQuestPopup("Hi strong man, I afraid to go to my grandma through the forrest. There are a lot of wolfs. For each wolf skin I'll gibe you a bread that is very tasty (doubleclick on it from the inventory).",
-                new[]{(Loot.WolfSkin, 1u)},
-                new[]{(Loot.Bread, 1u)}
+                new[] { (Loot.WolfSkin, 1u) },
+                new[] { (Loot.Bread, 1u) }
             );
             if (result)
             {

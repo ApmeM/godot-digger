@@ -37,7 +37,11 @@ public partial class BaseLevel
         foreach (int id in this.loot.TileSet.GetTilesIds())
         {
             var tex = this.loot.TileSet.TileGetTexture(id);
-            this.Resources.SlotConfigs.Add(id, new Inventory.InventorySlotConfig { Texture = tex });
+            this.Resources.SlotConfigs.Add(id, new Inventory.InventorySlotConfig
+            {
+                Texture = tex,
+                MaxCount = LootDefinition.KnownLoot[(id, 0, 0)].MaxCount
+            });
             GD.Print($"Add loot {id} to inventory.");
         }
 

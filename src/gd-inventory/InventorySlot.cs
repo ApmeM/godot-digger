@@ -15,9 +15,6 @@ public partial class InventorySlot
     private int itemsCount = 0;
 
     [Export]
-    public int MaxCount;
-
-    [Export]
     public int ItemsCount
     {
         get => itemsCount; set
@@ -87,7 +84,7 @@ public partial class InventorySlot
             this.ItemId = itemId;
         }
 
-        this.ItemsCount = Math.Min(result, MaxCount);
+        this.ItemsCount = Math.Min(result, this.Config.SlotConfigs[itemId].MaxCount);
         result -= this.ItemsCount;
         return result;
     }
