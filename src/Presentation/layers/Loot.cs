@@ -11,6 +11,19 @@ public static class Loot
     public static ValueTuple<int, int, int> Bread = (1, 0, 0);
     public static ValueTuple<int, int, int> WolfSkin = (4, 0, 0);
     public static ValueTuple<int, int, int> Gold = (7, 0, 0);
+    public static ValueTuple<int, int, int> PotionEmpty = (8, 0, 0);
+    public static ValueTuple<int, int, int> PotionBlack = (9, 0, 0);
+    public static ValueTuple<int, int, int> PotionBlue = (10, 0, 0);
+    public static ValueTuple<int, int, int> PotionBrown = (11, 0, 0);
+    public static ValueTuple<int, int, int> PotionGray = (12, 0, 0);
+    public static ValueTuple<int, int, int> PotionGreen = (13, 0, 0);
+    public static ValueTuple<int, int, int> PotionLightBlue = (14, 0, 0);
+    public static ValueTuple<int, int, int> PotionOrange = (15, 0, 0);
+    public static ValueTuple<int, int, int> PotionPurple = (16, 0, 0);
+    public static ValueTuple<int, int, int> PotionRed = (17, 0, 0);
+    public static ValueTuple<int, int, int> PotionViolet = (18, 0, 0);
+    public static ValueTuple<int, int, int> PotionWhite = (19, 0, 0);
+    public static ValueTuple<int, int, int> PotionYellow = (20, 0, 0);
 }
 
 public class LootDefinition : IActionDefinition
@@ -22,11 +35,25 @@ public class LootDefinition : IActionDefinition
         { Loot.Steel, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.Cloth, new LootDefinition{Price=20, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.StaminaPlant, new LootDefinition{Price=20, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 2; }} },
-        { Loot.Bread, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 10; }} },
+        { Loot.Bread, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 5; }} },
         { Loot.WolfSkin, new LootDefinition{Price=50, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.Gold, new LootDefinition{Price=1, MaxCount = 1000, ClickAction = CustomLoot} },
+
+        { Loot.PotionEmpty, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionBlack, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionBlue, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionBrown, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionGray, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionGreen, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionLightBlue, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentNumberOfTurns += 10; }} },
+        { Loot.PotionOrange, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionPurple, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionRed, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionViolet, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionWhite, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionYellow, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
     };
-    
+
     public int MaxCount;
 
     public uint Price { get; set; }
