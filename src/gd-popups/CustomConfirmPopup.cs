@@ -57,7 +57,7 @@ public partial class CustomConfirmPopup
         this.Content = this.content;
     }
 
-    protected override void Close()
+    public override void Close()
     {
         this.EmitSignal(nameof(NoClicked));
         this.EmitSignal(nameof(ChoiceMade), false);

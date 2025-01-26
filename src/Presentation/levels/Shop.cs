@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -23,15 +24,25 @@ public partial class Shop
 
     private void SellButtonClicked()
     {
-        var items = this.shopInventory.GetItems();
-        this.bagInventory.TryAddItem(Loot.Gold.Item1, (uint)CalculatePrice());
+        var price = (uint)CalculatePrice();
+        if (price == 0)
+        {
+            this.bagInventoryPopup.Close();
+            return;
+        }
+
+        this.bagInventory.TryAddItem(Loot.Gold.Item1, price);
         this.shopInventory.ClearItems();
         UpdateCost(null);
     }
 
     private void UpdateCost(InventorySlot slot)
     {
-        this.shopSellButton.Text = $"Sell for {CalculatePrice()}";
+        var price = CalculatePrice();
+        if (price == 0)
+            this.shopSellButton.Text = $"Close";
+        else
+            this.shopSellButton.Text = $"Sell for {CalculatePrice()}";
     }
 
     private long CalculatePrice()
@@ -63,10 +74,12 @@ public partial class Shop
         {
             this.shopInventory.Visible = true;
             this.shopSellButton.Visible = true;
+            this.bagInventoryPopup.CloseOnClickButton = false;
             this.bagInventoryPopup.Show();
             await this.ToSignal(this.bagInventoryPopup, nameof(CustomPopup.PopupClosed));
             this.shopInventory.Visible = false;
             this.shopSellButton.Visible = false;
+            this.bagInventoryPopup.CloseOnClickButton = true;
             return;
         }
 
