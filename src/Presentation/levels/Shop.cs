@@ -23,11 +23,7 @@ public partial class Shop
     private void SellButtonClicked()
     {
         var items = this.shopInventory.GetItems();
-        foreach (var item in items)
-        {
-            var tileId = item.Item1;
-            this.Money += LootDefinition.KnownLoot[(tileId, 0, 0)].Price * item.Item2;
-        }
+        this.bagInventory.TryAddItem(Loot.Gold.Item1, (uint)CalculatePrice());
         this.shopInventory.ClearItems();
         UpdateCost(null);
     }

@@ -729,19 +729,12 @@ margin_top = 9.0
 margin_right = 161.0
 margin_bottom = 96.0
 
-[node name="BagMoney" type="Label" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer"]
-margin_right = 152.0
-margin_bottom = 14.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-text = "0 coins"
-
 [node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 8 )]
 margin_left = 0.0
 margin_top = 18.0
 margin_right = 152.0
 margin_bottom = 87.0
 Size = 3
-MaxCountPerSlot = 1
 SizePerRow = 4
 Title = "Bag"
 

@@ -15,20 +15,6 @@ public partial class BaseLevel
 
     [Export]
     public uint DigPower = 1;
-    private long money;
-
-    public long Money
-    {
-        get => money;
-        set
-        {
-            money = value;
-            if (this.IsInsideTree())
-            {
-                this.bagMoney.Text = $"{money} coins";
-            }
-        }
-    }
 
     public Stamina Stamina => this.stamina;
 
@@ -70,8 +56,6 @@ public partial class BaseLevel
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
 
         this.AddToGroup(Groups.LevelScene);
-
-        this.Money = this.money;
     }
 
     protected void InventoryUseItem(InventorySlot slot)
@@ -176,30 +160,11 @@ public partial class BaseLevel
         }
 
         var items = inventory.GetItems().ToList();
-        var success = true;
-        foreach (var req in requirements)
-        {
-            var lootId = req.Item1.Item1;
 
-            var result = inventory.TryRemoveItems(lootId, req.Item2);
-            if (result != 0)
-            {
-                success = false;
-            }
-        }
+        var successRemove = inventory.TryRemoveItems(requirements.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
+        var successAdd = inventory.TryAddItems(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
 
-        foreach (var reward in rewards)
-        {
-            var lootId = reward.Item1.Item1;
-
-            var result = inventory.TryAddItem(lootId, reward.Item2);
-            if (result != 0)
-            {
-                success = false;
-            }
-        }
-
-        if (!success)
+        if (!successRemove || !successAdd)
         {
             inventory.ClearItems();
             var result = inventory.TryAddItems(items);
@@ -209,7 +174,7 @@ public partial class BaseLevel
             }
         }
 
-        return success;
+        return successRemove && successAdd;
     }
 
     public virtual void CustomConstructionClickedAsync(Vector2 pos)

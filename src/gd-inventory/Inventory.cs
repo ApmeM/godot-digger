@@ -112,7 +112,7 @@ public partial class Inventory
         this.Title = this.title;
     }
 
-    public uint TryRemoveItems(int itemId, uint count)
+    public uint TryRemoveItem(int itemId, uint count)
     {
         if (count == 0)
         {
@@ -138,12 +138,26 @@ public partial class Inventory
         return count;
     }
 
+    public IEnumerable<(int, int)> TryRemoveItems(IEnumerable<(int, int)> items)
+    {
+        foreach (var item in items)
+        {
+            var result = TryRemoveItem(item.Item1, (uint)item.Item2);
+            if (result != 0)
+            {
+                yield return (item.Item1, (int)result);
+            }
+        }
+    }
+
     public uint TryAddItem(int itemId, uint count)
     {
         if (count == 0)
         {
             return 0;
         }
+
+        GD.Print($"Add item {itemId} with {count}");
 
         if (!Config.SlotConfigs.ContainsKey(itemId))
         {
@@ -162,6 +176,18 @@ public partial class Inventory
         }
 
         return (uint)diff;
+    }
+
+    public IEnumerable<(int, int)> TryAddItems(IEnumerable<(int, int)> items)
+    {
+        foreach (var item in items)
+        {
+            var result = TryAddItem(item.Item1, (uint)item.Item2);
+            if (result != 0)
+            {
+                yield return (item.Item1, (int)result);
+            }
+        }
     }
 
     public void ClearItems()
@@ -194,17 +220,5 @@ public partial class Inventory
             .Select(a => a.GetItem())
             .Where(a => a.Item1 == item)
             .Sum(a => a.Item2);
-    }
-
-    public IEnumerable<(int, int)> TryAddItems(IEnumerable<(int, int)> items)
-    {
-        foreach (var item in items)
-        {
-            var result = TryAddItem(item.Item1, (uint)item.Item2);
-            if (result != 0)
-            {
-                yield return (item.Item1, (int)result);
-            }
-        }
     }
 }
