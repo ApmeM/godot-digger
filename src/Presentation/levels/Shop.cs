@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -74,20 +75,18 @@ public partial class Shop
 
     public override async void CustomLootClickedAsync(Vector2 pos)
     {
-        if (pos == new Vector2(2, 9))
-        {
-            var tileId = this.loot.GetCellv(pos);
-            var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+        var tileId = this.loot.GetCellv(pos);
+        var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-            var price = LootDefinition.KnownLoot[(tileId, 0, 0)].Price;
-            var result = await ShowQuestPopup("To buy:",
-                new[] { (Loot.Gold, price) },
-                new[] { ((tileId, (int)coord.x, (int)coord.y), 1u) });
-            if (!result)
-            {
-                return;
-            }
+        var price = LootDefinition.KnownLoot[(tileId, 0, 0)].Price;
+        var result = await ShowQuestPopup("To buy:",
+            new[] { (Loot.Gold, price) },
+            new ValueTuple<ValueTuple<int, int, int>, uint>[] { });
+        if (!result)
+        {
+            return;
         }
+
         base.CustomLootClickedAsync(pos);
     }
 }
