@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -32,7 +33,7 @@ public partial class InventorySlot
     public delegate void UseItem();
 
     [Signal]
-    public delegate void DragAndDropComplete();
+    public delegate void DragAndDropComplete(InventorySlot from, InventorySlot to);
 
     public override void _Ready()
     {
@@ -148,7 +149,7 @@ public partial class InventorySlot
     public override bool CanDropData(Vector2 position, object data)
     {
         var ddata = (InventorySlot)data;
-        return !HasItem() || this.ItemId == ddata.ItemId;
+        return !HasItem() || this.ItemId == ddata.ItemId || Config.SlotConfigs[this.ItemId].MergeActions.ContainsKey(ddata.ItemId);
     }
 
     public override void DropData(Vector2 position, object data)
@@ -160,11 +161,30 @@ public partial class InventorySlot
             return;
         }
 
-        var item = ddata.GetItem();
-        ddata.RemoveItem();
-        var diff = this.TryAddItem(item.Item1, item.Item2);
-        ddata.TryAddItem(item.Item1, diff);
-        this.EmitSignal(nameof(DragAndDropComplete));
-        ddata.EmitSignal(nameof(DragAndDropComplete));
+        var ditem = ddata.GetItem();
+        var item = this.GetItem();
+
+        if (ItemId == ddata.ItemId || !this.HasItem())
+        {
+            ddata.RemoveItem();
+            var diff = this.TryAddItem(ditem.Item1, ditem.Item2);
+            ddata.TryAddItem(ditem.Item1, diff);
+        }
+        else
+        {
+            ddata.TryAddItem(ditem.Item1, -1);
+            this.TryAddItem(item.Item1, -1);
+            if (this.ItemsCount == 0)
+            {
+                GD.Print($"{ditem} -> {item}.");
+                var config = Config.SlotConfigs[item.Item1];
+                GD.Print($"Config: {string.Join(",", config.MergeActions.Keys)}");
+                var action = config.MergeActions[ditem.Item1];
+                this.TryAddItem(action, 1);
+            }
+        }
+
+        this.EmitSignal(nameof(DragAndDropComplete), ddata, this);
+        ddata.EmitSignal(nameof(DragAndDropComplete), ddata, this);
     }
 }

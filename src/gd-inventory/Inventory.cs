@@ -11,6 +11,7 @@ public partial class Inventory
     {
         public Texture Texture;
         public int MaxCount;
+        public Dictionary<int, int> MergeActions;
     }
 
     public class InventoryConfig
@@ -30,7 +31,7 @@ public partial class Inventory
     public delegate void UseItem(InventorySlot slot);
 
     [Signal]
-    public delegate void DragAndDropComplete(InventorySlot slot);
+    public delegate void DragAndDropComplete(InventorySlot from, InventorySlot to);
 
     private uint size;
 
@@ -52,7 +53,7 @@ public partial class Inventory
                     slot.Config = Config;
                     this.slotContainer.AddChild(slot);
                     slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
-                    slot.Connect(nameof(InventorySlot.DragAndDropComplete), this, nameof(SlotDragAndDropComplete), new Godot.Collections.Array { slot });
+                    slot.Connect(nameof(InventorySlot.DragAndDropComplete), this, nameof(SlotDragAndDropComplete));
                 }
             }
             this.size = value;
@@ -67,9 +68,9 @@ public partial class Inventory
         }
     }
 
-    private void SlotDragAndDropComplete(InventorySlot slot)
+    private void SlotDragAndDropComplete(InventorySlot from, InventorySlot to)
     {
-        this.EmitSignal(nameof(DragAndDropComplete), slot);
+        this.EmitSignal(nameof(DragAndDropComplete), from, to);
     }
 
     private int sizePerRow;

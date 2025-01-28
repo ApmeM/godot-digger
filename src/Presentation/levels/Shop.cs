@@ -33,10 +33,10 @@ public partial class Shop
 
         this.bagInventory.TryAddItem(Loot.Gold.Item1, price);
         this.shopInventory.ClearItems();
-        UpdateCost(null);
+        UpdateCost(null, null);
     }
 
-    private void UpdateCost(InventorySlot slot)
+    private void UpdateCost(InventorySlot from, InventorySlot to)
     {
         var price = CalculatePrice();
         if (price == 0)

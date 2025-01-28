@@ -26,7 +26,8 @@ public partial class BaseLevel
             this.Resources.SlotConfigs.Add(id, new Inventory.InventorySlotConfig
             {
                 Texture = tex,
-                MaxCount = LootDefinition.KnownLoot[(id, 0, 0)].MaxCount
+                MaxCount = LootDefinition.KnownLoot[(id, 0, 0)].MaxCount,
+                MergeActions = LootDefinition.KnownLoot[(id, 0, 0)].MergeActions.ToDictionary(a => a.Key.Item1, a => a.Value.Item1),
             });
             GD.Print($"Add loot {id} to inventory.");
         }
