@@ -8,7 +8,7 @@
 size = 8
 font_data = ExtResource( 3 )
 
-[node name="CustomPopupInentorySlot" type="CenterContainer"]
+[node name="InventorySlot" type="CenterContainer"]
 margin_right = 20.0
 margin_bottom = 20.0
 script = ExtResource( 2 )
@@ -20,6 +20,10 @@ rect_min_size = Vector2( 48, 48 )
 mouse_filter = 2
 texture = ExtResource( 1 )
 expand = true
+
+[node name="SlotTypePlaceholder" type="TextureRect" parent="Background"]
+margin_right = 40.0
+margin_bottom = 40.0
 
 [node name="LootContainer" type="CenterContainer" parent="."]
 margin_left = 24.0

@@ -12,6 +12,7 @@ public partial class Inventory
         public Texture Texture;
         public int MaxCount;
         public Dictionary<int, int> MergeActions;
+        public int ItemType;
     }
 
     public class InventoryConfig
@@ -158,8 +159,6 @@ public partial class Inventory
             return 0;
         }
 
-        GD.Print($"Add item {itemId} with {count}");
-
         if (!Config.SlotConfigs.ContainsKey(itemId))
         {
             GD.PrintErr($"Resource with index {itemId} is not known for this inventory.");
@@ -215,10 +214,7 @@ public partial class Inventory
 
     public int GetItemCount(int item)
     {
-        return this.slotContainer.GetChildren()
-            .OfType<InventorySlot>()
-            .Where(a => a.HasItem())
-            .Select(a => a.GetItem())
+        return this.GetItems()
             .Where(a => a.Item1 == item)
             .Sum(a => a.Item2);
     }

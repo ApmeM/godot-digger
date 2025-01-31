@@ -20,7 +20,7 @@ public partial class CustomPopup
             closeOnClickButton = value;
             if (IsInsideTree())
             {
-                this.closeButtonContainer.Visible = value;
+                this.closeButton.Visible = value;
             }
         }
     }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=85 format=2]
+[gd_scene load_steps=91 format=2]
 
 [ext_resource path="res://Presentation/assets/TileSets/constructions_stairsup.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -75,6 +75,12 @@
 [ext_resource path="res://Presentation/assets/TileSets/loot_potionblack.png" type="Texture" id=73]
 [ext_resource path="res://Presentation/assets/TileSets/loot_potionpurple.png" type="Texture" id=74]
 [ext_resource path="res://Presentation/assets/TileSets/loot_potionblue.png" type="Texture" id=75]
+[ext_resource path="res://gd-inventory/InventorySlot.tscn" type="PackedScene" id=76]
+[ext_resource path="res://Presentation/assets/TileSets/loot_chest_cloth.png" type="Texture" id=77]
+[ext_resource path="res://Presentation/assets/TileSets/loot_weapon_pickaxe.png" type="Texture" id=78]
+[ext_resource path="res://Presentation/assets/UI/slot_chest.png" type="Texture" id=79]
+[ext_resource path="res://Presentation/assets/UI/slot_potion.png" type="Texture" id=80]
+[ext_resource path="res://Presentation/assets/UI/slot_weapon.png" type="Texture" id=81]
 
 [sub_resource type="TileSet" id=1]
 1/name = "floor_water.png 1"
@@ -626,6 +632,34 @@ frame_11/delay_sec = 0.0
 20/shape_one_way_margin = 0.0
 20/shapes = [  ]
 20/z_index = 0
+21/name = "loot_weapon_pickaxe.png 21"
+21/texture = ExtResource( 78 )
+21/tex_offset = Vector2( 0, 0 )
+21/modulate = Color( 1, 1, 1, 1 )
+21/region = Rect2( 0, 0, 48, 48 )
+21/tile_mode = 0
+21/occluder_offset = Vector2( 0, 0 )
+21/navigation_offset = Vector2( 0, 0 )
+21/shape_offset = Vector2( 0, 0 )
+21/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+21/shape_one_way = false
+21/shape_one_way_margin = 0.0
+21/shapes = [  ]
+21/z_index = 0
+22/name = "loot_chest_cloth.png 22"
+22/texture = ExtResource( 77 )
+22/tex_offset = Vector2( 0, 0 )
+22/modulate = Color( 1, 1, 1, 1 )
+22/region = Rect2( 0, 0, 48, 48 )
+22/tile_mode = 0
+22/occluder_offset = Vector2( 0, 0 )
+22/navigation_offset = Vector2( 0, 0 )
+22/shape_offset = Vector2( 0, 0 )
+22/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+22/shape_one_way = false
+22/shape_one_way_margin = 0.0
+22/shapes = [  ]
+22/z_index = 0
 
 [sub_resource type="AnimatedTexture" id=9]
 flags = 4
@@ -866,7 +900,6 @@ texture_normal = ExtResource( 6 )
 expand = true
 
 [node name="BagInventoryPopup" parent="." instance=ExtResource( 7 )]
-visible = false
 CloseOnClickButton = true
 Title = "Inventory"
 CloseOnClickOutside = false
@@ -896,57 +929,69 @@ text = "Inventory"
 
 [node name="PopupContainer" parent="BagInventoryPopup/CustomPopupContainer" index="1"]
 margin_right = 188.0
-margin_bottom = 144.0
+margin_bottom = 230.0
 
 [node name="MarginContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer" index="0"]
 margin_right = 188.0
-margin_bottom = 123.0
+margin_bottom = 209.0
 
 [node name="PopupOuterBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
 margin_right = 188.0
-margin_bottom = 123.0
+margin_bottom = 209.0
 
 [node name="PopupOuterMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
 margin_right = 188.0
-margin_bottom = 123.0
+margin_bottom = 209.0
 
 [node name="PopupInnerBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
 margin_right = 179.0
-margin_bottom = 114.0
+margin_bottom = 200.0
 
 [node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
 margin_right = 179.0
-margin_bottom = 114.0
+margin_bottom = 200.0
 
 [node name="InventoriesContainer" type="VBoxContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_left = 9.0
 margin_top = 9.0
 margin_right = 161.0
-margin_bottom = 96.0
+margin_bottom = 182.0
 
 [node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 8 )]
 margin_left = 0.0
-margin_top = 18.0
+margin_top = 0.0
 margin_right = 152.0
-margin_bottom = 87.0
+margin_bottom = 69.0
 Size = 3
 SizePerRow = 4
 Title = "Bag"
 
-[node name="CloseButtonContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+[node name="EquipmentInventory" type="Control" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer"]
+margin_top = 73.0
+margin_right = 152.0
+margin_bottom = 173.0
+rect_min_size = Vector2( 100, 100 )
+
+[node name="PotionSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
+ItemTypePlaceholderTexture = ExtResource( 80 )
+
+[node name="WeaponSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
+margin_left = 1.0
+margin_top = 50.0
+margin_right = 49.0
+margin_bottom = 98.0
+ItemTypePlaceholderTexture = ExtResource( 81 )
+
+[node name="ChestSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
+margin_left = 52.0
+margin_top = 49.0
+margin_right = 100.0
+margin_bottom = 97.0
+ItemTypePlaceholderTexture = ExtResource( 79 )
+
+[node name="CloseButton" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+margin_left = 132.0
 margin_right = 179.0
-margin_bottom = 114.0
-
-[node name="CloseButtonMarginRight" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="0"]
-margin_right = 119.0
-
-[node name="CloseButton" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="1"]
-margin_left = 123.0
-margin_right = 170.0
-
-[node name="CloseButtonMaringBottom" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/CloseButtonContainer" index="2"]
-margin_right = 119.0
-margin_bottom = 105.0
 
 [node name="SignPopup" parent="." instance=ExtResource( 7 )]
 visible = false
@@ -974,9 +1019,6 @@ margin_bottom = 51.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Text"
 align = 1
-
-[node name="CloseButtonContainer" parent="SignPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
-visible = false
 
 [node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
 position = Vector2( 241, 400 )
@@ -1041,8 +1083,8 @@ text = "0 / 10"
 margin_top = 82.0
 margin_bottom = 102.0
 
-[node name="CloseButtonContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
-margin_bottom = 129.0
+[node name="CloseButton" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+visible = true
 
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]

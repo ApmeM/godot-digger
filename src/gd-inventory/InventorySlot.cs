@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -10,10 +10,26 @@ public partial class InventorySlot
     [Export]
     public int ItemId = -1;
 
-    [Export]
     public Inventory.InventoryConfig Config = new Inventory.InventoryConfig();
 
+    public readonly HashSet<int> AcceptedTypes = new HashSet<int>();
+
+    [Export]
+    public Texture ItemTypePlaceholderTexture
+    {
+        get => itemTypePlaceholderTexture;
+        set
+        {
+            itemTypePlaceholderTexture = value;
+            if (IsInsideTree())
+            {
+                this.slotTypePlaceholder.Texture = value;
+            }
+        }
+    }
+
     private int itemsCount = 0;
+    private Texture itemTypePlaceholderTexture;
 
     [Export]
     public int ItemsCount
@@ -42,6 +58,7 @@ public partial class InventorySlot
         this.RemoveItem();
 
         this.ItemsCount = itemsCount;
+        this.ItemTypePlaceholderTexture = this.itemTypePlaceholderTexture;
     }
 
     public bool HasItem()
@@ -57,6 +74,12 @@ public partial class InventorySlot
 
     public int TryAddItem(int itemId, int countDiff)
     {
+        if (this.AcceptedTypes.Count > 0 && !this.AcceptedTypes.Contains(this.Config.SlotConfigs[itemId].ItemType))
+        {
+            GD.PrintErr($"This slot does not accept this item type. ItemTypes: {this.Config.SlotConfigs[itemId].ItemType}, AcceptedType: {string.Join(",", this.AcceptedTypes)}");
+            return countDiff;
+        }
+
         if (HasItem() && this.ItemId != itemId)
         {
             GD.PrintErr("Can not add loot item to the slot as it is already occupied by different resouce.");
@@ -176,9 +199,7 @@ public partial class InventorySlot
             this.TryAddItem(item.Item1, -1);
             if (this.ItemsCount == 0)
             {
-                GD.Print($"{ditem} -> {item}.");
                 var config = Config.SlotConfigs[item.Item1];
-                GD.Print($"Config: {string.Join(",", config.MergeActions.Keys)}");
                 var action = config.MergeActions[ditem.Item1];
                 this.TryAddItem(action, 1);
             }
