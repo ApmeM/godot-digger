@@ -65,7 +65,8 @@ public partial class Level1
             );
             if (result)
             {
-                this.DigPower++;
+                signLabel.Text = "Thank you young man.";
+                signPopup.Show();
             }
             return;
         }
@@ -99,6 +100,7 @@ public partial class Level1
             if (result)
             {
                 signLabel.Text = "Thanks. Take your bread.";
+                signPopup.Show();
             }
             return;
         }

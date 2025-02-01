@@ -67,13 +67,15 @@ public class LootDefinition : IActionDefinition
         { Loot.PotionViolet, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.PotionWhite, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.PotionYellow, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.WeaponPickaxe, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, ItemType = ItemType.Weapon} },
+        { Loot.WeaponPickaxe, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, ItemType = ItemType.Weapon, DigPower=2} },
         { Loot.ChestCloth, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, ItemType = ItemType.Chest} },
     };
 
     public Dictionary<ValueTuple<int, int, int>, ValueTuple<int, int, int>> MergeActions = new Dictionary<(int, int, int), (int, int, int)>();
 
     public int MaxCount;
+    public int DigPower;
+
     public ItemType ItemType { get; set; }
 
     public uint Price { get; set; }

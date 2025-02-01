@@ -13,9 +13,6 @@ public partial class BaseLevel
 
     protected Inventory.InventoryConfig Resources = new Inventory.InventoryConfig();
 
-    [Export]
-    public uint DigPower = 1;
-
     public Stamina Stamina => this.stamina;
 
     public override void _Ready()
@@ -52,8 +49,6 @@ public partial class BaseLevel
 
         this.stamina.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
-
-        this.DigPower = this.equipmentInventory.CalcDigPower();
 
         this.AddToGroup(Groups.LevelScene);
     }
@@ -210,9 +205,10 @@ public partial class BaseLevel
             return;
         }
 
-        if (currentHp > this.DigPower)
+        var digPower = this.equipmentInventory.CalcDigPower();
+        if (currentHp > digPower)
         {
-            this.blocks.SetMeta(metaName, currentHp - this.DigPower);
+            this.blocks.SetMeta(metaName, currentHp - digPower);
             return;
         }
 

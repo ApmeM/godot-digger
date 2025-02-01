@@ -55,7 +55,7 @@ public partial class EquipmentInventory
 
     public uint CalcDigPower()
     {
-        return 1;
+        return 1 + (uint)Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum());
     }
 
     public uint CalcNumberOfTurns()
