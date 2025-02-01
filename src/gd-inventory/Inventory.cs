@@ -20,7 +20,23 @@ public partial class Inventory
         public readonly Dictionary<int, InventorySlotConfig> SlotConfigs = new Dictionary<int, InventorySlotConfig>();
     }
 
-    public InventoryConfig Config = new InventoryConfig();
+    private InventoryConfig config;
+
+    public InventoryConfig Config
+    {
+        get => config;
+        set
+        {
+            config = value;
+            if (IsInsideTree())
+            {
+                foreach (InventorySlot slot in this.slotContainer.GetChildren().Cast<InventorySlot>())
+                {
+                    slot.Config = value;
+                }
+            }
+        }
+    }
 
     [Export]
     public PackedScene InventorySlotScene;
@@ -112,6 +128,7 @@ public partial class Inventory
         this.SizePerRow = this.sizePerRow;
         this.Size = size;
         this.Title = this.title;
+        this.Config = this.config;
     }
 
     public uint TryRemoveItem(int itemId, uint count)

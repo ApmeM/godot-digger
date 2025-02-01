@@ -1,4 +1,4 @@
-[gd_scene load_steps=97 format=2]
+[gd_scene load_steps=88 format=2]
 
 [ext_resource path="res://Presentation/assets/TileSets/constructions_stairsup.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/BaseLevel.cs" type="Script" id=2]
@@ -75,18 +75,9 @@
 [ext_resource path="res://Presentation/assets/TileSets/loot_potionblack.png" type="Texture" id=73]
 [ext_resource path="res://Presentation/assets/TileSets/loot_potionpurple.png" type="Texture" id=74]
 [ext_resource path="res://Presentation/assets/TileSets/loot_potionblue.png" type="Texture" id=75]
-[ext_resource path="res://gd-inventory/InventorySlot.tscn" type="PackedScene" id=76]
+[ext_resource path="res://Presentation/EquipmentInventory.tscn" type="PackedScene" id=76]
 [ext_resource path="res://Presentation/assets/TileSets/loot_chest_cloth.png" type="Texture" id=77]
 [ext_resource path="res://Presentation/assets/TileSets/loot_weapon_pickaxe.png" type="Texture" id=78]
-[ext_resource path="res://Presentation/assets/UI/slot_chest.png" type="Texture" id=79]
-[ext_resource path="res://Presentation/assets/UI/slot_ring.png" type="Texture" id=80]
-[ext_resource path="res://Presentation/assets/UI/slot_weapon.png" type="Texture" id=81]
-[ext_resource path="res://Presentation/assets/UI/slot_helm.png" type="Texture" id=82]
-[ext_resource path="res://Presentation/assets/UI/slot_shield.png" type="Texture" id=83]
-[ext_resource path="res://Presentation/assets/UI/slot_belt.png" type="Texture" id=84]
-[ext_resource path="res://Presentation/assets/UI/slot_pants.png" type="Texture" id=85]
-[ext_resource path="res://Presentation/assets/UI/slot_neck.png" type="Texture" id=86]
-[ext_resource path="res://Presentation/assets/UI/slot_boots.png" type="Texture" id=87]
 
 [sub_resource type="TileSet" id=1]
 1/name = "floor_water.png 1"
@@ -973,97 +964,7 @@ Size = 3
 SizePerRow = 4
 Title = "Bag"
 
-[node name="EquipmentInventory" type="GridContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer"]
-margin_top = 73.0
-margin_right = 152.0
-margin_bottom = 329.0
-columns = 3
-
-[node name="NeckSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_right = 48.0
-margin_bottom = 48.0
-ItemTypePlaceholderTexture = ExtResource( 86 )
-
-[node name="HelmSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 52.0
-margin_right = 100.0
-margin_bottom = 48.0
-ItemTypePlaceholderTexture = ExtResource( 82 )
-
-[node name="SkipControl1" type="Control" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory"]
-margin_left = 104.0
-margin_right = 152.0
-margin_bottom = 48.0
-
-[node name="WeaponSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_top = 52.0
-margin_right = 48.0
-margin_bottom = 100.0
-ItemTypePlaceholderTexture = ExtResource( 81 )
-
-[node name="ChestSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 52.0
-margin_top = 52.0
-margin_right = 100.0
-margin_bottom = 100.0
-ItemTypePlaceholderTexture = ExtResource( 79 )
-
-[node name="ShieldSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 104.0
-margin_top = 52.0
-margin_right = 152.0
-margin_bottom = 100.0
-ItemTypePlaceholderTexture = ExtResource( 83 )
-
-[node name="Ring1Slot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_top = 104.0
-margin_right = 48.0
-margin_bottom = 152.0
-ItemTypePlaceholderTexture = ExtResource( 80 )
-
-[node name="BeltSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 52.0
-margin_top = 104.0
-margin_right = 100.0
-margin_bottom = 152.0
-ItemTypePlaceholderTexture = ExtResource( 84 )
-
-[node name="Ring2Slot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 104.0
-margin_top = 104.0
-margin_right = 152.0
-margin_bottom = 152.0
-ItemTypePlaceholderTexture = ExtResource( 80 )
-
-[node name="SkipControl2" type="Control" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory"]
-margin_top = 156.0
-margin_right = 48.0
-margin_bottom = 204.0
-
-[node name="PantsSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 52.0
-margin_top = 156.0
-margin_right = 100.0
-margin_bottom = 204.0
-ItemTypePlaceholderTexture = ExtResource( 85 )
-
-[node name="SkipControl3" type="Control" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory"]
-margin_left = 104.0
-margin_top = 156.0
-margin_right = 152.0
-margin_bottom = 204.0
-
-[node name="SkipControl4" type="Control" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory"]
-margin_top = 208.0
-margin_right = 48.0
-margin_bottom = 256.0
-
-[node name="BootsSlot" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer/EquipmentInventory" instance=ExtResource( 76 )]
-margin_left = 52.0
-margin_top = 208.0
-margin_right = 100.0
-margin_bottom = 256.0
-ItemTypePlaceholderTexture = ExtResource( 87 )
+[node name="EquipmentInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 76 )]
 
 [node name="CloseButton" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
 margin_left = 132.0
@@ -1161,6 +1062,9 @@ text = "0 / 10"
 [node name="HBoxContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="2"]
 margin_top = 82.0
 margin_bottom = 102.0
+
+[node name="CloseButton" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+visible = false
 
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]
