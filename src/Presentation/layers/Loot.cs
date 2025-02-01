@@ -30,9 +30,16 @@ public static class Loot
 
 public enum ItemType
 {
-    Potion = 1,
-    Chest = 2,
-    Weapon = 3
+    Neck = 1,
+    Helm = 2,
+    Weapon = 3,
+    Chest = 4,
+    Shield = 5,
+    Ring = 6,
+    Belt = 7,
+    Pants = 8,
+    Boots = 9,
+    Potion = 10,
 }
 
 public class LootDefinition : IActionDefinition

@@ -100,6 +100,7 @@ public partial class InventorySlot
 
         if (!HasItem())
         {
+            this.slotTypePlaceholder.Visible = false;
             this.lootContainer.AddChild(new TextureRect
             {
                 Texture = Config.SlotConfigs[itemId].Texture,
@@ -131,7 +132,7 @@ public partial class InventorySlot
         {
             return;
         }
-
+        this.slotTypePlaceholder.Visible = true;
         this.lootContainer.ClearChildren();
         this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
         this.ItemsCount = 0;

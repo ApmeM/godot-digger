@@ -18,6 +18,8 @@ public partial class BaseLevel
 
     public Stamina Stamina => this.stamina;
 
+    private InventorySlot[] slots;
+
     public virtual void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
     {
         foreach (int id in this.loot.TileSet.GetTilesIds())
@@ -31,15 +33,36 @@ public partial class BaseLevel
                 MergeActions = definition.MergeActions.ToDictionary(a => a.Key.Item1, a => a.Value.Item1),
                 ItemType = (int)definition.ItemType
             });
-            GD.Print($"Add loot {id} to inventory.");
         }
+        
+        this.slots = new[]{
+            this.neckSlot,
+            this.helmSlot,
+            this.weaponSlot,
+            this.chestSlot,
+            this.shieldSlot,
+            this.ring1Slot,
+            this.beltSlot,
+            this.ring2Slot,
+            this.pantsSlot,
+            this.bootsSlot,
+        };
 
-        this.potionSlot.Config = Resources;
-        this.potionSlot.AcceptedTypes.Add((int)ItemType.Potion);
-        this.weaponSlot.Config = Resources;
+        this.neckSlot.AcceptedTypes.Add((int)ItemType.Neck);
+        this.helmSlot.AcceptedTypes.Add((int)ItemType.Helm);
         this.weaponSlot.AcceptedTypes.Add((int)ItemType.Weapon);
-        this.chestSlot.Config = Resources;
         this.chestSlot.AcceptedTypes.Add((int)ItemType.Chest);
+        this.shieldSlot.AcceptedTypes.Add((int)ItemType.Shield);
+        this.ring1Slot.AcceptedTypes.Add((int)ItemType.Ring);
+        this.beltSlot.AcceptedTypes.Add((int)ItemType.Belt);
+        this.ring2Slot.AcceptedTypes.Add((int)ItemType.Ring);
+        this.pantsSlot.AcceptedTypes.Add((int)ItemType.Pants);
+        this.bootsSlot.AcceptedTypes.Add((int)ItemType.Boots);
+
+        foreach (var slot in slots)
+        {
+            slot.Config = Resources;
+        }
 
         this.bagInventory.Config = Resources;
         this.bagInventory.Size = inventorySlots;
@@ -69,217 +92,217 @@ public partial class BaseLevel
     }
 
     protected void InventoryUseItem(InventorySlot slot)
-{
-    var tileId = slot.ItemId;
-    if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
     {
-        LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
-        slot.TryAddItem(slot.ItemId, -1);
-    }
-}
-
-public override void _UnhandledInput(InputEvent @event)
-{
-    base._UnhandledInput(@event);
-    if (!(@event is InputEventScreenTouch eventMouseButton) || eventMouseButton.Pressed)
-    {
-        return;
-    }
-
-    var newPos = this.GetViewport().CanvasTransform.AffineInverse() * eventMouseButton.Position;
-    var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
-
-    var result =
-        TryLayer(this.fog, pos, FogDefinition.KnownFog) &&
-        TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks) &&
-        TryLayer(this.loot, pos, LootDefinition.KnownLoot) &&
-        TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions) &&
-        TryLayer(this.floor, pos, FloorDefinition.KnownFloors);
-
-    if (result)
-    {
-        GD.Print($"Clicked outside of the map at {pos}.");
-    }
-}
-
-private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions) where T : IActionDefinition
-{
-    var cell = map.GetCellv(pos);
-
-    if (cell == -1)
-    {
-        return true;
-    }
-
-    var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-    var key = (cell, (int)cellTile.x, (int)cellTile.y);
-
-    if (!knownActions.ContainsKey(key))
-    {
-        GD.PrintErr($"Unknown key {key} in knownActions.");
-        return false;
-    }
-    knownActions[key].ClickAction.Invoke(this, pos);
-    return false;
-}
-
-private void ShowInventoryPopup()
-{
-    this.bagInventoryPopup.Show();
-}
-
-public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
-{
-    var inventory = this.bagInventory;
-
-    this.questRequirements.Content = description;
-    this.requirementsList.ClearChildren();
-
-    var isEnough = true;
-    foreach (var req in requirements)
-    {
-        var lootId = req.Item1.Item1;
-        this.requirementsList.AddChild(new TextureRect
+        var tileId = slot.ItemId;
+        if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
         {
-            Texture = inventory.Config.SlotConfigs[lootId].Texture
-        });
-
-        var existing = inventory.GetItemCount(lootId);
-
-        this.requirementsList.AddChild(new Label
-        {
-            Text = $"x {existing} / {req.Item2}"
-        });
-
-        isEnough = isEnough && existing >= req.Item2;
-    }
-
-    this.questRequirements.AllowYes = isEnough;
-    this.questRequirements.Show();
-
-    if (!isEnough)
-    {
-        return false;
-    }
-
-    this.questRequirements.Show();
-    var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
-    if (!decision)
-    {
-        return false;
-    }
-
-    var items = inventory.GetItems().ToList();
-
-    var successRemove = inventory.TryRemoveItems(requirements.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
-    var successAdd = inventory.TryAddItems(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
-
-    if (!successRemove || !successAdd)
-    {
-        inventory.ClearItems();
-        var result = inventory.TryAddItems(items);
-        if (result.Any())
-        {
-            GD.PrintErr($"Cant restore inventory status!!!");
+            LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
+            slot.TryAddItem(slot.ItemId, -1);
         }
     }
 
-    return successRemove && successAdd;
-}
-
-public virtual void CustomConstructionClickedAsync(Vector2 pos)
-{
-    GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
-}
-
-public virtual void CustomBlockClicked(Vector2 pos)
-{
-    GD.Print($"Clicked on a block at {pos}, no custom action defined, dig it.");
-
-    var blocksCell = this.blocks.GetCellv(pos);
-    var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-
-    if (this.stamina.CurrentNumberOfTurns == 0)
+    public override void _UnhandledInput(InputEvent @event)
     {
-        return;
-    }
-
-    this.stamina.CurrentNumberOfTurns--;
-
-    var metaName = $"HP_{pos}";
-
-    if (!this.blocks.HasMeta(metaName))
-    {
-        this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
-    }
-
-    var currentHp = (int)this.blocks.GetMeta(metaName);
-
-    if (currentHp == 0)
-    {
-        return;
-    }
-
-    if (currentHp > this.DigPower)
-    {
-        this.blocks.SetMeta(metaName, currentHp - this.DigPower);
-        return;
-    }
-
-    this.blocks.SetMeta(metaName, null);
-    this.blocks.SetCellv(pos, -1);
-    this.UnFogCell(pos);
-}
-
-protected void UnFogCell(Vector2 cell)
-{
-    if (
-        this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
-        this.blocks.GetCellv(cell) != -1)  // Can start unfog if the block is not yet removed
-    {
-        return;
-    }
-
-    this.fog.SetCellv(cell, -1);
-
-    var queue = new Queue<Vector2>();
-    queue.Enqueue(cell + Vector2.Down);
-    queue.Enqueue(cell + Vector2.Left);
-    queue.Enqueue(cell + Vector2.Up);
-    queue.Enqueue(cell + Vector2.Right);
-
-    while (queue.Any())
-    {
-        cell = queue.Dequeue();
-
-        if (this.fog.GetCellv(cell) == -1)
+        base._UnhandledInput(@event);
+        if (!(@event is InputEventScreenTouch eventMouseButton) || eventMouseButton.Pressed)
         {
-            continue;
+            return;
+        }
+
+        var newPos = this.GetViewport().CanvasTransform.AffineInverse() * eventMouseButton.Position;
+        var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
+
+        var result =
+            TryLayer(this.fog, pos, FogDefinition.KnownFog) &&
+            TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks) &&
+            TryLayer(this.loot, pos, LootDefinition.KnownLoot) &&
+            TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions) &&
+            TryLayer(this.floor, pos, FloorDefinition.KnownFloors);
+
+        if (result)
+        {
+            GD.Print($"Clicked outside of the map at {pos}.");
+        }
+    }
+
+    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions) where T : IActionDefinition
+    {
+        var cell = map.GetCellv(pos);
+
+        if (cell == -1)
+        {
+            return true;
+        }
+
+        var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+        var key = (cell, (int)cellTile.x, (int)cellTile.y);
+
+        if (!knownActions.ContainsKey(key))
+        {
+            GD.PrintErr($"Unknown key {key} in knownActions.");
+            return false;
+        }
+        knownActions[key].ClickAction.Invoke(this, pos);
+        return false;
+    }
+
+    private void ShowInventoryPopup()
+    {
+        this.bagInventoryPopup.Show();
+    }
+
+    public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
+    {
+        var inventory = this.bagInventory;
+
+        this.questRequirements.Content = description;
+        this.requirementsList.ClearChildren();
+
+        var isEnough = true;
+        foreach (var req in requirements)
+        {
+            var lootId = req.Item1.Item1;
+            this.requirementsList.AddChild(new TextureRect
+            {
+                Texture = inventory.Config.SlotConfigs[lootId].Texture
+            });
+
+            var existing = inventory.GetItemCount(lootId);
+
+            this.requirementsList.AddChild(new Label
+            {
+                Text = $"x {existing} / {req.Item2}"
+            });
+
+            isEnough = isEnough && existing >= req.Item2;
+        }
+
+        this.questRequirements.AllowYes = isEnough;
+        this.questRequirements.Show();
+
+        if (!isEnough)
+        {
+            return false;
+        }
+
+        this.questRequirements.Show();
+        var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+        if (!decision)
+        {
+            return false;
+        }
+
+        var items = inventory.GetItems().ToList();
+
+        var successRemove = inventory.TryRemoveItems(requirements.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
+        var successAdd = inventory.TryAddItems(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
+
+        if (!successRemove || !successAdd)
+        {
+            inventory.ClearItems();
+            var result = inventory.TryAddItems(items);
+            if (result.Any())
+            {
+                GD.PrintErr($"Cant restore inventory status!!!");
+            }
+        }
+
+        return successRemove && successAdd;
+    }
+
+    public virtual void CustomConstructionClickedAsync(Vector2 pos)
+    {
+        GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
+    }
+
+    public virtual void CustomBlockClicked(Vector2 pos)
+    {
+        GD.Print($"Clicked on a block at {pos}, no custom action defined, dig it.");
+
+        var blocksCell = this.blocks.GetCellv(pos);
+        var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
+
+        if (this.stamina.CurrentNumberOfTurns == 0)
+        {
+            return;
+        }
+
+        this.stamina.CurrentNumberOfTurns--;
+
+        var metaName = $"HP_{pos}";
+
+        if (!this.blocks.HasMeta(metaName))
+        {
+            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
+        }
+
+        var currentHp = (int)this.blocks.GetMeta(metaName);
+
+        if (currentHp == 0)
+        {
+            return;
+        }
+
+        if (currentHp > this.DigPower)
+        {
+            this.blocks.SetMeta(metaName, currentHp - this.DigPower);
+            return;
+        }
+
+        this.blocks.SetMeta(metaName, null);
+        this.blocks.SetCellv(pos, -1);
+        this.UnFogCell(pos);
+    }
+
+    protected void UnFogCell(Vector2 cell)
+    {
+        if (
+            this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
+            this.blocks.GetCellv(cell) != -1)  // Can start unfog if the block is not yet removed
+        {
+            return;
         }
 
         this.fog.SetCellv(cell, -1);
 
-        if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
-        {
-            continue;
-        }
-
+        var queue = new Queue<Vector2>();
         queue.Enqueue(cell + Vector2.Down);
         queue.Enqueue(cell + Vector2.Left);
         queue.Enqueue(cell + Vector2.Up);
         queue.Enqueue(cell + Vector2.Right);
+
+        while (queue.Any())
+        {
+            cell = queue.Dequeue();
+
+            if (this.fog.GetCellv(cell) == -1)
+            {
+                continue;
+            }
+
+            this.fog.SetCellv(cell, -1);
+
+            if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
+            {
+                continue;
+            }
+
+            queue.Enqueue(cell + Vector2.Down);
+            queue.Enqueue(cell + Vector2.Left);
+            queue.Enqueue(cell + Vector2.Up);
+            queue.Enqueue(cell + Vector2.Right);
+        }
     }
-}
 
-public virtual void CustomLootClickedAsync(Vector2 pos)
-{
-    GD.Print($"Clicked on a loot at {pos}, no custom action defined, put to inventory.");
-
-    var lootId = this.loot.GetCellv(pos);
-
-    if (this.bagInventory.TryAddItem(lootId, 1) == 0)
+    public virtual void CustomLootClickedAsync(Vector2 pos)
     {
-        this.loot.SetCellv(pos, -1);
+        GD.Print($"Clicked on a loot at {pos}, no custom action defined, put to inventory.");
+
+        var lootId = this.loot.GetCellv(pos);
+
+        if (this.bagInventory.TryAddItem(lootId, 1) == 0)
+        {
+            this.loot.SetCellv(pos, -1);
+        }
     }
-}
 }
