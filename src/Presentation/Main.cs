@@ -22,17 +22,7 @@ public partial class Main
         this.gamePosition.ClearChildren();
         var levelScene = ResourceLoader.Load<PackedScene>($"res://Presentation/levels/{nextLevel}.tscn");
         var game = levelScene.Instance<BaseLevel>();
-        game.InitMap(this.MaxNumberOfTurns, this.InventorySlots, this.DigPower);
         game.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
         this.gamePosition.AddChild(game);
     }
-
-    [Export]
-    public uint InventorySlots = 3;
-
-    [Export]
-    public uint DigPower = 1;
-
-    [Export]
-    public uint MaxNumberOfTurns = 10;
 }

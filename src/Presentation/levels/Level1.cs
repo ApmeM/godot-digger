@@ -1,4 +1,3 @@
-using System.Linq;
 using Godot;
 
 [SceneReference("Level1.tscn")]
@@ -10,12 +9,6 @@ public partial class Level1
         this.FillMembers();
 
         this.stashInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
-    }
-
-    public override void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
-    {
-        base.InitMap(maxNumberOfTurns, inventorySlots, digPower);
-
         this.stashInventory.Config = new Inventory.InventoryConfig();
         foreach (var slot in Resources.SlotConfigs)
         {

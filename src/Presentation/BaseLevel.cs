@@ -18,8 +18,21 @@ public partial class BaseLevel
 
     public Stamina Stamina => this.stamina;
 
-    public virtual void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
+    public override void _Ready()
     {
+        base._Ready();
+        this.FillMembers();
+
+        this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
+        this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
+        this.draggableCamera.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
+        this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
+
+        // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
+
+        this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
+
         foreach (int id in this.loot.TileSet.GetTilesIds())
         {
             var tex = this.loot.TileSet.TileGetTexture(id);
@@ -35,28 +48,12 @@ public partial class BaseLevel
         this.equipmentInventory.Config = Resources;
 
         this.bagInventory.Config = Resources;
-        this.bagInventory.Size = inventorySlots;
+        this.bagInventory.Size = 3; // ToDo: 
 
-        this.stamina.MaxNumberOfTurns = maxNumberOfTurns;
+        this.stamina.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
 
-        this.DigPower = digPower;
-    }
-
-    public override void _Ready()
-    {
-        base._Ready();
-        this.FillMembers();
-
-        this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
-        this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
-        this.draggableCamera.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
-        this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
-
-        // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
-
-        this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
-        this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
+        this.DigPower = this.equipmentInventory.CalcDigPower();
 
         this.AddToGroup(Groups.LevelScene);
     }

@@ -52,4 +52,14 @@ public partial class EquipmentInventory
 
         this.Config = this.config;
     }
+
+    public uint CalcDigPower()
+    {
+        return 1;
+    }
+
+    public uint CalcNumberOfTurns()
+    {
+        return 10;
+    }
 }

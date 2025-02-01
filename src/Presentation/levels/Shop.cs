@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -12,12 +11,6 @@ public partial class Shop
         this.FillMembers();
 
         this.shopInventory.Connect(nameof(Inventory.DragAndDropComplete), this, nameof(UpdateCost));
-    }
-
-    public override void InitMap(uint maxNumberOfTurns, uint inventorySlots, uint digPower)
-    {
-        base.InitMap(maxNumberOfTurns, inventorySlots, digPower);
-
         this.shopInventory.Config = Resources;
         this.shopSellButton.Connect(CommonSignals.Pressed, this, nameof(SellButtonClicked));
     }
