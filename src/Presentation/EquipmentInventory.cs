@@ -5,6 +5,10 @@ using System.Linq;
 [SceneReference("EquipmentInventory.tscn")]
 public partial class EquipmentInventory
 {
+
+    [Signal]
+    public delegate void ItemCountChanged(InventorySlot slot, int itemId, int from, int to);
+
     private Inventory.InventoryConfig config;
 
     public Inventory.InventoryConfig Config
@@ -25,20 +29,6 @@ public partial class EquipmentInventory
 
     public override void _Ready()
     {
-
-        var slots = new[]{
-            this.neckSlot,
-            this.helmSlot,
-            this.weaponSlot,
-            this.chestSlot,
-            this.shieldSlot,
-            this.ring1Slot,
-            this.beltSlot,
-            this.ring2Slot,
-            this.pantsSlot,
-            this.bootsSlot,
-        };
-
         this.neckSlot.AcceptedTypes.Add((int)ItemType.Neck);
         this.helmSlot.AcceptedTypes.Add((int)ItemType.Helm);
         this.weaponSlot.AcceptedTypes.Add((int)ItemType.Weapon);
@@ -51,15 +41,41 @@ public partial class EquipmentInventory
         this.bootsSlot.AcceptedTypes.Add((int)ItemType.Boots);
 
         this.Config = this.config;
+
+        foreach (InventorySlot slot in this.GetChildren().OfType<InventorySlot>())
+        {
+            slot.Connect(nameof(InventorySlot.ItemCountChanged), this, nameof(SlotItemCountChanged), new Godot.Collections.Array { slot });
+        }
     }
 
+    private void SlotItemCountChanged(int itemId, int from, int to, InventorySlot slot)
+    {
+        this.cacheDigPower = -1;
+        this.cacheNumberOfTurns = -1;
+        this.EmitSignal(nameof(ItemCountChanged), slot, itemId, from, to);
+    }
+
+    private int cacheDigPower = -1;
     public uint CalcDigPower()
     {
-        return 1 + (uint)Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum());
+        if (cacheDigPower != -1)
+        {
+            return (uint)cacheDigPower;
+        }
+
+        cacheDigPower = 1 + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum());
+        return (uint)cacheDigPower;
     }
 
+    private int cacheNumberOfTurns = -1;
     public uint CalcNumberOfTurns()
     {
-        return 10;
+        if (cacheNumberOfTurns != -1)
+        {
+            return (uint)cacheNumberOfTurns;
+        }
+
+        cacheNumberOfTurns = 10 + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].NumberOfTurns).Sum());
+        return (uint)cacheNumberOfTurns;
     }
 }

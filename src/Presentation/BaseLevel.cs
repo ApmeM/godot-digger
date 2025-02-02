@@ -29,6 +29,7 @@ public partial class BaseLevel
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
+        this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
 
         foreach (int id in this.loot.TileSet.GetTilesIds())
         {
@@ -51,6 +52,11 @@ public partial class BaseLevel
         this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
 
         this.AddToGroup(Groups.LevelScene);
+    }
+
+    private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
+    {
+        this.stamina.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
     }
 
     protected void InventoryUseItem(InventorySlot slot)

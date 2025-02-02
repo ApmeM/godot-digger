@@ -51,6 +51,9 @@ public partial class InventorySlot
     [Signal]
     public delegate void DragAndDropComplete(InventorySlot from, InventorySlot to);
 
+    [Signal]
+    public delegate void ItemCountChanged(int itemId, int from, int to);
+
     public override void _Ready()
     {
         base._Ready();
@@ -109,8 +112,11 @@ public partial class InventorySlot
             this.ItemId = itemId;
         }
 
+        var before = this.ItemsCount;
         this.ItemsCount = Math.Min(result, this.Config.SlotConfigs[itemId].MaxCount);
         result -= this.ItemsCount;
+
+        this.EmitSignal(nameof(ItemCountChanged), itemId, before, this.ItemsCount);
         return result;
     }
 
@@ -135,8 +141,11 @@ public partial class InventorySlot
         this.slotTypePlaceholder.Visible = true;
         this.lootContainer.ClearChildren();
         this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
+        var before = this.ItemsCount;
+        var itemId = this.ItemId;
         this.ItemsCount = 0;
         this.ItemId = -1;
+        this.EmitSignal(nameof(ItemCountChanged), itemId, before, this.ItemsCount);
     }
 
     public override void _GuiInput(InputEvent @event)
