@@ -182,7 +182,19 @@ public partial class InventorySlot
     public override bool CanDropData(Vector2 position, object data)
     {
         var ddata = (InventorySlot)data;
-        return !HasItem() || this.ItemId == ddata.ItemId || Config.SlotConfigs[this.ItemId].MergeActions.ContainsKey(ddata.ItemId);
+        if (HasItem())
+        {
+            if (Config.SlotConfigs[this.ItemId].MergeActions.ContainsKey(ddata.ItemId))
+            {
+                return true;
+            }
+
+            return this.ItemId == ddata.ItemId;
+        }
+        else
+        {
+            return this.AcceptedTypes.Count == 0 || this.AcceptedTypes.Contains(this.Config.SlotConfigs[ddata.ItemId].ItemType);
+        }
     }
 
     public override void DropData(Vector2 position, object data)

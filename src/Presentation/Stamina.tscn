@@ -10,7 +10,7 @@ margin_bottom = 40.0
 script = ExtResource( 2 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_right = 200.0
+margin_right = 70.0
 margin_bottom = 50.0
 
 [node name="Stamina" type="TextureRect" parent="HBoxContainer"]
@@ -29,6 +29,6 @@ text = "10"
 
 [node name="StaminaProgress" type="TextureProgress" parent="."]
 margin_top = 54.0
-margin_right = 200.0
-margin_bottom = 80.0
+margin_right = 70.0
+margin_bottom = 62.0
 texture_progress = ExtResource( 3 )
