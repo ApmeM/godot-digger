@@ -13,7 +13,7 @@ public partial class BaseLevel
 
     protected Inventory.InventoryConfig Resources = new Inventory.InventoryConfig();
 
-    public Stamina Stamina => this.stamina;
+    public Header Stamina => this.header;
 
     public override void _Ready()
     {
@@ -27,7 +27,7 @@ public partial class BaseLevel
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(ShowInventoryPopup));
+        this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopupAsync));
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
         this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
 
@@ -48,15 +48,15 @@ public partial class BaseLevel
         this.bagInventory.Config = Resources;
         this.bagInventory.Size = 3; // ToDo: 
 
-        this.stamina.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
-        this.stamina.CurrentNumberOfTurns = this.stamina.MaxNumberOfTurns;
+        this.header.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
+        this.header.CurrentNumberOfTurns = this.header.MaxNumberOfTurns;
 
         this.AddToGroup(Groups.LevelScene);
     }
 
     private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
     {
-        this.stamina.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
+        this.header.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
     }
 
     protected void InventoryUseItem(InventorySlot slot)
@@ -114,9 +114,12 @@ public partial class BaseLevel
         return false;
     }
 
-    private void ShowInventoryPopup()
+    private async Task ShowInventoryPopupAsync()
     {
+        draggableCamera.enabled = false;
         this.bagInventoryPopup.Show();
+        await ToSignal(this.questRequirements, nameof(CustomPopup.PopupClosed));
+        draggableCamera.enabled = false;
     }
 
     public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
@@ -145,16 +148,18 @@ public partial class BaseLevel
             isEnough = isEnough && existing >= req.Item2;
         }
 
+
+        this.draggableCamera.enabled = false;
         this.questRequirements.AllowYes = isEnough;
         this.questRequirements.Show();
-
+        var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+        this.draggableCamera.enabled = true;
+        
         if (!isEnough)
         {
             return false;
         }
 
-        this.questRequirements.Show();
-        var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
         if (!decision)
         {
             return false;
@@ -190,12 +195,12 @@ public partial class BaseLevel
         var blocksCell = this.blocks.GetCellv(pos);
         var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (this.stamina.CurrentNumberOfTurns == 0)
+        if (this.header.CurrentNumberOfTurns == 0)
         {
             return;
         }
 
-        this.stamina.CurrentNumberOfTurns--;
+        this.header.CurrentNumberOfTurns--;
 
         var metaName = $"HP_{pos}";
 

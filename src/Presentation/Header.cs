@@ -1,10 +1,14 @@
 using System;
 using Godot;
+using GodotDigger.Presentation.Utils;
 
-[SceneReference("Stamina.tscn")]
+[SceneReference("Header.tscn")]
 [Tool]
-public partial class Stamina
+public partial class Header
 {
+    [Signal]
+    public delegate void InventoryButtonClicked();
+
     [Export]
     public uint MaxNumberOfTurns = 10;
 
@@ -48,6 +52,13 @@ public partial class Stamina
         base._Ready();
         this.FillMembers();
         this.CurrentNumberOfTurns = this.currentNumberOfTurns;
+
+        this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
+    }
+
+    private void OpenInventory()
+    {
+        this.EmitSignal(nameof(InventoryButtonClicked));
     }
 
     public override void _Process(float delta)
