@@ -30,6 +30,7 @@ public partial class BaseLevel
         this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
         this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
+        this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
 
         foreach (int id in this.loot.TileSet.GetTilesIds())
         {
@@ -48,14 +49,27 @@ public partial class BaseLevel
         this.bagInventory.Config = Resources;
         this.bagInventory.Size = 3; // ToDo: 
 
-        this.header.MaxStamina = this.equipmentInventory.CalcNumberOfTurns();
+        this.CharacteristicsChanged();
 
         this.AddToGroup(Groups.LevelScene);
     }
 
+    private void BuffsChanged()
+    {
+        this.CharacteristicsChanged();
+    }
+
     private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
     {
-        this.header.MaxStamina = this.equipmentInventory.CalcNumberOfTurns();
+        this.CharacteristicsChanged();
+    }
+
+    private void CharacteristicsChanged()
+    {
+        var character = new Character();
+        this.equipmentInventory.ApplyEquipment(character);
+        this.header.ApplyBuffs(character);
+        this.header.Character = character;
     }
 
     protected void InventoryUseItem(InventorySlot slot)
@@ -223,7 +237,7 @@ public partial class BaseLevel
             return;
         }
 
-        var digPower = this.equipmentInventory.CalcDigPower();
+        var digPower = this.header.Character.DigPower;
         if (currentHp > digPower)
         {
             this.blocks.SetMeta(metaName, currentHp - digPower);
@@ -285,5 +299,10 @@ public partial class BaseLevel
         {
             this.loot.SetCellv(pos, -1);
         }
+    }
+
+    public void AddBuff(Buff staminaRegen)
+    {
+        this.header.AddBuff(staminaRegen);
     }
 }

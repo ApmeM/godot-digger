@@ -78,3 +78,9 @@ margin_top = 109.0
 margin_right = 108.0
 margin_bottom = 123.0
 text = "10"
+
+[node name="BuffContainer" type="GridContainer" parent="."]
+margin_left = 113.0
+margin_top = 34.0
+margin_right = 277.0
+margin_bottom = 56.0

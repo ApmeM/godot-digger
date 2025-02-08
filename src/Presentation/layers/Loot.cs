@@ -57,7 +57,7 @@ public class LootDefinition : IActionDefinition
         { Loot.Gold, new LootDefinition{Price=1, MaxCount = 1000, ClickAction = CustomLoot} },
         { Loot.PotionEmpty, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, MergeActions = new Dictionary<(int, int, int), (int, int, int)>{{Loot.StaminaPlant, Loot.PotionLightBlue}} }},
         { Loot.PotionBlack, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionBlue, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
+        { Loot.PotionBlue, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{level.AddBuff(Buff.StaminaRegen);} } },
         { Loot.PotionBrown, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.PotionGray, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
         { Loot.PotionGreen, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },

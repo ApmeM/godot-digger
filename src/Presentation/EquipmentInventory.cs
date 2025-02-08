@@ -5,7 +5,6 @@ using System.Linq;
 [SceneReference("EquipmentInventory.tscn")]
 public partial class EquipmentInventory
 {
-
     [Signal]
     public delegate void ItemCountChanged(InventorySlot slot, int itemId, int from, int to);
 
@@ -50,32 +49,12 @@ public partial class EquipmentInventory
 
     private void SlotItemCountChanged(int itemId, int from, int to, InventorySlot slot)
     {
-        this.cacheDigPower = -1;
-        this.cacheNumberOfTurns = -1;
         this.EmitSignal(nameof(ItemCountChanged), slot, itemId, from, to);
     }
 
-    private int cacheDigPower = -1;
-    public uint CalcDigPower()
+    public void ApplyEquipment(Character character)
     {
-        if (cacheDigPower != -1)
-        {
-            return (uint)cacheDigPower;
-        }
-
-        cacheDigPower = 1 + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum());
-        return (uint)cacheDigPower;
-    }
-
-    private int cacheNumberOfTurns = -1;
-    public uint CalcNumberOfTurns()
-    {
-        if (cacheNumberOfTurns != -1)
-        {
-            return (uint)cacheNumberOfTurns;
-        }
-
-        cacheNumberOfTurns = 10 + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].NumberOfTurns).Sum());
-        return (uint)cacheNumberOfTurns;
+        character.DigPower = (uint)(character.DigPower + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum()));
+        character.MaxStamina = (uint)(character.MaxStamina + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].NumberOfTurns).Sum()));
     }
 }
