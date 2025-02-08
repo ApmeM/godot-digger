@@ -10,14 +10,16 @@ public partial class Header
     public delegate void InventoryButtonClicked();
 
     [Export]
-    public uint MaxNumberOfTurns = 10;
+    public uint MaxStamina = 10;
 
-    private uint currentNumberOfTurns = 10;
+    private uint MaxHp = 100;
+
+    private uint currentStamina = 10;
 
     [Export]
-    public uint CurrentNumberOfTurns
+    public uint CurrentStamina
     {
-        get => currentNumberOfTurns;
+        get => currentStamina;
         set
         {
             if (value < 0)
@@ -25,33 +27,69 @@ public partial class Header
                 value = 0;
             }
 
-            if (this.currentNumberOfTurns == this.MaxNumberOfTurns && value < this.MaxNumberOfTurns)
+            if (this.currentStamina == this.MaxStamina && value < this.MaxStamina)
             {
-                this.NumberOfTurnsLastUpdate = DateTime.Now;
+                this.staminaLastUpdate = DateTime.Now;
             }
 
-            this.currentNumberOfTurns = value;
-            if (this.currentNumberOfTurns > this.MaxNumberOfTurns)
+            this.currentStamina = value;
+            if (this.currentStamina > this.MaxStamina)
             {
-                this.currentNumberOfTurns = this.MaxNumberOfTurns;
+                this.currentStamina = this.MaxStamina;
             }
             if (IsInsideTree())
             {
-                this.turnsCount.Text = this.CurrentNumberOfTurns.ToString();
+                this.staminaLabel.Text = this.CurrentStamina.ToString();
+            }
+        }
+    }
+    private uint currentHp = 10;
+
+    [Export]
+    public uint CurrentHp
+    {
+        get => currentHp;
+        set
+        {
+            if (value < 0)
+            {
+                value = 0;
+            }
+
+            if (this.currentHp == this.MaxHp && value < this.MaxHp)
+            {
+                this.hpLastUpdate = DateTime.Now;
+            }
+
+            this.currentHp = value;
+            if (this.currentHp > this.MaxHp)
+            {
+                this.currentHp = this.MaxHp;
+            }
+
+            if (IsInsideTree())
+            {
+                this.hpProgress.Value = this.CurrentHp;
+                this.hpLabel.Text = this.CurrentHp.ToString();
             }
         }
     }
 
     [Export]
-    public float NumberOfTurnsRecoverySeconds = 20;
+    public float StaminaRecoverySeconds = 20;
 
-    private DateTime NumberOfTurnsLastUpdate = DateTime.Now;
+    private DateTime staminaLastUpdate = DateTime.Now;
+
+    [Export]
+    public float HpRecoverySeconds = 5;
+
+    private DateTime hpLastUpdate = DateTime.Now;
 
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
-        this.CurrentNumberOfTurns = this.currentNumberOfTurns;
+        this.CurrentStamina = this.currentStamina;
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
     }
@@ -64,19 +102,33 @@ public partial class Header
     public override void _Process(float delta)
     {
         base._Process(delta);
-        if (this.CurrentNumberOfTurns == this.MaxNumberOfTurns)
+        if (this.CurrentStamina == this.MaxStamina)
         {
             this.staminaProgress.Value = 0;
-            this.NumberOfTurnsLastUpdate = DateTime.Now;
-            return;
+            this.staminaLastUpdate = DateTime.Now;
         }
-
-        if (NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds) < DateTime.Now)
+        else
         {
-            CurrentNumberOfTurns++;
-            NumberOfTurnsLastUpdate = NumberOfTurnsLastUpdate.AddSeconds(NumberOfTurnsRecoverySeconds);
+            if (staminaLastUpdate.AddSeconds(StaminaRecoverySeconds) < DateTime.Now)
+            {
+                CurrentStamina++;
+                staminaLastUpdate = staminaLastUpdate.AddSeconds(StaminaRecoverySeconds);
+            }
+
+            this.staminaProgress.Value = (DateTime.Now - this.staminaLastUpdate).TotalSeconds * 100 / this.StaminaRecoverySeconds;
         }
 
-        this.staminaProgress.Value = (DateTime.Now - this.NumberOfTurnsLastUpdate).TotalSeconds * 100 / this.NumberOfTurnsRecoverySeconds;
+        if (this.CurrentHp == this.MaxHp)
+        {
+            this.hpLastUpdate = DateTime.Now;
+        }
+        else
+        {
+            if (staminaLastUpdate.AddSeconds(StaminaRecoverySeconds) < DateTime.Now)
+            {
+                CurrentHp++;
+                hpLastUpdate = hpLastUpdate.AddSeconds(HpRecoverySeconds);
+            }
+        }
     }
 }

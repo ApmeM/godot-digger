@@ -48,15 +48,15 @@ public partial class BaseLevel
         this.bagInventory.Config = Resources;
         this.bagInventory.Size = 3; // ToDo: 
 
-        this.header.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
-        this.header.CurrentNumberOfTurns = this.header.MaxNumberOfTurns;
+        this.header.MaxStamina = this.equipmentInventory.CalcNumberOfTurns();
+        this.header.CurrentStamina = this.header.MaxStamina;
 
         this.AddToGroup(Groups.LevelScene);
     }
 
     private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
     {
-        this.header.MaxNumberOfTurns = this.equipmentInventory.CalcNumberOfTurns();
+        this.header.MaxStamina = this.equipmentInventory.CalcNumberOfTurns();
     }
 
     protected void InventoryUseItem(InventorySlot slot)
@@ -190,12 +190,12 @@ public partial class BaseLevel
         var blocksCell = this.blocks.GetCellv(pos);
         var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        if (this.header.CurrentNumberOfTurns == 0)
+        if (this.header.CurrentStamina == 0)
         {
             return;
         }
 
-        this.header.CurrentNumberOfTurns--;
+        this.header.CurrentStamina--;
 
         var metaName = $"HP_{pos}";
 

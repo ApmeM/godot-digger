@@ -28,11 +28,13 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Blacksmith, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
         { Blocks.RedHat, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
         { Blocks.Tree, new BlocksDefinition{HP = 3, ClickAction=CustomClicked} },
-        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=CustomClicked} },
+        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=CustomClicked, Attack = 10} },
         { Blocks.Wall, new BlocksDefinition{HP = 0, ClickAction = CustomClicked} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }
+
+    public int Attack;
 
     public uint HP;
 }

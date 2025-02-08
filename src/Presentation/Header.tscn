@@ -35,13 +35,20 @@ margin_right = 7.0
 margin_bottom = 14.0
 texture = ExtResource( 5 )
 
-[node name="Life" type="TextureProgress" parent="."]
+[node name="HpProgress" type="TextureProgress" parent="."]
 margin_left = 116.0
 margin_top = 13.0
 margin_right = 316.0
 margin_bottom = 39.0
 value = 100.0
 texture_progress = ExtResource( 2 )
+
+[node name="HpLabel" type="Label" parent="."]
+margin_left = 115.0
+margin_top = 13.0
+margin_right = 131.0
+margin_bottom = 27.0
+text = "100"
 
 [node name="StaminaProgress" type="TextureProgress" parent="."]
 margin_left = 87.0
@@ -57,7 +64,7 @@ stretch_margin_top = 1
 stretch_margin_right = 1
 stretch_margin_bottom = 1
 
-[node name="Stamina" type="TextureRect" parent="."]
+[node name="StaminaIcon" type="TextureRect" parent="."]
 margin_left = 86.0
 margin_top = 86.0
 margin_right = 120.0
@@ -65,7 +72,7 @@ margin_bottom = 121.0
 texture = ExtResource( 3 )
 expand = true
 
-[node name="TurnsCount" type="Label" parent="."]
+[node name="StaminaLabel" type="Label" parent="."]
 margin_left = 92.0
 margin_top = 109.0
 margin_right = 108.0
