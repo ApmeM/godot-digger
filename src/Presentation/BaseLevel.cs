@@ -49,7 +49,6 @@ public partial class BaseLevel
         this.bagInventory.Size = 3; // ToDo: 
 
         this.header.MaxStamina = this.equipmentInventory.CalcNumberOfTurns();
-        this.header.CurrentStamina = this.header.MaxStamina;
 
         this.AddToGroup(Groups.LevelScene);
     }
@@ -145,7 +144,6 @@ public partial class BaseLevel
             isEnough = isEnough && existing >= req.Item2;
         }
 
-
         this.questRequirements.AllowYes = isEnough;
         this.questRequirements.Show();
         var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
@@ -202,6 +200,20 @@ public partial class BaseLevel
         if (!this.blocks.HasMeta(metaName))
         {
             this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
+        }
+
+        var enemyAttack = BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].Attack;
+        if (enemyAttack > 0)
+        {
+            if (enemyAttack > this.header.CurrentHp)
+            {
+                this.header.CurrentHp = 0;
+                // ToDo: debuff for moves, attack power and attack ability.
+            }
+            else
+            {
+                this.header.CurrentHp -= (uint)BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].Attack;
+            }
         }
 
         var currentHp = (int)this.blocks.GetMeta(metaName);

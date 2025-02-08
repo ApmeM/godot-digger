@@ -43,7 +43,8 @@ public partial class Header
             }
         }
     }
-    private uint currentHp = 10;
+
+    private uint currentHp = 100;
 
     [Export]
     public uint CurrentHp
@@ -69,8 +70,8 @@ public partial class Header
 
             if (IsInsideTree())
             {
-                this.hpProgress.Value = this.CurrentHp;
-                this.hpLabel.Text = this.CurrentHp.ToString();
+                this.hpProgress.Value = this.currentHp;
+                this.hpLabel.Text = this.currentHp.ToString();
             }
         }
     }
@@ -90,6 +91,7 @@ public partial class Header
         base._Ready();
         this.FillMembers();
         this.CurrentStamina = this.currentStamina;
+        this.CurrentHp = this.currentHp;
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
     }
@@ -124,7 +126,7 @@ public partial class Header
         }
         else
         {
-            if (staminaLastUpdate.AddSeconds(StaminaRecoverySeconds) < DateTime.Now)
+            if (hpLastUpdate.AddSeconds(HpRecoverySeconds) < DateTime.Now)
             {
                 CurrentHp++;
                 hpLastUpdate = hpLastUpdate.AddSeconds(HpRecoverySeconds);
