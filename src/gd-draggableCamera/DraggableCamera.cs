@@ -12,10 +12,10 @@ public partial class DraggableCamera
 
     private bool drag = false;
     private Vector2 initPosMouse = Vector2.Zero;
-    
+
     [Export]
     public float minimumZoom = 0.3f;
-    
+
     [Export]
     public float maximumZoom = 3f;
 
@@ -48,7 +48,7 @@ public partial class DraggableCamera
                 this.Zoom = Vector2.One * Map(newZoom, 0, 1, 1, this.maximumZoom);
         }
     }
-    
+
     /// <summary>
     ///     Minimum non-scaled value (0 - float.Max) that the camera zoom can be. 
     ///     Defaults to 0.3
@@ -91,48 +91,41 @@ public partial class DraggableCamera
         }
     }
 
-    public override void _Process(float delta)
+    public override void _UnhandledInput(InputEvent @event)
     {
-        base._Process(delta);
+        base._UnhandledInput(@event);
 
         if (!enabled)
         {
             return;
         }
 
-        if (Input.IsMouseButtonPressed(1))
+        if (@event is InputEventMouseMotion mouseMotion)
         {
-            if (drag)
+            if (((ButtonList)mouseMotion.ButtonMask & ButtonList.MaskLeft) == ButtonList.Left)
             {
-                this.GlobalPosition = (this.GetViewport().Size / 2 - this.GetViewport().CanvasTransform.origin) / this.GetViewport().CanvasTransform.Scale;
-                var mousePos = this.GetViewport().GetMousePosition();
-                this.GlobalPosition += (initPosMouse - mousePos) * this.Zoom;
-                this.initPosMouse = mousePos;
+                if (drag)
+                {
+                    this.GlobalPosition = (this.GetViewport().Size / 2 - this.GetViewport().CanvasTransform.origin) / this.GetViewport().CanvasTransform.Scale;
+                    var mousePos = this.GetViewport().GetMousePosition();
+                    this.GlobalPosition += (initPosMouse - mousePos) * this.Zoom;
+                    this.initPosMouse = mousePos;
+                }
+                else
+                {
+                    if (initPosMouse == Vector2.Zero)
+                    {
+                        this.initPosMouse = this.GetViewport().GetMousePosition();
+                    }
+
+                    this.drag = this.initPosMouse != this.GetViewport().GetMousePosition();
+                }
             }
             else
             {
-                if (initPosMouse == Vector2.Zero)
-                {
-                    this.initPosMouse = this.GetViewport().GetMousePosition();
-                }
-
-                this.drag = this.initPosMouse != this.GetViewport().GetMousePosition();
+                this.drag = false;
+                this.initPosMouse = Vector2.Zero;
             }
-        }
-        else
-        {
-            this.drag = false;
-            this.initPosMouse = Vector2.Zero;
-        }
-    }
-
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
-
-        if (!enabled)
-        {
-            return;
         }
 
         if (@event is InputEventMouseButton buttonEvent)

@@ -900,11 +900,14 @@ format = 1
 
 [node name="BagInventoryPopup" parent="." instance=ExtResource( 7 )]
 visible = false
+CloseOnClickOutside = false
 CloseOnClickButton = true
 Title = "Inventory"
-CloseOnClickOutside = false
 
-[node name="CustomPopupContainer" parent="BagInventoryPopup" index="0"]
+[node name="OutsidePopupButton" parent="BagInventoryPopup" index="0"]
+disabled = true
+
+[node name="CustomPopupContainer" parent="BagInventoryPopup" index="1"]
 margin_left = 112.0
 margin_top = 78.0
 margin_right = 216.0
@@ -969,6 +972,7 @@ Title = "Bag"
 [node name="EquipmentInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 76 )]
 
 [node name="CloseButton" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
+visible = true
 margin_left = 132.0
 margin_right = 179.0
 
@@ -999,9 +1003,6 @@ custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Text"
 align = 1
 
-[node name="CloseButton" parent="SignPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
-visible = false
-
 [node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
 position = Vector2( 241, 400 )
 minimumZoom = 1.0
@@ -1010,6 +1011,9 @@ maximumZoom = 2.0
 [node name="QuestRequirements" parent="." instance=ExtResource( 14 )]
 visible = false
 CloseOnClickOutside = false
+
+[node name="OutsidePopupButton" parent="QuestRequirements" index="0"]
+disabled = true
 
 [node name="TitleLabel" parent="QuestRequirements/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
 custom_fonts/font = SubResource( 8 )
@@ -1065,9 +1069,6 @@ text = "0 / 10"
 [node name="HBoxContainer" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="2"]
 margin_top = 82.0
 margin_bottom = 102.0
-
-[node name="CloseButton" parent="QuestRequirements/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
-visible = false
 
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]

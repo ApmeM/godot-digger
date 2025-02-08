@@ -27,7 +27,7 @@ public partial class BaseLevel
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopupAsync));
+        this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
         this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
 
@@ -114,12 +114,9 @@ public partial class BaseLevel
         return false;
     }
 
-    private async Task ShowInventoryPopupAsync()
+    private void ShowInventoryPopup()
     {
-        draggableCamera.enabled = false;
         this.bagInventoryPopup.Show();
-        await ToSignal(this.questRequirements, nameof(CustomPopup.PopupClosed));
-        draggableCamera.enabled = false;
     }
 
     public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
@@ -149,12 +146,10 @@ public partial class BaseLevel
         }
 
 
-        this.draggableCamera.enabled = false;
         this.questRequirements.AllowYes = isEnough;
         this.questRequirements.Show();
         var decision = (bool)(await ToSignal(this.questRequirements, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
-        this.draggableCamera.enabled = true;
-        
+
         if (!isEnough)
         {
             return false;

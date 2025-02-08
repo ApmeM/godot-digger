@@ -8,8 +8,23 @@ public partial class CustomPopup
     [Signal]
     public delegate void PopupClosed();
 
+    private bool closeOnClickOutside = true;
+
     [Export]
-    public bool CloseOnClickOutside = true;
+    public bool CloseOnClickOutside
+    {
+        get => closeOnClickOutside;
+        set
+        {
+            closeOnClickOutside = value;
+            if (this.IsInsideTree())
+            {
+                this.outsidePopupButton.Disabled = !value;
+            }
+        }
+    }
+
+    private bool closeOnClickButton;
 
     [Export]
     public bool CloseOnClickButton
@@ -26,7 +41,6 @@ public partial class CustomPopup
     }
 
     private string title;
-    private bool closeOnClickButton;
 
     [Export]
     public string Title
@@ -49,8 +63,10 @@ public partial class CustomPopup
 
         this.Title = this.title;
         this.CloseOnClickButton = this.closeOnClickButton;
+        this.CloseOnClickOutside = this.closeOnClickOutside;
 
         this.closeButton.Connect(CommonSignals.Pressed, this, nameof(Close));
+        this.outsidePopupButton.Connect(CommonSignals.Pressed, this, nameof(Close));
 
 #if DEBUG
         this.GetTree().EditedSceneRoot?.SetEditableInstance(this, true);
@@ -62,24 +78,5 @@ public partial class CustomPopup
     {
         this.Hide();
         this.EmitSignal(nameof(PopupClosed));
-    }
-
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        base._UnhandledInput(@event);
-        if (!Visible)
-        {
-            return;
-        }
-
-        if (@event is InputEventMouse mouse && ((ButtonList)mouse.ButtonMask & ButtonList.Left) == ButtonList.Left && CloseOnClickOutside)
-        {
-            Close();
-        }
-
-        if (@event is InputEventKey key && ((KeyList)key.Scancode & KeyList.Escape) == KeyList.Escape)
-        {
-            Close();
-        }
     }
 }
