@@ -226,12 +226,15 @@ public partial class BaseLevel
         {
             if (enemyAttack > this.header.CurrentHp)
             {
+                floatingTextManager.ShowValue((-this.header.CurrentHp).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 0, 0));
                 this.header.CurrentHp = 0;
-                this.header.AddBuff(Buff.Dead);
+                var buff = this.header.AddBuff(Buff.Dead);
+                floatingTextManager.ShowValue((Control)buff.Duplicate(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2);
             }
             else
             {
-                this.header.CurrentHp -= (uint)BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].Attack;
+                this.header.CurrentHp -= (uint)enemyAttack;
+                floatingTextManager.ShowValue((-enemyAttack).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 0, 0));
             }
         }
 
@@ -245,10 +248,12 @@ public partial class BaseLevel
         var digPower = this.header.Character.DigPower;
         if (currentHp > digPower)
         {
+            floatingTextManager.ShowValue((-digPower).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 1, 0));
             this.blocks.SetMeta(metaName, currentHp - digPower);
             return;
         }
 
+        floatingTextManager.ShowValue((-currentHp).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 1, 0));
         this.blocks.SetMeta(metaName, null);
         this.blocks.SetCellv(pos, -1);
         this.UnFogCell(pos);

@@ -99,7 +99,7 @@ public partial class Header
         this.EmitSignal(nameof(InventoryButtonClicked));
     }
 
-    public void AddBuff(Buff buff)
+    public BaseBuff AddBuff(Buff buff)
     {
         var buffPath = $"res://Presentation/buffs/{buff}.tscn";
         var buffInstance = ResourceLoader.Load<PackedScene>($"res://Presentation/buffs/{buff}.tscn").Instance<BaseBuff>();
@@ -107,6 +107,7 @@ public partial class Header
         buffInstance.Connect(CommonSignals.Pressed, this, nameof(BuffClicked), new Godot.Collections.Array { buffInstance });
         this.buffContainer.AddChild(buffInstance);
         this.EmitSignal(nameof(BuffsChanged));
+        return buffInstance;
     }
 
     private void BuffClicked(BaseBuff buff)
