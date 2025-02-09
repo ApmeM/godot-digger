@@ -56,7 +56,6 @@ margin_left = 87.0
 margin_top = 91.0
 margin_right = 119.0
 margin_bottom = 123.0
-value = 75.0
 texture_progress = ExtResource( 1 )
 fill_mode = 3
 nine_patch_stretch = true
@@ -85,23 +84,24 @@ margin_left = 113.0
 margin_top = 34.0
 margin_right = 277.0
 margin_bottom = 56.0
+columns = 6
 
 [node name="BuffPopup" parent="." instance=ExtResource( 8 )]
 visible = false
 Title = "Buff"
 
 [node name="HeaderMargin" parent="BuffPopup/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 126.0
-margin_right = 181.0
+margin_left = 128.0
+margin_right = 179.0
 
 [node name="TitleBackground" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 55.0
+margin_right = 51.0
 
 [node name="TitleMargin" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 55.0
+margin_right = 51.0
 
 [node name="TitleLabel" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 45.0
+margin_right = 41.0
 text = "Buff"
 
 [node name="BuffDescriptionLabel" type="Label" parent="BuffPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]

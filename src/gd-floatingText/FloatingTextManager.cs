@@ -69,6 +69,24 @@ public partial class FloatingTextManager
         await this.ShowValueAsync(label, at);
     }
 
+    public async Task ShowValueDelayedAsync(Task toWait, Control node, Vector2 at)
+    {
+        await toWait;
+        await this.ShowValueAsync(node, at);
+    }
+
+    public async Task ShowValueDelayedAsync(Task toWait, PackedScene scene, Vector2 at)
+    {
+        await toWait;
+        await this.ShowValueAsync(scene, at);
+    }
+
+    public async Task ShowValueDelayedAsync(Task toWait, string value, Vector2 at, Color? color = null)
+    {
+        await toWait;
+        await this.ShowValueAsync(value, at, color);
+    }
+
     public async void ShowValue(Control node, Vector2 at) =>
         await this.ShowValueAsync(node, at);
 
@@ -77,4 +95,22 @@ public partial class FloatingTextManager
 
     public async void ShowValue(string value, Vector2 at, Color? color = null) =>
         await this.ShowValueAsync(value, at, color);
+
+    public async void ShowValueDelayed(Task toWait, Control node, Vector2 at) =>
+        await this.ShowValueDelayedAsync(toWait, node, at);
+
+    public async void ShowValueDelayed(Task toWait, PackedScene scene, Vector2 at) =>
+        await this.ShowValueDelayedAsync(toWait, scene, at);
+
+    public async void ShowValueDelayed(Task toWait, string value, Vector2 at, Color? color = null) =>
+        await this.ShowValueDelayedAsync(toWait, value, at, color);     
+
+    public async void ShowValueDelayed(float secondsToWait, Control node, Vector2 at) =>
+        await this.ShowValueDelayedAsync(Task.Delay((int)(secondsToWait * 1000)), node, at);
+
+    public async void ShowValueDelayed(float secondsToWait, PackedScene scene, Vector2 at) =>
+        await this.ShowValueDelayedAsync(Task.Delay((int)(secondsToWait * 1000)), scene, at);
+
+    public async void ShowValueDelayed(float secondsToWait, string value, Vector2 at, Color? color = null) =>
+        await this.ShowValueDelayedAsync(Task.Delay((int)(secondsToWait * 1000)), value, at, color);
 }
