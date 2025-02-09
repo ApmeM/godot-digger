@@ -8,6 +8,15 @@ public partial class BaseBuff
     [Signal]
     public delegate void BuffRemoved();
 
+    public virtual string Description
+    {
+        get
+        {
+            GD.PrintErr($"Buff descripio is not set for {this.GetType()}");
+            return "Default description.";
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();

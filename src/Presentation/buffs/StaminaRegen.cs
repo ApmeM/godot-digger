@@ -9,6 +9,8 @@ public partial class StaminaRegen
         this.FillMembers();
     }
 
+    public override string Description => "Stamina recovery increased.";
+
     public override void ApplyBuff(Character character)
     {
         character.StaminaRecoverySeconds -= 15;

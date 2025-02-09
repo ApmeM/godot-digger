@@ -12,6 +12,9 @@ public partial class Header
     [Signal]
     public delegate void BuffsChanged();
 
+    [Signal]
+    public delegate void BuffsClicked(string description);
+
     private uint currentStamina = 10;
 
     [Export]
@@ -100,9 +103,16 @@ public partial class Header
     {
         var buffPath = $"res://Presentation/buffs/{buff}.tscn";
         var buffInstance = ResourceLoader.Load<PackedScene>($"res://Presentation/buffs/{buff}.tscn").Instance<BaseBuff>();
-        buffInstance.Connect(nameof(BaseBuff.BuffRemoved), this, nameof(BuffRemoved), new Godot.Collections.Array{buffInstance});
+        buffInstance.Connect(nameof(BaseBuff.BuffRemoved), this, nameof(BuffRemoved), new Godot.Collections.Array { buffInstance });
+        buffInstance.Connect(CommonSignals.Pressed, this, nameof(BuffClicked), new Godot.Collections.Array { buffInstance });
         this.buffContainer.AddChild(buffInstance);
         this.EmitSignal(nameof(BuffsChanged));
+    }
+
+    private void BuffClicked(BaseBuff buff)
+    {
+        this.buffDescriptionLabel.Text = buff.Description;
+        this.buffPopup.Show();
     }
 
     private void BuffRemoved(BaseBuff buff)
