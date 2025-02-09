@@ -156,4 +156,9 @@ public partial class Header
             }
         }
     }
+
+    internal void AddBuff(object dead)
+    {
+        throw new NotImplementedException();
+    }
 }

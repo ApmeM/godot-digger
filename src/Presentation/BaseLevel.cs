@@ -202,6 +202,11 @@ public partial class BaseLevel
         var blocksCell = this.blocks.GetCellv(pos);
         var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
+        if (!header.Character.CanDig)
+        {
+            return;
+        }
+
         if (this.header.CurrentStamina == 0)
         {
             return;
@@ -222,7 +227,7 @@ public partial class BaseLevel
             if (enemyAttack > this.header.CurrentHp)
             {
                 this.header.CurrentHp = 0;
-                // ToDo: debuff for moves, attack power and attack ability.
+                this.header.AddBuff(Buff.Dead);
             }
             else
             {

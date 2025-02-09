@@ -1,4 +1,5 @@
 public enum Buff
 {
-    StaminaRegen
+    StaminaRegen,
+    Dead
 }

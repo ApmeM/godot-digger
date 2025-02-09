@@ -5,5 +5,5 @@ public class Character
     public uint DigPower = 1;
     public float StaminaRecoverySeconds = 20;
     public float HpRecoverySeconds = 5;
-
+    public bool CanDig = true;
 }

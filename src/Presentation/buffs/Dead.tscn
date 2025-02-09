@@ -1,15 +1,15 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Presentation/buffs/BaseBuff.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Presentation/assets/Buffs/stamina_regen.png" type="Texture" id=2]
-[ext_resource path="res://Presentation/buffs/StaminaRegen.cs" type="Script" id=3]
+[ext_resource path="res://Presentation/assets/Buffs/dead.png" type="Texture" id=2]
+[ext_resource path="res://Presentation/buffs/Dead.cs" type="Script" id=3]
 
 [node name="StaminaRegen" instance=ExtResource( 1 )]
 texture_normal = ExtResource( 2 )
 script = ExtResource( 3 )
 
 [node name="Timer" parent="." index="0"]
-wait_time = 20.0
+wait_time = 120.0
 
 [node name="TextureProgress" parent="." index="1"]
 texture_progress = ExtResource( 2 )

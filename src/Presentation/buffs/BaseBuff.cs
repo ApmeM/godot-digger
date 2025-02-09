@@ -25,4 +25,17 @@ public partial class BaseBuff
     public virtual void ApplyBuff(Character character)
     {
     }
+
+    private DateTime start = DateTime.MinValue;
+
+    public override void _Process(float delta)
+    {
+        base._Process(delta);
+        if (start == DateTime.MinValue)
+        {
+            start = DateTime.Now;
+        }
+
+        this.textureProgress.Value = 100 - ((DateTime.Now - start).TotalSeconds * 100 / this.timer.WaitTime);
+    }
 }
