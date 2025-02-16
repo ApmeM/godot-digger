@@ -10,21 +10,21 @@ public partial class Shop
         base._Ready();
         this.FillMembers();
 
-        this.shopInventory.Connect(nameof(Inventory.DragAndDropComplete), this, nameof(UpdateCost));
+        this.shopInventory.Connect(nameof(Inventory.ItemCountChanged), this, nameof(UpdateCost));
         this.shopInventory.Config = Resources;
         this.shopSellButton.Connect(CommonSignals.Pressed, this, nameof(SellButtonClicked));
     }
 
     private void SellButtonClicked()
     {
-        var price = (uint)CalculatePrice();
+        var price = CalculatePrice();
         if (price == 0)
         {
             this.bagInventoryPopup.Close();
             return;
         }
 
-        this.bagInventory.TryAddItem(Loot.Gold.Item1, price);
+        this.bagInventory.TryChangeCount(Loot.Gold.Item1, (int)price);
         this.shopInventory.ClearItems();
         UpdateCost(null, null);
     }
@@ -84,7 +84,7 @@ public partial class Shop
         var tileId = this.loot.GetCellv(pos);
         var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        var price = LootDefinition.KnownLoot[(tileId, 0, 0)].Price;
+        var price = LootDefinition.KnownLoot[(tileId, (int)coord.x, (int)coord.y)].Price;
         var result = await ShowQuestPopup("To buy:",
             new[] { (Loot.Gold, price) },
             new ValueTuple<ValueTuple<int, int, int>, uint>[] { });

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 [SceneReference("EquipmentInventory.tscn")]
@@ -8,9 +9,9 @@ public partial class EquipmentInventory
     [Signal]
     public delegate void ItemCountChanged(InventorySlot slot, int itemId, int from, int to);
 
-    private Inventory.InventoryConfig config;
+    public Dictionary<int, InventorySlot.InventorySlotConfig> config = new Dictionary<int, InventorySlot.InventorySlotConfig>();
 
-    public Inventory.InventoryConfig Config
+    public Dictionary<int, InventorySlot.InventorySlotConfig> Config
     {
         get => config;
         set

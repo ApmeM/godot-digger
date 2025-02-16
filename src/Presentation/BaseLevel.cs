@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Godot;
 using GodotDigger.Presentation.Utils;
@@ -11,7 +12,7 @@ public partial class BaseLevel
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
 
-    protected Inventory.InventoryConfig Resources = new Inventory.InventoryConfig();
+    protected Dictionary<int, InventorySlot.InventorySlotConfig> Resources = new Dictionary<int, InventorySlot.InventorySlotConfig>();
 
     public Header Stamina => this.header;
 
@@ -29,6 +30,7 @@ public partial class BaseLevel
 
         this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
+        this.bagInventory.Connect(nameof(Inventory.DragOnAnotherItemType), this, nameof(InventoryTryMergeItems));
         this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
         this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
 
@@ -36,11 +38,10 @@ public partial class BaseLevel
         {
             var tex = this.loot.TileSet.TileGetTexture(id);
             var definition = LootDefinition.KnownLoot[(id, 0, 0)];
-            this.Resources.SlotConfigs.Add(id, new Inventory.InventorySlotConfig
+            this.Resources.Add(id, new InventorySlot.InventorySlotConfig
             {
                 Texture = tex,
                 MaxCount = definition.MaxCount,
-                MergeActions = definition.MergeActions.ToDictionary(a => a.Key.Item1, a => a.Value.Item1),
                 ItemType = (int)definition.ItemType
             });
         }
@@ -78,8 +79,21 @@ public partial class BaseLevel
         if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
         {
             LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
-            slot.TryAddItem(slot.ItemId, -1);
+            slot.TryChangeCount(slot.ItemId, -1);
         }
+    }
+    protected void InventoryTryMergeItems(InventorySlot fromSlot, InventorySlot toSlot)
+    {
+        if (!LootDefinition.KnownLoot[(toSlot.ItemId, 0, 0)].MergeActions.ContainsKey((fromSlot.ItemId, 0, 0)))
+        {
+            return;
+        }
+
+        var mergeResult = LootDefinition.KnownLoot[(toSlot.ItemId, 0, 0)].MergeActions[(fromSlot.ItemId, 0, 0)];
+        fromSlot.TryChangeCount(fromSlot.ItemId, -1);
+        toSlot.TryChangeCount(toSlot.ItemId, -1);
+
+        toSlot.TryChangeCount(mergeResult.Item1, 1);
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -145,7 +159,7 @@ public partial class BaseLevel
             var lootId = req.Item1.Item1;
             this.requirementsList.AddChild(new TextureRect
             {
-                Texture = inventory.Config.SlotConfigs[lootId].Texture
+                Texture = inventory.Config[lootId].Texture
             });
 
             var existing = inventory.GetItemCount(lootId);
@@ -172,22 +186,12 @@ public partial class BaseLevel
             return false;
         }
 
-        var items = inventory.GetItems().ToList();
+        var success = inventory.TryChangeCountsOrCancel(
+            requirements
+                .Select(a => (a.Item1.Item1, -(int)a.Item2))
+                .Union(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))));
 
-        var successRemove = inventory.TryRemoveItems(requirements.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
-        var successAdd = inventory.TryAddItems(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))).Count() == 0;
-
-        if (!successRemove || !successAdd)
-        {
-            inventory.ClearItems();
-            var result = inventory.TryAddItems(items);
-            if (result.Any())
-            {
-                GD.PrintErr($"Cant restore inventory status!!!");
-            }
-        }
-
-        return successRemove && successAdd;
+        return success;
     }
 
     public virtual void CustomConstructionClickedAsync(Vector2 pos)
@@ -316,7 +320,7 @@ public partial class BaseLevel
 
         var lootId = this.loot.GetCellv(pos);
 
-        if (this.bagInventory.TryAddItem(lootId, 1) == 0)
+        if (this.bagInventory.TryChangeCount(lootId, 1) == 0)
         {
             this.loot.SetCellv(pos, -1);
         }

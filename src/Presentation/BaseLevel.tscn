@@ -966,6 +966,7 @@ margin_left = 0.0
 margin_top = 0.0
 margin_right = 152.0
 margin_bottom = 69.0
+DropOnAnotherItemType = 4
 Size = 3
 SizePerRow = 4
 Title = "Bag"

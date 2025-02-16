@@ -7,12 +7,67 @@ using GodotDigger.Presentation.Utils;
 [Tool]
 public partial class InventorySlot
 {
-    [Export]
-    public int ItemId = -1;
+    [Flags]
+    public enum DropOnAnotherItemTypeAction
+    {
+        Not_Allowed = 1,
+        Switch_Items = 2,
+        Emit_Signal = 4
+    }
 
-    public Inventory.InventoryConfig Config = new Inventory.InventoryConfig();
+    [Export]
+    public DropOnAnotherItemTypeAction DropOnAnotherItemType = DropOnAnotherItemTypeAction.Not_Allowed;
+
+    public struct InventorySlotConfig
+    {
+
+        public Texture Texture;
+        public int MaxCount;
+        public int ItemType;
+    }
+
+    private int itemId = -1;
+
+    [Export]
+    public int ItemId
+    {
+        get => itemId;
+        set
+        {
+            itemId = value;
+
+            if (itemId == -1 && this.itemsCount != 0)
+            {
+                this.ItemsCount = 0;
+            }
+
+            if (this.IsInsideTree())
+            {
+                if (this.lootContainer.GetChildCount() > 0)
+                {
+                    this.lootContainer.ClearChildren();
+                    this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
+                }
+                this.slotTypePlaceholder.Visible = itemId == -1;
+                if (itemId != -1)
+                {
+                    this.lootContainer.AddChild(new TextureRect
+                    {
+                        Texture = Config[itemId].Texture,
+                        MouseFilter = MouseFilterEnum.Ignore
+                    });
+                }
+            }
+        }
+    }
+    public Dictionary<int, InventorySlotConfig> Config = new Dictionary<int, InventorySlotConfig>();
 
     public readonly HashSet<int> AcceptedTypes = new HashSet<int>();
+
+    [Export]
+    public bool CanDragData = true;
+
+    private Texture itemTypePlaceholderTexture;
 
     [Export]
     public Texture ItemTypePlaceholderTexture
@@ -29,7 +84,6 @@ public partial class InventorySlot
     }
 
     private int itemsCount = 0;
-    private Texture itemTypePlaceholderTexture;
 
     [Export]
     public int ItemsCount
@@ -37,6 +91,11 @@ public partial class InventorySlot
         get => itemsCount; set
         {
             itemsCount = value;
+            if (itemsCount == 0 && this.itemId != -1)
+            {
+                this.ItemId = -1;
+            }
+
             if (IsInsideTree())
             {
                 this.countLabel.Text = value.ToString();
@@ -49,7 +108,7 @@ public partial class InventorySlot
     public delegate void UseItem();
 
     [Signal]
-    public delegate void DragAndDropComplete(InventorySlot from, InventorySlot to);
+    public delegate void DragOnAnotherItemType(InventorySlot from, InventorySlot to);
 
     [Signal]
     public delegate void ItemCountChanged(int itemId, int from, int to);
@@ -58,8 +117,9 @@ public partial class InventorySlot
     {
         base._Ready();
         this.FillMembers();
-        this.RemoveItem();
+        this.ClearItem();
 
+        this.ItemId = itemId;
         this.ItemsCount = itemsCount;
         this.ItemTypePlaceholderTexture = this.itemTypePlaceholderTexture;
     }
@@ -69,17 +129,32 @@ public partial class InventorySlot
         if ((this.lootContainer.GetChildCount() == 0 || ItemId == -1 || ItemsCount == 0) &&
             (this.lootContainer.GetChildCount() != 0 || ItemId != -1 || ItemsCount != 0))
         {
-            throw new Exception("Inventory slot state inconsistent.");
+            throw new Exception($"Inventory slot state inconsistent: child count = {this.lootContainer.GetChildCount()}, ItemId = {ItemId}, ItemsCount = {ItemsCount}");
         }
 
         return this.lootContainer.GetChildCount() > 0;
     }
 
-    public int TryAddItem(int itemId, int countDiff)
+    public void ForceSetCount(int itemId, int count)
     {
-        if (this.AcceptedTypes.Count > 0 && !this.AcceptedTypes.Contains(this.Config.SlotConfigs[itemId].ItemType))
+        var oldItemsCount = this.ItemsCount;
+        var oldItemId = this.ItemId;
+        this.ItemsCount = count;
+        this.ItemId = itemId;
+        this.EmitSignal(nameof(ItemCountChanged), oldItemId, oldItemsCount, this.ItemsCount);
+    }
+
+    public int TryChangeCount(int itemId, int countDiff)
+    {
+        if (!Config.ContainsKey(itemId))
         {
-            GD.PrintErr($"This slot does not accept this item type. ItemTypes: {this.Config.SlotConfigs[itemId].ItemType}, AcceptedType: {string.Join(",", this.AcceptedTypes)}");
+            GD.PrintErr($"Resource with index {itemId} is not known for this inventory.");
+            return countDiff;
+        }
+
+        if (this.AcceptedTypes.Count > 0 && !this.AcceptedTypes.Contains(this.Config[itemId].ItemType))
+        {
+            GD.PrintErr($"This slot does not accept this item type. ItemTypes: {this.Config[itemId].ItemType}, AcceptedType: {string.Join(",", this.AcceptedTypes)}");
             return countDiff;
         }
 
@@ -97,23 +172,18 @@ public partial class InventorySlot
         var result = this.ItemsCount + countDiff;
         if (result <= 0)
         {
-            RemoveItem();
+            ClearItem();
             return result;
         }
 
         if (!HasItem())
         {
             this.slotTypePlaceholder.Visible = false;
-            this.lootContainer.AddChild(new TextureRect
-            {
-                Texture = Config.SlotConfigs[itemId].Texture,
-                MouseFilter = MouseFilterEnum.Ignore
-            });
             this.ItemId = itemId;
         }
 
         var before = this.ItemsCount;
-        this.ItemsCount = Math.Min(result, this.Config.SlotConfigs[itemId].MaxCount);
+        this.ItemsCount = Math.Min(result, this.Config[itemId].MaxCount);
         result -= this.ItemsCount;
 
         this.EmitSignal(nameof(ItemCountChanged), itemId, before, this.ItemsCount);
@@ -132,20 +202,14 @@ public partial class InventorySlot
         }
     }
 
-    public void RemoveItem()
+    public void ClearItem()
     {
         if (!HasItem())
         {
             return;
         }
-        this.slotTypePlaceholder.Visible = true;
-        this.lootContainer.ClearChildren();
-        this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
-        var before = this.ItemsCount;
-        var itemId = this.ItemId;
-        this.ItemsCount = 0;
-        this.ItemId = -1;
-        this.EmitSignal(nameof(ItemCountChanged), itemId, before, this.ItemsCount);
+
+        this.ForceSetCount(-1, 0);
     }
 
     public override void _GuiInput(InputEvent @event)
@@ -169,6 +233,11 @@ public partial class InventorySlot
 
     public override object GetDragData(Vector2 position)
     {
+        if (!CanDragData)
+        {
+            return null;
+        }
+
         if (!this.HasItem())
         {
             return null;
@@ -184,16 +253,11 @@ public partial class InventorySlot
         var ddata = (InventorySlot)data;
         if (HasItem())
         {
-            if (Config.SlotConfigs[this.ItemId].MergeActions.ContainsKey(ddata.ItemId))
-            {
-                return true;
-            }
-
-            return this.ItemId == ddata.ItemId;
+            return this.ItemId == ddata.ItemId || this.DropOnAnotherItemType != DropOnAnotherItemTypeAction.Not_Allowed;
         }
         else
         {
-            return this.AcceptedTypes.Count == 0 || this.AcceptedTypes.Contains(this.Config.SlotConfigs[ddata.ItemId].ItemType);
+            return this.AcceptedTypes.Count == 0 || this.AcceptedTypes.Contains(this.Config[ddata.ItemId].ItemType);
         }
     }
 
@@ -211,23 +275,39 @@ public partial class InventorySlot
 
         if (ItemId == ddata.ItemId || !this.HasItem())
         {
-            ddata.RemoveItem();
-            var diff = this.TryAddItem(ditem.Item1, ditem.Item2);
-            ddata.TryAddItem(ditem.Item1, diff);
+            var diff = this.TryChangeCount(ditem.Item1, ditem.Item2);
+            if (diff > 0)
+            {
+                ddata.ForceSetCount(ditem.Item1, diff);
+            }
+            else
+            {
+                ddata.ClearItem();
+            }
         }
         else
         {
-            ddata.TryAddItem(ditem.Item1, -1);
-            this.TryAddItem(item.Item1, -1);
-            if (this.ItemsCount == 0)
+            switch (DropOnAnotherItemType)
             {
-                var config = Config.SlotConfigs[item.Item1];
-                var action = config.MergeActions[ditem.Item1];
-                this.TryAddItem(action, 1);
+                case DropOnAnotherItemTypeAction.Not_Allowed:
+                    GD.PrintErr($"BUG: dropping item on a slot with {DropOnAnotherItemType} should not happen.");
+                    break;
+                case DropOnAnotherItemTypeAction.Switch_Items:
+                    ddata.ClearItem();
+                    this.ClearItem();
+
+                    if (
+                        this.TryChangeCount(ditem.Item1, ditem.Item2) != 0 ||
+                        ddata.TryChangeCount(item.Item1, item.Item2) != 0)
+                    {
+                        ddata.ForceSetCount(ditem.Item1, ditem.Item2);
+                        this.ForceSetCount(item.Item1, item.Item2);
+                    }
+                    break;
+                case DropOnAnotherItemTypeAction.Emit_Signal:
+                    this.EmitSignal(nameof(DragOnAnotherItemType), ddata, this);
+                    break;
             }
         }
-
-        this.EmitSignal(nameof(DragAndDropComplete), ddata, this);
-        ddata.EmitSignal(nameof(DragAndDropComplete), ddata, this);
     }
 }

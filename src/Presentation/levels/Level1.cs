@@ -9,10 +9,9 @@ public partial class Level1
         this.FillMembers();
 
         this.stashInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
-        this.stashInventory.Config = new Inventory.InventoryConfig();
-        foreach (var slot in Resources.SlotConfigs)
+        foreach (var slot in Resources)
         {
-            this.stashInventory.Config.SlotConfigs.Add(slot.Key, new Inventory.InventorySlotConfig
+            this.stashInventory.Config.Add(slot.Key, new InventorySlot.InventorySlotConfig
             {
                 MaxCount = slot.Value.MaxCount * 10,
                 Texture = slot.Value.Texture,
