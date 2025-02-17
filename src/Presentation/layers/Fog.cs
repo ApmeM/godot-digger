@@ -5,6 +5,8 @@ using Godot;
 public static class Fog
 {
     public static ValueTuple<int, int, int> Basic = (0, 0, 0);
+    public static ValueTuple<int, int, int> UnfogStart = (1, 0, 0);
+    public static ValueTuple<int, int, int> NoFog = (2, 0, 0);
 }
 
 
@@ -14,6 +16,8 @@ public class FogDefinition : IActionDefinition
 
     public static Dictionary<ValueTuple<int, int, int>, FogDefinition> KnownFog = new Dictionary<ValueTuple<int, int, int>, FogDefinition>{
         { Fog.Basic, new FogDefinition{ClickAction = DoNothing} },
+        { Fog.UnfogStart, new FogDefinition{ClickAction = DoNothing} },
+        { Fog.NoFog, new FogDefinition{ClickAction = DoNothing} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }
