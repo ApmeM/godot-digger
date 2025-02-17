@@ -54,11 +54,13 @@ public partial class BaseLevel
         this.CharacteristicsChanged();
 
         this.AddToGroup(Groups.LevelScene);
+        ReFogMap();
     }
 
     public override void _Process(float delta)
     {
         base._Process(delta);
+        var moveDone = false;
         foreach (var definition in BlocksDefinition.KnownBlocks)
         {
             if (definition.Value.MoveDelay <= 0)
@@ -76,29 +78,48 @@ public partial class BaseLevel
                     this.blocks.SetMeta(metaName, random.NextDouble() * definition.Value.MoveDelay);
                 }
 
-                if ((float)this.blocks.GetMeta(metaName) <= 0)
+                if ((float)this.blocks.GetMeta(metaName) >= 0)
                 {
-                    this.blocks.SetMeta(metaName, definition.Value.MoveDelay);
-
-                    var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
-                        .Select(dir => cell + dir)
-                        .Where(pos => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)pos.x, (int)pos.y), 0, 0)))
-                        .Where(pos => this.blocks.GetCell((int)pos.x, (int)pos.y) == -1)
-                        .Where(pos => this.loot.GetCell((int)pos.x, (int)pos.y) == -1)
-                        .ToList();
-
-                    if (possibleMoves.Count > 0)
-                    {
-                        var move = possibleMoves[random.Next(possibleMoves.Count)];
-                        this.blocks.SetCellv(move, this.blocks.GetCellv(cell), autotileCoord: this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y));
-                        this.loot.SetCellv(move, this.loot.GetCellv(cell), autotileCoord: this.loot.GetCellAutotileCoord((int)cell.x, (int)cell.y));
-                        this.blocks.SetCellv(cell, -1);
-                        this.loot.SetCellv(cell, -1);
-                    }
+                    this.blocks.SetMeta(metaName, (float)this.blocks.GetMeta(metaName) - delta);
+                    continue;
                 }
 
-                this.blocks.SetMeta(metaName, (float)this.blocks.GetMeta(metaName) - delta);
+                this.blocks.SetMeta(metaName, definition.Value.MoveDelay);
+
+                var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+                    .Select(dir => cell + dir)
+                    .Where(pos => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)pos.x, (int)pos.y), 0, 0)))
+                    .Where(pos => this.blocks.GetCell((int)pos.x, (int)pos.y) == -1)
+                    .Where(pos => this.loot.GetCell((int)pos.x, (int)pos.y) == -1)
+                    .ToList();
+
+                if (possibleMoves.Count <= 0)
+                {
+                    continue;
+                }
+                
+                var move = possibleMoves[random.Next(possibleMoves.Count)];
+                this.blocks.SetCellv(move, this.blocks.GetCellv(cell), autotileCoord: this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y));
+                this.loot.SetCellv(move, this.loot.GetCellv(cell), autotileCoord: this.loot.GetCellAutotileCoord((int)cell.x, (int)cell.y));
+                this.blocks.SetCellv(cell, -1);
+                this.loot.SetCellv(cell, -1);
+
+                var cellString = cell.ToString();
+                foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(cellString)))
+                {
+                    var metaString = meta.Substring(0, meta.Length - cellString.Length);
+                    this.blocks.SetMeta(metaString + move, this.blocks.GetMeta(meta));
+                    this.blocks.SetMeta(meta, null);
+
+                    GD.PrintErr($"Moved from {meta} to {metaString + move}");
+                }
+
+                moveDone = true;
             }
+        }
+        if (moveDone)
+        {
+            ReFogMap();
         }
     }
 
@@ -155,11 +176,11 @@ public partial class BaseLevel
         var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
 
         var result =
-            TryLayer(this.fog, pos, FogDefinition.KnownFog) &&
-            TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks) &&
-            TryLayer(this.loot, pos, LootDefinition.KnownLoot) &&
-            TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions) &&
-            TryLayer(this.floor, pos, FloorDefinition.KnownFloors);
+            TryLayer(this.fog, pos, FogDefinition.KnownFog, new HashSet<int> { 2, 1 }) &&
+            TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks, new HashSet<int> { -1 }) &&
+            TryLayer(this.loot, pos, LootDefinition.KnownLoot, new HashSet<int> { -1 }) &&
+            TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions, new HashSet<int> { -1 }) &&
+            TryLayer(this.floor, pos, FloorDefinition.KnownFloors, new HashSet<int> { -1 });
 
         if (result)
         {
@@ -167,11 +188,11 @@ public partial class BaseLevel
         }
     }
 
-    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions) where T : IActionDefinition
+    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions, HashSet<int> ignorableCells) where T : IActionDefinition
     {
         var cell = map.GetCellv(pos);
 
-        if (cell == -1)
+        if (ignorableCells.Contains(cell))
         {
             return true;
         }
@@ -316,38 +337,53 @@ public partial class BaseLevel
 
         floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-currentHp).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 1, 0));
         currentFloatingsDelay += floatingDelay;
+        foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
+        {
+            this.blocks.SetMeta(meta, null);
+            GD.PrintErr($"Remove meta from {meta}");
+        }
         this.blocks.SetMeta(metaName, null);
         this.blocks.SetCellv(pos, -1);
-        this.UnFogCell(pos);
+
+        UnFogCell(pos + Vector2.Down);
+        UnFogCell(pos + Vector2.Left);
+        UnFogCell(pos + Vector2.Right);
+        UnFogCell(pos + Vector2.Up);
+    }
+
+    protected void ReFogMap()
+    {
+        foreach (Vector2 cell in this.fog.GetUsedCellsById(Fog.NoFog.Item1))
+        {
+            this.fog.SetCellv(cell, Fog.Basic.Item1);
+        }
+
+        foreach (Vector2 pos in this.fog.GetUsedCellsById(Fog.UnfogStart.Item1))
+        {
+            UnFogCell(pos + Vector2.Down);
+            UnFogCell(pos + Vector2.Left);
+            UnFogCell(pos + Vector2.Right);
+            UnFogCell(pos + Vector2.Up);
+        }
     }
 
     protected void UnFogCell(Vector2 cell)
     {
-        if (
-            this.fog.GetCellv(cell) != -1 ||  // Unfog should be started from already unfoged cell
-            this.blocks.GetCellv(cell) != -1)  // Can start unfog if the block is not yet removed
-        {
-            return;
-        }
-
-        this.fog.SetCellv(cell, -1);
-
         var queue = new Queue<Vector2>();
-        queue.Enqueue(cell + Vector2.Down);
-        queue.Enqueue(cell + Vector2.Left);
-        queue.Enqueue(cell + Vector2.Up);
-        queue.Enqueue(cell + Vector2.Right);
+        queue.Enqueue(cell);
 
         while (queue.Any())
         {
             cell = queue.Dequeue();
 
-            if (this.fog.GetCellv(cell) == -1)
+            var fog = this.fog.GetCellv(cell);
+
+            if (fog == -1 || fog == Fog.NoFog.Item1 || fog == Fog.UnfogStart.Item1)
             {
                 continue;
             }
 
-            this.fog.SetCellv(cell, -1);
+            this.fog.SetCellv(cell, Fog.NoFog.Item1);
 
             if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
             {
