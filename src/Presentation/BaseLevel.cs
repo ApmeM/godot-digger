@@ -82,7 +82,7 @@ public partial class BaseLevel
 
                     var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
                         .Select(dir => cell + dir)
-                        .Where(pos => this.floor.GetCell((int)pos.x, (int)pos.y) != -1)
+                        .Where(pos => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)pos.x, (int)pos.y), 0, 0)))
                         .Where(pos => this.blocks.GetCell((int)pos.x, (int)pos.y) == -1)
                         .Where(pos => this.loot.GetCell((int)pos.x, (int)pos.y) == -1)
                         .ToList();

@@ -15,7 +15,6 @@ public static class Constructions
     public static ValueTuple<int, int, int> Blacksmith = (4,0,0);
     public static ValueTuple<int, int, int> Inn = (7,0,0);
     public static ValueTuple<int, int, int> Stash = (11,0,0);
-    public static ValueTuple<int, int, int> Fish = (1,0,0);
     public static ValueTuple<int, int, int> Stump = (2,0,0);
     public static ValueTuple<int, int, int> Grandma = (3,0,0);
 }
@@ -36,7 +35,6 @@ public class ConstructionsDefinition : IActionDefinition
         { Constructions.Blacksmith, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Inn, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Stash, new ConstructionsDefinition{ClickAction = CustomConstruction} },
-        { Constructions.Fish, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Stump, new ConstructionsDefinition{ClickAction = CustomConstruction} },
         { Constructions.Grandma, new ConstructionsDefinition{ClickAction = CustomConstruction} },
     };
