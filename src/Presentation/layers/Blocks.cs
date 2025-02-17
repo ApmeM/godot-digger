@@ -28,7 +28,7 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Blacksmith, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
         { Blocks.RedHat, new BlocksDefinition{HP = 0, ClickAction=CustomClicked} },
         { Blocks.Tree, new BlocksDefinition{HP = 3, ClickAction=CustomClicked} },
-        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=CustomClicked, Attack = 40} },
+        { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=CustomClicked, Attack = 40, MoveDelay=5} },
         { Blocks.Wall, new BlocksDefinition{HP = 0, ClickAction = CustomClicked} },
     };
 
@@ -37,4 +37,6 @@ public class BlocksDefinition : IActionDefinition
     public int Attack;
 
     public uint HP;
+
+    public float MoveDelay;
 }

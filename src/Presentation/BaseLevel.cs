@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Godot;
 using GodotDigger.Presentation.Utils;
@@ -15,6 +14,8 @@ public partial class BaseLevel
     protected Dictionary<int, InventorySlot.InventorySlotConfig> Resources = new Dictionary<int, InventorySlot.InventorySlotConfig>();
 
     public Header Stamina => this.header;
+
+    public Random random = new Random();
 
     public override void _Ready()
     {
@@ -53,6 +54,52 @@ public partial class BaseLevel
         this.CharacteristicsChanged();
 
         this.AddToGroup(Groups.LevelScene);
+    }
+
+    public override void _Process(float delta)
+    {
+        base._Process(delta);
+        foreach (var definition in BlocksDefinition.KnownBlocks)
+        {
+            if (definition.Value.MoveDelay <= 0)
+            {
+                continue;
+            }
+
+            var usedells = blocks.GetUsedCellsById(definition.Key.Item1);
+            foreach (Vector2 cell in usedells)
+            {
+                var metaName = $"Move_{cell}";
+
+                if (!this.blocks.HasMeta(metaName))
+                {
+                    this.blocks.SetMeta(metaName, random.NextDouble() * definition.Value.MoveDelay);
+                }
+
+                if ((float)this.blocks.GetMeta(metaName) <= 0)
+                {
+                    this.blocks.SetMeta(metaName, definition.Value.MoveDelay);
+
+                    var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+                        .Select(dir => cell + dir)
+                        .Where(pos => this.floor.GetCell((int)pos.x, (int)pos.y) != -1)
+                        .Where(pos => this.blocks.GetCell((int)pos.x, (int)pos.y) == -1)
+                        .Where(pos => this.loot.GetCell((int)pos.x, (int)pos.y) == -1)
+                        .ToList();
+
+                    if (possibleMoves.Count > 0)
+                    {
+                        var move = possibleMoves[random.Next(possibleMoves.Count)];
+                        this.blocks.SetCellv(move, this.blocks.GetCellv(cell), autotileCoord: this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y));
+                        this.loot.SetCellv(move, this.loot.GetCellv(cell), autotileCoord: this.loot.GetCellAutotileCoord((int)cell.x, (int)cell.y));
+                        this.blocks.SetCellv(cell, -1);
+                        this.loot.SetCellv(cell, -1);
+                    }
+                }
+
+                this.blocks.SetMeta(metaName, (float)this.blocks.GetMeta(metaName) - delta);
+            }
+        }
     }
 
     private void BuffsChanged()
