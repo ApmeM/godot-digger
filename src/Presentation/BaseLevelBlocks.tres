@@ -1,8 +1,8 @@
-[gd_resource type="TileSet" load_steps=21 format=2]
+[gd_resource type="TileSet" load_steps=23 format=2]
 
 [ext_resource path="res://Presentation/assets/TileSets/blocks_shopkeeper.tres" type="Texture" id=1]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_woodpile.png" type="Texture" id=2]
-[ext_resource path="res://Presentation/assets/TileSets/bocks_tree.png" type="Texture" id=3]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_tree.png" type="Texture" id=3]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_wolf.png" type="Texture" id=4]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith1.png" type="Texture" id=5]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith3.png" type="Texture" id=6]
@@ -12,12 +12,14 @@
 [ext_resource path="res://Presentation/assets/TileSets/blocks_bookshelf.png" type="Texture" id=10]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_redhat3.png" type="Texture" id=11]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith4.png" type="Texture" id=12]
-[ext_resource path="res://Presentation/assets/TileSets/block_wall.png" type="Texture" id=13]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_wall.png" type="Texture" id=13]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_grass.png" type="Texture" id=14]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_rock.png" type="Texture" id=15]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_blacksmith2.png" type="Texture" id=16]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_redhat5.png" type="Texture" id=17]
 [ext_resource path="res://Presentation/assets/TileSets/blocks_piranha.tres" type="Texture" id=18]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_wasp.tres" type="Texture" id=19]
+[ext_resource path="res://Presentation/assets/TileSets/blocks_wasp_nest.png" type="Texture" id=20]
 
 [sub_resource type="AnimatedTexture" id=9]
 flags = 4
@@ -199,3 +201,31 @@ frame_4/delay_sec = 0.0
 11/shape_one_way_margin = 0.0
 11/shapes = [  ]
 11/z_index = 0
+12/name = "blocks_wasp.tres 12"
+12/texture = ExtResource( 19 )
+12/tex_offset = Vector2( 0, 0 )
+12/modulate = Color( 1, 1, 1, 1 )
+12/region = Rect2( 0, 0, 48, 48 )
+12/tile_mode = 0
+12/occluder_offset = Vector2( 0, 0 )
+12/navigation_offset = Vector2( 0, 0 )
+12/shape_offset = Vector2( 0, 0 )
+12/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+12/shape_one_way = false
+12/shape_one_way_margin = 0.0
+12/shapes = [  ]
+12/z_index = 0
+13/name = "blocks_wasp_nest.png 13"
+13/texture = ExtResource( 20 )
+13/tex_offset = Vector2( -14, -11 )
+13/modulate = Color( 1, 1, 1, 1 )
+13/region = Rect2( 0, 0, 63, 63 )
+13/tile_mode = 0
+13/occluder_offset = Vector2( 0, 0 )
+13/navigation_offset = Vector2( 0, 0 )
+13/shape_offset = Vector2( 0, 0 )
+13/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+13/shape_one_way = false
+13/shape_one_way_margin = 0.0
+13/shapes = [  ]
+13/z_index = 0

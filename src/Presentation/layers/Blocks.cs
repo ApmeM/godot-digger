@@ -15,6 +15,8 @@ public static class Blocks
     public static ValueTuple<int, int, int> Wolf = (5, 0, 0);
     public static ValueTuple<int, int, int> Wall = (10, 0, 0);
     public static ValueTuple<int, int, int> Fish = (11, 0, 0);
+    public static ValueTuple<int, int, int> Wasp = (12, 0, 0);
+    public static ValueTuple<int, int, int> WaspNest = (13, 0, 0);
 
 }
 
@@ -33,6 +35,8 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Wolf, new BlocksDefinition{HP = 2, ClickAction=CustomClicked, Attack = 40, MoveDelay=5, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground}} },
         { Blocks.Wall, new BlocksDefinition{HP = 0, ClickAction = CustomClicked} },
         { Blocks.Fish, new BlocksDefinition{HP = 0, ClickAction = CustomClicked, MoveDelay = 1, MoveFloor = new HashSet<(int, int, int)>{Floor.Water}} },
+        { Blocks.Wasp, new BlocksDefinition{HP = 2, ClickAction = CustomClicked, Attack = 10, MoveDelay = 0.5f, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Water}} },
+        { Blocks.WaspNest, new BlocksDefinition{HP = 3, ClickAction = CustomClicked, SpawnBlock = Blocks.Wasp} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; }
@@ -41,6 +45,10 @@ public class BlocksDefinition : IActionDefinition
 
     public uint HP;
 
+    // Move data
     public float MoveDelay;
     public HashSet<ValueTuple<int, int, int>> MoveFloor = new HashSet<(int, int, int)>();
+
+    // Spawn data
+    public ValueTuple<int, int, int> SpawnBlock = (-1, -1, -1);
 }

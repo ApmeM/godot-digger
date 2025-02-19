@@ -69,9 +69,9 @@ public partial class BaseLevel
             }
 
             var usedells = blocks.GetUsedCellsById(definition.Key.Item1);
-            foreach (Vector2 cell in usedells)
+            foreach (Vector2 pos in usedells)
             {
-                var metaName = $"Move_{cell}";
+                var metaName = $"Move_{pos}";
 
                 if (!this.blocks.HasMeta(metaName))
                 {
@@ -87,31 +87,29 @@ public partial class BaseLevel
                 this.blocks.SetMeta(metaName, definition.Value.MoveDelay);
 
                 var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
-                    .Select(dir => cell + dir)
-                    .Where(pos => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)pos.x, (int)pos.y), 0, 0)))
-                    .Where(pos => this.blocks.GetCell((int)pos.x, (int)pos.y) == -1)
-                    .Where(pos => this.loot.GetCell((int)pos.x, (int)pos.y) == -1)
+                    .Select(dir => pos + dir)
+                    .Where(cell => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)cell.x, (int)cell.y), 0, 0)))
+                    .Where(cell => this.blocks.GetCell((int)cell.x, (int)cell.y) == -1)
+                    .Where(cell => this.loot.GetCell((int)cell.x, (int)cell.y) == -1)
                     .ToList();
 
                 if (possibleMoves.Count <= 0)
                 {
                     continue;
                 }
-                
-                var move = possibleMoves[random.Next(possibleMoves.Count)];
-                this.blocks.SetCellv(move, this.blocks.GetCellv(cell), autotileCoord: this.blocks.GetCellAutotileCoord((int)cell.x, (int)cell.y));
-                this.loot.SetCellv(move, this.loot.GetCellv(cell), autotileCoord: this.loot.GetCellAutotileCoord((int)cell.x, (int)cell.y));
-                this.blocks.SetCellv(cell, -1);
-                this.loot.SetCellv(cell, -1);
 
-                var cellString = cell.ToString();
+                var move = possibleMoves[random.Next(possibleMoves.Count)];
+                this.blocks.SetCellv(move, this.blocks.GetCellv(pos), autotileCoord: this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y));
+                this.loot.SetCellv(move, this.loot.GetCellv(pos), autotileCoord: this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y));
+                this.blocks.SetCellv(pos, -1);
+                this.loot.SetCellv(pos, -1);
+
+                var cellString = pos.ToString();
                 foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(cellString)))
                 {
                     var metaString = meta.Substring(0, meta.Length - cellString.Length);
                     this.blocks.SetMeta(metaString + move, this.blocks.GetMeta(meta));
                     this.blocks.SetMeta(meta, null);
-
-                    GD.PrintErr($"Moved from {meta} to {metaString + move}");
                 }
 
                 moveDone = true;
@@ -283,6 +281,13 @@ public partial class BaseLevel
         {
             return;
         }
+        var definition = BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)];
+
+        if (definition.HP == 0)
+        {
+            // If block has no HP - it is a custom building / ally, no need to do anything here.
+            return;
+        }
 
         const float floatingDelay = 0.3f;
         var currentFloatingsDelay = 0f;
@@ -296,10 +301,10 @@ public partial class BaseLevel
 
         if (!this.blocks.HasMeta(metaName))
         {
-            this.blocks.SetMeta(metaName, BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].HP);
+            this.blocks.SetMeta(metaName, definition.HP);
         }
 
-        var enemyAttack = BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)].Attack;
+        var enemyAttack = definition.Attack;
         if (enemyAttack > 0)
         {
             if (enemyAttack > this.header.CurrentHp)
@@ -319,12 +324,23 @@ public partial class BaseLevel
             }
         }
 
-        var currentHp = (int)this.blocks.GetMeta(metaName);
-
-        if (currentHp == 0)
+        var spawnBlock = definition.SpawnBlock;
+        if (spawnBlock.Item1 >= 0)
         {
-            return;
+            var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+                .Select(dir => pos + dir)
+                .Where(cell => this.blocks.GetCell((int)cell.x, (int)cell.y) == -1)
+                .Where(cell => this.loot.GetCell((int)cell.x, (int)cell.y) == -1)
+                .ToList();
+
+            if (possibleMoves.Count > 0)
+            {
+                var move = possibleMoves[random.Next(possibleMoves.Count)];
+                this.blocks.SetCellv(move, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
+            }
         }
+
+        var currentHp = (int)this.blocks.GetMeta(metaName);
 
         var digPower = this.header.Character.DigPower;
         if (currentHp > digPower)
