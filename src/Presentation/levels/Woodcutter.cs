@@ -9,13 +9,13 @@ public partial class Woodcutter
         this.FillMembers();
     }
 
-    public override void CustomConstructionClickedAsync(Vector2 pos)
+    public override void CustomBlockClicked(Vector2 pos)
     {
         if (pos == new Vector2(4, 9))
         {
             this.EmitSignal(nameof(ChangeLevel), "Level1");
             return;
         }
-        base.CustomConstructionClickedAsync(pos);
+        base.CustomBlockClicked(pos);
     }
 }

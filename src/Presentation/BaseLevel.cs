@@ -260,11 +260,6 @@ public partial class BaseLevel
         return success;
     }
 
-    public virtual void CustomConstructionClickedAsync(Vector2 pos)
-    {
-        GD.PrintErr($"Clicked on a custom construction with no action set at {pos} for {this.Name}");
-    }
-
     public virtual void CustomBlockClicked(Vector2 pos)
     {
         GD.Print($"Clicked on a block at {pos}, no custom action defined, dig it.");
@@ -401,7 +396,7 @@ public partial class BaseLevel
 
             this.fog.SetCellv(cell, Fog.NoFog.Item1);
 
-            if (this.blocks.GetCellv(cell) != -1)  // Blocks are not removed from the cell
+            if (this.blocks.GetCellv(cell) != -1 && BlocksDefinition.KnownBlocks[(this.blocks.GetCellv(cell), 0, 0)].FogBlocker)  // Blocks are not removed from the cell
             {
                 continue;
             }

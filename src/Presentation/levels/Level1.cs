@@ -19,7 +19,7 @@ public partial class Level1
         }
     }
 
-    public override async void CustomConstructionClickedAsync(Vector2 pos)
+    public override async void CustomBlockClicked(Vector2 pos)
     {
         if (pos == new Vector2(4, 12))
         {
@@ -43,11 +43,6 @@ public partial class Level1
             this.EmitSignal(nameof(ChangeLevel), "Woodcutter");
             return;
         }
-        if (pos == new Vector2(4, 2))
-        {
-            this.EmitSignal(nameof(ChangeLevel), "Shop");
-            return;
-        }
         if (pos == new Vector2(1, 4))
         {
             this.stashInventory.Visible = true;
@@ -69,26 +64,26 @@ public partial class Level1
             }
             return;
         }
-
-        base.CustomConstructionClickedAsync(pos);
-    }
-
-    public override async void CustomBlockClicked(Vector2 pos)
-    {
         if (pos == new Vector2(4, 2))
         {
-            var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.",
-                new[] { (Loot.Wood, 1u) },
-                new[] { (Loot.Gold, 1u) }
-            );
-            if (result)
+            if (this.blocks.GetCellv(pos) == Blocks.Shopkeeper.Item1)
             {
-                signLabel.Text = "Thanks.";
-                signPopup.Show();
-                this.blocks.SetCellv(pos, -1);
-                this.constructions.SetCellv(pos, Constructions.Blacksmith.Item1, autotileCoord: new Vector2(Constructions.Blacksmith.Item2, Constructions.Blacksmith.Item3));
+                var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.",
+                    new[] { (Loot.Wood, 1u) },
+                    new[] { (Loot.Gold, 1u) }
+                );
+                if (result)
+                {
+                    signLabel.Text = "Thanks.";
+                    signPopup.Show();
+                    this.blocks.SetCellv(pos, Blocks.BlacksmithHouse.Item1, autotileCoord: new Vector2(Blocks.BlacksmithHouse.Item2, Blocks.BlacksmithHouse.Item3));
+                }
+                return;
             }
-            return;
+            else
+            {
+                this.EmitSignal(nameof(ChangeLevel), "Shop");
+            }
         }
         if (pos == new Vector2(9, 13))
         {

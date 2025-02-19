@@ -9,7 +9,7 @@ public partial class Level2
         this.FillMembers();
     }
 
-    public override void CustomConstructionClickedAsync(Vector2 pos)
+    public override void CustomBlockClicked(Vector2 pos)
     {
         if (pos == new Vector2(8, 15))
         {
@@ -21,6 +21,6 @@ public partial class Level2
             this.EmitSignal(nameof(ChangeLevel), "Level3");
             return;
         }
-        base.CustomConstructionClickedAsync(pos);
+        base.CustomBlockClicked(pos);
     }
 }

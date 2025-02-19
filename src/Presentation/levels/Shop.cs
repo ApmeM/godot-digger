@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -51,18 +52,13 @@ public partial class Shop
         return money;
     }
 
-    public override void CustomConstructionClickedAsync(Vector2 pos)
+    public override async void CustomBlockClicked(Vector2 pos)
     {
         if (pos == new Vector2(5, 12))
         {
             this.EmitSignal(nameof(ChangeLevel), "Level1");
             return;
         }
-        base.CustomConstructionClickedAsync(pos);
-    }
-
-    public override async void CustomBlockClicked(Vector2 pos)
-    {
         if (pos == new Vector2(6, 10))
         {
             this.shopInventory.Visible = true;
