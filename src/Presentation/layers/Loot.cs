@@ -48,29 +48,29 @@ public class LootDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> CustomLoot = (level, pos) => { level.CustomLootClickedAsync(pos); };
 
     public static Dictionary<ValueTuple<int, int, int>, LootDefinition> KnownLoot = new Dictionary<ValueTuple<int, int, int>, LootDefinition>{
-        { Loot.Wood, new LootDefinition{Price=10, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.Steel, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.Cloth, new LootDefinition{Price=20, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.StaminaPlant, new LootDefinition{Price=20, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentStamina += 2; }} },
-        { Loot.Bread, new LootDefinition{Price=30, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentStamina += 5; }} },
-        { Loot.WolfSkin, new LootDefinition{Price=50, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.Gold, new LootDefinition{Price=1, MaxCount = 1000, ClickAction = CustomLoot} },
-        { Loot.PotionEmpty, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, MergeActions = new Dictionary<(int, int, int), (int, int, int)>{{Loot.StaminaPlant, Loot.PotionLightBlue}} }},
-        { Loot.PotionBlack, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionBlue, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{level.AddBuff(Buff.StaminaRegen);} } },
-        { Loot.PotionBrown, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionGray, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionGreen, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionLightBlue, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, UseAction = (level)=>{ level.Stamina.CurrentStamina += 10; }, ItemType = ItemType.Potion} },
-        { Loot.PotionOrange, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionPurple, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionRed, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionViolet, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionWhite, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.PotionYellow, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot} },
-        { Loot.WeaponPickaxe, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, ItemType = ItemType.Weapon, DigPower = 2} },
-        { Loot.ChestCloth, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, ItemType = ItemType.Chest} },
-        { Loot.Boots, new LootDefinition{Price=1, MaxCount = 1, ClickAction = CustomLoot, ItemType = ItemType.Boots, NumberOfTurns = 10} },
+        { Loot.Wood,            new LootDefinition{Price=10, MaxCount = 1} },
+        { Loot.Steel,           new LootDefinition{Price=30, MaxCount = 1} },
+        { Loot.Cloth,           new LootDefinition{Price=20, MaxCount = 1} },
+        { Loot.StaminaPlant,    new LootDefinition{Price=20, MaxCount = 1, UseAction = (level)=>{ level.Stamina.CurrentStamina += 2; }} },
+        { Loot.Bread,           new LootDefinition{Price=30, MaxCount = 1, UseAction = (level)=>{ level.Stamina.CurrentStamina += 5; }} },
+        { Loot.WolfSkin,        new LootDefinition{Price=50, MaxCount = 1} },
+        { Loot.Gold,            new LootDefinition{Price=1,  MaxCount = 1000} },
+        { Loot.PotionEmpty,     new LootDefinition{Price=1,  MaxCount = 1, MergeActions = new Dictionary<(int, int, int), (int, int, int)>{{Loot.StaminaPlant, Loot.PotionLightBlue}} }},
+        { Loot.PotionBlack,     new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionBlue,      new LootDefinition{Price=1,  MaxCount = 1, UseAction = (level)=>{level.AddBuff(Buff.StaminaRegen);} } },
+        { Loot.PotionBrown,     new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionGray,      new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionGreen,     new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionLightBlue, new LootDefinition{Price=1,  MaxCount = 1, UseAction = (level)=>{ level.Stamina.CurrentStamina += 10; }, ItemType = ItemType.Potion} },
+        { Loot.PotionOrange,    new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionPurple,    new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionRed,       new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionViolet,    new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionWhite,     new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.PotionYellow,    new LootDefinition{Price=1,  MaxCount = 1} },
+        { Loot.WeaponPickaxe,   new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Weapon, DigPower = 2} },
+        { Loot.ChestCloth,      new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Chest} },
+        { Loot.Boots,           new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Boots, NumberOfTurns = 10} },
     };
 
     public Dictionary<ValueTuple<int, int, int>, ValueTuple<int, int, int>> MergeActions = new Dictionary<(int, int, int), (int, int, int)>();
@@ -82,6 +82,6 @@ public class LootDefinition : IActionDefinition
     public ItemType ItemType { get; set; }
 
     public uint Price { get; set; }
-    public Action<BaseLevel, Vector2> ClickAction { get; set; }
+    public Action<BaseLevel, Vector2> ClickAction { get; set; } = CustomLoot;
     public Action<BaseLevel> UseAction { get; set; }
 }

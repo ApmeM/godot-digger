@@ -15,10 +15,10 @@ public class FogDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
 
     public static Dictionary<ValueTuple<int, int, int>, FogDefinition> KnownFog = new Dictionary<ValueTuple<int, int, int>, FogDefinition>{
-        { Fog.Basic, new FogDefinition{ClickAction = DoNothing} },
-        { Fog.UnfogStart, new FogDefinition{ClickAction = DoNothing} },
-        { Fog.NoFog, new FogDefinition{ClickAction = DoNothing} },
+        { Fog.Basic, new FogDefinition{} },
+        { Fog.UnfogStart, new FogDefinition{} },
+        { Fog.NoFog, new FogDefinition{} },
     };
 
-    public Action<BaseLevel, Vector2> ClickAction { get; set; }
+    public Action<BaseLevel, Vector2> ClickAction { get; set; } = DoNothing;
 }

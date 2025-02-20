@@ -14,10 +14,10 @@ public class FloorDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
 
     public static Dictionary<ValueTuple<int, int, int>, FloorDefinition> KnownFloors = new Dictionary<ValueTuple<int, int, int>, FloorDefinition>{
-        { Floor.Tiles, new FloorDefinition{ClickAction = DoNothing} },
-        { Floor.Ground, new FloorDefinition{ClickAction = DoNothing} },
-        { Floor.Water, new FloorDefinition{ClickAction = DoNothing} },
+        { Floor.Tiles, new FloorDefinition{} },
+        { Floor.Ground, new FloorDefinition{} },
+        { Floor.Water, new FloorDefinition{} },
     };
 
-    public Action<BaseLevel, Vector2> ClickAction { get; set; }
+    public Action<BaseLevel, Vector2> ClickAction { get; set; } = DoNothing;
 }

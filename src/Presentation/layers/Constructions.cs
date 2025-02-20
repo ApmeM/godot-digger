@@ -16,12 +16,12 @@ public class ConstructionsDefinition : IActionDefinition
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
 
     public static Dictionary<ValueTuple<int, int, int>, ConstructionsDefinition> KnownConstructions = new Dictionary<ValueTuple<int, int, int>, ConstructionsDefinition>{
-        { Constructions.Grass, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.StatueLeft, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.StatueRight, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.OpenDoor, new ConstructionsDefinition{ClickAction = DoNothing} },
-        { Constructions.Stump, new ConstructionsDefinition{ClickAction = DoNothing} },
+        { Constructions.Grass, new ConstructionsDefinition{} },
+        { Constructions.StatueLeft, new ConstructionsDefinition{} },
+        { Constructions.StatueRight, new ConstructionsDefinition{} },
+        { Constructions.OpenDoor, new ConstructionsDefinition{} },
+        { Constructions.Stump, new ConstructionsDefinition{} },
     };
 
-    public Action<BaseLevel, Vector2> ClickAction { get; set; }
+    public Action<BaseLevel, Vector2> ClickAction { get; set; } = DoNothing;
 }
