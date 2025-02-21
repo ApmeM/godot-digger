@@ -17,6 +17,8 @@ public partial class BaseLevel
 
     public Random random = new Random();
 
+    private Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
+
     public override void _Ready()
     {
         base._Ready();
@@ -59,6 +61,13 @@ public partial class BaseLevel
             var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)];
             this.blocks.SetMeta($"HP_{cell}", definition.HP);
             this.blocks.SetMeta($"Move_{cell}", random.NextDouble() * definition.MoveDelay);
+            var loots = new List<int>();
+            if (this.loot.GetCellv(cell) != -1)
+            {
+                loots.Add(this.loot.GetCellv(cell));
+                this.loot.SetCellv(cell, -1);
+            }
+            this.blocks.SetMeta($"Loot_{cell}", loots);
         }
 
         this.AddToGroup(Groups.LevelScene);
@@ -89,11 +98,10 @@ public partial class BaseLevel
 
                 this.blocks.SetMeta(metaName, definition.Value.MoveDelay);
 
-                var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+                var possibleMoves = cardinalDirections
                     .Select(dir => pos + dir)
                     .Where(cell => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)cell.x, (int)cell.y), 0, 0)))
                     .Where(cell => this.blocks.GetCell((int)cell.x, (int)cell.y) == -1)
-                    .Where(cell => this.loot.GetCell((int)cell.x, (int)cell.y) == -1)
                     .ToList();
 
                 if (possibleMoves.Count <= 0)
@@ -103,9 +111,7 @@ public partial class BaseLevel
 
                 var move = possibleMoves[random.Next(possibleMoves.Count)];
                 this.blocks.SetCellv(move, this.blocks.GetCellv(pos), autotileCoord: this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y));
-                this.loot.SetCellv(move, this.loot.GetCellv(pos), autotileCoord: this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y));
                 this.blocks.SetCellv(pos, -1);
-                this.loot.SetCellv(pos, -1);
 
                 var cellString = pos.ToString();
                 foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(cellString)))
@@ -321,16 +327,15 @@ public partial class BaseLevel
         var spawnBlock = definition.SpawnBlock;
         if (spawnBlock.Item1 >= 0)
         {
-            var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+            var possibleSpawns = cardinalDirections
                 .Select(dir => pos + dir)
                 .Where(cell => this.blocks.GetCell((int)cell.x, (int)cell.y) == -1)
-                .Where(cell => this.loot.GetCell((int)cell.x, (int)cell.y) == -1)
                 .ToList();
 
-            if (possibleMoves.Count > 0)
+            if (possibleSpawns.Count > 0)
             {
-                var move = possibleMoves[random.Next(possibleMoves.Count)];
-                this.blocks.SetCellv(move, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
+                var spawn = possibleSpawns[random.Next(possibleSpawns.Count)];
+                this.blocks.SetCellv(spawn, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
             }
         }
 
@@ -347,6 +352,9 @@ public partial class BaseLevel
 
         floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-currentHp).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 1, 0));
         currentFloatingsDelay += floatingDelay;
+
+        var loots = (int[])this.blocks.GetMeta($"Loot_{pos}");
+
         foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
         {
             this.blocks.SetMeta(meta, null);
@@ -354,10 +362,28 @@ public partial class BaseLevel
         this.blocks.SetMeta(metaName, null);
         this.blocks.SetCellv(pos, -1);
 
-        UnFogCell(pos + Vector2.Down);
-        UnFogCell(pos + Vector2.Left);
-        UnFogCell(pos + Vector2.Right);
-        UnFogCell(pos + Vector2.Up);
+        foreach (var loot in loots)
+        {
+            if (this.loot.GetCellv(pos) == -1 && this.blocks.GetCellv(pos) == -1)
+            {
+                this.loot.SetCellv(pos, loot);
+                continue;
+            }
+
+            foreach (var dir in cardinalDirections)
+            {
+                if (this.loot.GetCellv(pos + dir) == -1 && this.blocks.GetCellv(pos + dir) == -1)
+                {
+                    this.loot.SetCellv(pos + dir, loot);
+                    break;
+                }
+            }
+        }
+
+        foreach (var dir in cardinalDirections)
+        {
+            UnFogCell(pos + dir);
+        }
     }
 
     protected void ReFogMap()
@@ -369,10 +395,10 @@ public partial class BaseLevel
 
         foreach (Vector2 pos in this.fog.GetUsedCellsById(Fog.UnfogStart.Item1))
         {
-            UnFogCell(pos + Vector2.Down);
-            UnFogCell(pos + Vector2.Left);
-            UnFogCell(pos + Vector2.Right);
-            UnFogCell(pos + Vector2.Up);
+            foreach (var dir in cardinalDirections)
+            {
+                UnFogCell(pos + dir);
+            }
         }
     }
 
@@ -399,10 +425,10 @@ public partial class BaseLevel
                 continue;
             }
 
-            queue.Enqueue(cell + Vector2.Down);
-            queue.Enqueue(cell + Vector2.Left);
-            queue.Enqueue(cell + Vector2.Up);
-            queue.Enqueue(cell + Vector2.Right);
+            foreach (var dir in cardinalDirections)
+            {
+                queue.Enqueue(cell + dir);
+            }
         }
     }
 
