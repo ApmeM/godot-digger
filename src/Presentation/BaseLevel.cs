@@ -49,9 +49,17 @@ public partial class BaseLevel
         this.equipmentInventory.Config = Resources;
 
         this.bagInventory.Config = Resources;
-        this.bagInventory.Size = 3; // ToDo: 
+        this.bagInventory.Size = 3;
 
         this.CharacteristicsChanged();
+
+        foreach (Vector2 cell in this.blocks.GetUsedCells())
+        {
+            var tile = this.blocks.GetCellv(cell);
+            var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)];
+            this.blocks.SetMeta($"HP_{cell}", definition.HP);
+            this.blocks.SetMeta($"Move_{cell}", random.NextDouble() * definition.MoveDelay);
+        }
 
         this.AddToGroup(Groups.LevelScene);
         ReFogMap();
@@ -72,11 +80,6 @@ public partial class BaseLevel
             foreach (Vector2 pos in usedells)
             {
                 var metaName = $"Move_{pos}";
-
-                if (!this.blocks.HasMeta(metaName))
-                {
-                    this.blocks.SetMeta(metaName, random.NextDouble() * definition.Value.MoveDelay);
-                }
 
                 if ((float)this.blocks.GetMeta(metaName) >= 0)
                 {
@@ -274,6 +277,7 @@ public partial class BaseLevel
 
         if (this.header.CurrentStamina == 0)
         {
+            floatingTextManager.ShowValue("Too tired", this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(0.60f, 0.85f, 0.91f));
             return;
         }
         var definition = BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)];
@@ -293,11 +297,6 @@ public partial class BaseLevel
         this.header.CurrentStamina--;
 
         var metaName = $"HP_{pos}";
-
-        if (!this.blocks.HasMeta(metaName))
-        {
-            this.blocks.SetMeta(metaName, definition.HP);
-        }
 
         var enemyAttack = definition.Attack;
         if (enemyAttack > 0)
@@ -351,7 +350,6 @@ public partial class BaseLevel
         foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
         {
             this.blocks.SetMeta(meta, null);
-            GD.PrintErr($"Remove meta from {meta}");
         }
         this.blocks.SetMeta(metaName, null);
         this.blocks.SetCellv(pos, -1);
