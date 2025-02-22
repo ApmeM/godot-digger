@@ -31,9 +31,8 @@ public static class Blocks
 
 }
 
-public class BlocksDefinition : IActionDefinition
+public class BlocksDefinition
 {
-    private static Action<BaseLevel, Vector2> CustomClicked = (level, pos) => { level.CustomBlockClicked(pos); };
     public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
         { Blocks.Wood, new BlocksDefinition{HP = 2 } },
         { Blocks.Steel, new BlocksDefinition{HP = 3} },
@@ -59,8 +58,6 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Door, new BlocksDefinition{HP = 0} },
         { Blocks.Slime, new BlocksDefinition{HP = 2, Attack = 1, MoveDelay = 2, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}} },
     };
-
-    public Action<BaseLevel, Vector2> ClickAction { get; set; } = CustomClicked;
 
     public int Attack;
 

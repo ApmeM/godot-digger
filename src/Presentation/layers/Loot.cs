@@ -43,10 +43,8 @@ public enum ItemType
     Potion = 10,
 }
 
-public class LootDefinition : IActionDefinition
+public class LootDefinition
 {
-    private static Action<BaseLevel, Vector2> CustomLoot = (level, pos) => { level.CustomLootClickedAsync(pos); };
-
     public static Dictionary<ValueTuple<int, int, int>, LootDefinition> KnownLoot = new Dictionary<ValueTuple<int, int, int>, LootDefinition>{
         { Loot.Wood,            new LootDefinition{Price=10, MaxCount = 1} },
         { Loot.Steel,           new LootDefinition{Price=30, MaxCount = 1} },
@@ -82,6 +80,5 @@ public class LootDefinition : IActionDefinition
     public ItemType ItemType { get; set; }
 
     public uint Price { get; set; }
-    public Action<BaseLevel, Vector2> ClickAction { get; set; } = CustomLoot;
     public Action<BaseLevel> UseAction { get; set; }
 }

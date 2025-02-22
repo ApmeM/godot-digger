@@ -10,15 +10,11 @@ public static class Fog
 }
 
 
-public class FogDefinition : IActionDefinition
+public class FogDefinition
 {
-    private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
-
     public static Dictionary<ValueTuple<int, int, int>, FogDefinition> KnownFog = new Dictionary<ValueTuple<int, int, int>, FogDefinition>{
         { Fog.Basic, new FogDefinition{} },
         { Fog.UnfogStart, new FogDefinition{} },
         { Fog.NoFog, new FogDefinition{} },
     };
-
-    public Action<BaseLevel, Vector2> ClickAction { get; set; } = DoNothing;
 }

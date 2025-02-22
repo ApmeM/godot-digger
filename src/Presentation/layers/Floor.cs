@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 
 public static class Floor
 {
@@ -9,15 +8,11 @@ public static class Floor
     public static ValueTuple<int, int, int> Water = (1, 0, 0);
 }
 
-public class FloorDefinition : IActionDefinition
+public class FloorDefinition
 {
-    private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
-
     public static Dictionary<ValueTuple<int, int, int>, FloorDefinition> KnownFloors = new Dictionary<ValueTuple<int, int, int>, FloorDefinition>{
         { Floor.Tiles, new FloorDefinition{} },
         { Floor.Ground, new FloorDefinition{} },
         { Floor.Water, new FloorDefinition{} },
     };
-
-    public Action<BaseLevel, Vector2> ClickAction { get; set; } = DoNothing;
 }

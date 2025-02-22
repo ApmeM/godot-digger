@@ -58,6 +58,7 @@ public partial class BaseLevel
         foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
             var tile = this.blocks.GetCellv(cell);
+            GD.Print($"{tile} at {cell}");
             var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)];
             this.blocks.SetMeta($"HP_{cell}", definition.HP);
             this.blocks.SetMeta($"Move_{cell}", random.NextDouble() * definition.MoveDelay);
@@ -70,8 +71,17 @@ public partial class BaseLevel
             this.blocks.SetMeta($"Loot_{cell}", loots);
         }
 
-        this.AddToGroup(Groups.LevelScene);
+        foreach (Vector2 cell in this.floor.GetUsedCells())
+        {
+            if (this.fog.GetCellv(cell) == -1)
+            {
+                this.fog.SetCellv(cell, Fog.Basic.Item1, autotileCoord: new Vector2(Fog.Basic.Item2, Fog.Basic.Item3));
+            }
+        }
+
         ReFogMap();
+
+        this.AddToGroup(Groups.LevelScene);
     }
 
     public override void _Process(float delta)
@@ -171,6 +181,10 @@ public partial class BaseLevel
         toSlot.TryChangeCount(mergeResult.Item1, 1);
     }
 
+    private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
+    private static Action<BaseLevel, Vector2> LootClicked = (level, pos) => { level.CustomLootClickedAsync(pos); };
+    private static Action<BaseLevel, Vector2> BlockClicked = (level, pos) => { level.CustomBlockClicked(pos); };
+
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
@@ -183,11 +197,11 @@ public partial class BaseLevel
         var pos = this.floor.WorldToMap(this.floor.ToLocal(newPos));
 
         var result =
-            TryLayer(this.fog, pos, FogDefinition.KnownFog, new HashSet<int> { 2, 1 }) &&
-            TryLayer(this.blocks, pos, BlocksDefinition.KnownBlocks, new HashSet<int> { -1 }) &&
-            TryLayer(this.loot, pos, LootDefinition.KnownLoot, new HashSet<int> { -1 }) &&
-            TryLayer(this.constructions, pos, ConstructionsDefinition.KnownConstructions, new HashSet<int> { -1 }) &&
-            TryLayer(this.floor, pos, FloorDefinition.KnownFloors, new HashSet<int> { -1 });
+            TryLayer(this.fog, pos, DoNothing, new HashSet<int> { 2, 1 }) &&
+            TryLayer(this.blocks, pos, BlockClicked, new HashSet<int> { -1 }) &&
+            TryLayer(this.loot, pos, LootClicked, new HashSet<int> { -1 }) &&
+            TryLayer(this.constructions, pos, DoNothing, new HashSet<int> { -1 }) &&
+            TryLayer(this.floor, pos, DoNothing, new HashSet<int> { -1 });
 
         if (result)
         {
@@ -195,7 +209,7 @@ public partial class BaseLevel
         }
     }
 
-    private bool TryLayer<T>(TileMap map, Vector2 pos, Dictionary<ValueTuple<int, int, int>, T> knownActions, HashSet<int> ignorableCells) where T : IActionDefinition
+    private bool TryLayer(TileMap map, Vector2 pos, Action<BaseLevel, Vector2> clickAction, HashSet<int> ignorableCells)
     {
         var cell = map.GetCellv(pos);
 
@@ -204,15 +218,7 @@ public partial class BaseLevel
             return true;
         }
 
-        var cellTile = map.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-        var key = (cell, (int)cellTile.x, (int)cellTile.y);
-
-        if (!knownActions.ContainsKey(key))
-        {
-            GD.PrintErr($"Unknown key {key} in knownActions.");
-            return false;
-        }
-        knownActions[key].ClickAction.Invoke(this, pos);
+        clickAction(this, pos);
         return false;
     }
 
