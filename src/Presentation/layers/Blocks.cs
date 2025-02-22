@@ -18,15 +18,16 @@ public static class Blocks
     public static ValueTuple<int, int, int> Wasp = (12, 0, 0);
     public static ValueTuple<int, int, int> WaspNest = (13, 0, 0);
 
-    public static ValueTuple<int, int, int> StairsUp = (18,0,0);
-    public static ValueTuple<int, int, int> StairsDown = (17,0,0);
-    public static ValueTuple<int, int, int> Sign = (16,0,0);
-    public static ValueTuple<int, int, int> Woodcutter = (20,0,0);
-    public static ValueTuple<int, int, int> BlacksmithHouse = (14,0,0);
-    public static ValueTuple<int, int, int> Inn = (15,0,0);
-    public static ValueTuple<int, int, int> Stash = (19,0,0);
-    public static ValueTuple<int, int, int> Grandma = (21,0,0);
-    public static ValueTuple<int, int, int> Door = (22,0,0);
+    public static ValueTuple<int, int, int> StairsUp = (18, 0, 0);
+    public static ValueTuple<int, int, int> StairsDown = (17, 0, 0);
+    public static ValueTuple<int, int, int> Sign = (16, 0, 0);
+    public static ValueTuple<int, int, int> Woodcutter = (20, 0, 0);
+    public static ValueTuple<int, int, int> BlacksmithHouse = (14, 0, 0);
+    public static ValueTuple<int, int, int> Inn = (15, 0, 0);
+    public static ValueTuple<int, int, int> Stash = (19, 0, 0);
+    public static ValueTuple<int, int, int> Grandma = (21, 0, 0);
+    public static ValueTuple<int, int, int> Door = (22, 0, 0);
+    public static ValueTuple<int, int, int> Slime = (23, 0, 0);
 
 }
 
@@ -42,10 +43,10 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Blacksmith, new BlocksDefinition{HP = 0} },
         { Blocks.RedHat, new BlocksDefinition{HP = 0} },
         { Blocks.Tree, new BlocksDefinition{HP = 3} },
-        { Blocks.Wolf, new BlocksDefinition{HP = 2, Attack = 4, MoveDelay=5, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground}} },
+        { Blocks.Wolf, new BlocksDefinition{HP = 2, Attack = 4, MoveDelay=5, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}} },
         { Blocks.Wall, new BlocksDefinition{HP = 0} },
         { Blocks.Fish, new BlocksDefinition{HP = 0, MoveDelay = 1, MoveFloor = new HashSet<(int, int, int)>{Floor.Water}} },
-        { Blocks.Wasp, new BlocksDefinition{HP = 2, Attack = 10, MoveDelay = 0.5f, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Water}} },
+        { Blocks.Wasp, new BlocksDefinition{HP = 2, Attack = 10, MoveDelay = 0.5f, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles, Floor.Water}} },
         { Blocks.WaspNest, new BlocksDefinition{HP = 3, SpawnBlock = Blocks.Wasp} },
         { Blocks.StairsUp, new BlocksDefinition{HP = 0} },
         { Blocks.StairsDown, new BlocksDefinition{HP = 0} },
@@ -56,6 +57,7 @@ public class BlocksDefinition : IActionDefinition
         { Blocks.Stash, new BlocksDefinition{HP = 0} },
         { Blocks.Grandma, new BlocksDefinition{HP = 0} },
         { Blocks.Door, new BlocksDefinition{HP = 0} },
+        { Blocks.Slime, new BlocksDefinition{HP = 2, Attack = 1, MoveDelay = 2, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}} },
     };
 
     public Action<BaseLevel, Vector2> ClickAction { get; set; } = CustomClicked;
