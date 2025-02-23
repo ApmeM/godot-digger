@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public static class Blocks
@@ -33,43 +34,116 @@ public static class Blocks
 
 public class BlocksDefinition
 {
-    public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
-        { Blocks.Wood, new BlocksDefinition{HP = 2 } },
-        { Blocks.Steel, new BlocksDefinition{HP = 3} },
-        { Blocks.Wardrobe, new BlocksDefinition{HP = 4} },
-        { Blocks.Grass, new BlocksDefinition{HP = 1} },
-        { Blocks.Shopkeeper, new BlocksDefinition{HP = 0} },
-        { Blocks.Blacksmith, new BlocksDefinition{HP = 0} },
-        { Blocks.RedHat, new BlocksDefinition{HP = 0} },
-        { Blocks.Tree, new BlocksDefinition{HP = 3} },
-        { Blocks.Wolf, new BlocksDefinition{HP = 2, Attack = 4, MoveDelay=5, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}} },
-        { Blocks.Wall, new BlocksDefinition{HP = 0} },
-        { Blocks.Fish, new BlocksDefinition{HP = 0, MoveDelay = 1, MoveFloor = new HashSet<(int, int, int)>{Floor.Water}} },
-        { Blocks.Wasp, new BlocksDefinition{HP = 2, Attack = 10, MoveDelay = 0.5f, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles, Floor.Water}} },
-        { Blocks.WaspNest, new BlocksDefinition{HP = 3, SpawnBlock = Blocks.Wasp} },
-        { Blocks.StairsUp, new BlocksDefinition{HP = 0} },
-        { Blocks.StairsDown, new BlocksDefinition{HP = 0} },
-        { Blocks.Sign, new BlocksDefinition{HP = 0, FogBlocker = false} },
-        { Blocks.Woodcutter, new BlocksDefinition{HP = 0} },
-        { Blocks.BlacksmithHouse, new BlocksDefinition{HP = 0} },
-        { Blocks.Inn, new BlocksDefinition{HP = 0} },
-        { Blocks.Stash, new BlocksDefinition{HP = 0} },
-        { Blocks.Grandma, new BlocksDefinition{HP = 0} },
-        { Blocks.Door, new BlocksDefinition{HP = 0} },
-        { Blocks.Slime, new BlocksDefinition{HP = 2, Attack = 1, MoveDelay = 2, MoveFloor = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}} },
-    };
+    private static Random random = new Random();
 
-    public int Attack;
+    private static void OnClickAttack(BaseLevel level, Vector2 pos, int power)
+    {
+        const float floatingDelay = 0.3f;
+        var currentFloatingsDelay = 0f;
+
+        if (power > level.HeaderControl.CurrentHp)
+        {
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-level.HeaderControl.CurrentHp).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
+            currentFloatingsDelay += floatingDelay;
+            level.HeaderControl.CurrentHp = 0;
+            var buff = level.HeaderControl.AddBuff(Buff.Dead);
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (Control)buff.Duplicate(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2);
+            currentFloatingsDelay += floatingDelay;
+        }
+        else
+        {
+            level.HeaderControl.CurrentHp -= (uint)power;
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-power).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
+            currentFloatingsDelay += floatingDelay;
+        }
+    }
+
+    private static void OnCickSpawn(BaseLevel level, Vector2 pos, ValueTuple<int, int, int> spawnBlock)
+    {
+        var possibleSpawns = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+            .Select(dir => pos + dir)
+            .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1)
+            .ToList();
+
+        if (possibleSpawns.Count > 0)
+        {
+            var spawn = possibleSpawns[random.Next(possibleSpawns.Count)];
+            level.BlocksMap.SetCellv(spawn, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
+        }
+    }
+
+    private static bool OnTickRandomMove(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
+    {
+        var moveFloor = new HashSet<(int, int, int)>(moveFloors);
+        var metaName = $"Move_{pos}";
+        if (!level.BlocksMap.HasMeta(metaName))
+        {
+            level.BlocksMap.SetMeta(metaName, random.NextDouble() * moveDelay);
+        }
+
+        if ((float)level.BlocksMap.GetMeta(metaName) >= 0)
+        {
+            level.BlocksMap.SetMeta(metaName, (float)level.BlocksMap.GetMeta(metaName) - delta);
+            return false;
+        }
+
+        level.BlocksMap.SetMeta(metaName, moveDelay);
+
+        var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+            .Select(dir => pos + dir)
+            .Where(cell => moveFloor.Contains((level.FloorMap.GetCell((int)cell.x, (int)cell.y), 0, 0)))
+            .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1)
+            .ToList();
+
+        if (possibleMoves.Count <= 0)
+        {
+            return false;
+        }
+
+        var move = possibleMoves[random.Next(possibleMoves.Count)];
+        level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
+        level.BlocksMap.SetCellv(pos, -1);
+
+        var cellString = pos.ToString();
+        foreach (var meta in level.BlocksMap.GetMetaList().Where(a => a.EndsWith(cellString)))
+        {
+            var metaString = meta.Substring(0, meta.Length - cellString.Length);
+            level.BlocksMap.SetMeta(metaString + move, level.BlocksMap.GetMeta(meta));
+            level.BlocksMap.SetMeta(meta, null);
+        }
+        return true;
+    }
+
+    public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
+        { Blocks.Wood,            new BlocksDefinition{HP = 2                    } },
+        { Blocks.Steel,           new BlocksDefinition{HP = 3                    } },
+        { Blocks.Wardrobe,        new BlocksDefinition{HP = 4                    } },
+        { Blocks.Grass,           new BlocksDefinition{HP = 1                    } },
+        { Blocks.Shopkeeper,      new BlocksDefinition{                          } },
+        { Blocks.Blacksmith,      new BlocksDefinition{                          } },
+        { Blocks.RedHat,          new BlocksDefinition{                          } },
+        { Blocks.Tree,            new BlocksDefinition{HP = 3                    } },
+        { Blocks.Wolf,            new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 4);},         OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 5, Floor.Ground, Floor.Tiles);} }},
+        { Blocks.Wall,            new BlocksDefinition{                          } },
+        { Blocks.Fish,            new BlocksDefinition{                                                                                                     OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 1, Floor.Water);} }},
+        { Blocks.Wasp,            new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 10);},        OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 0.5f, Floor.Ground, Floor.Tiles, Floor.Water);} }},
+        { Blocks.WaspNest,        new BlocksDefinition{HP = 3,                     OnClickAction = (level, pos) => {OnCickSpawn(level, pos, Blocks.Wasp);}} },
+        { Blocks.StairsUp,        new BlocksDefinition{                          } },
+        { Blocks.StairsDown,      new BlocksDefinition{                          } },
+        { Blocks.Sign,            new BlocksDefinition{        FogBlocker = false} },
+        { Blocks.Woodcutter,      new BlocksDefinition{                          } },
+        { Blocks.BlacksmithHouse, new BlocksDefinition{                          } },
+        { Blocks.Inn,             new BlocksDefinition{                          } },
+        { Blocks.Stash,           new BlocksDefinition{                          } },
+        { Blocks.Grandma,         new BlocksDefinition{                          } },
+        { Blocks.Door,            new BlocksDefinition{                          } },
+        { Blocks.Slime,           new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 1);},         OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 2, Floor.Ground, Floor.Tiles);} }},
+    };
 
     public uint HP;
 
-    // Fog Blocker
     public bool FogBlocker = true;
 
-    // Move data
-    public float MoveDelay;
-    public HashSet<ValueTuple<int, int, int>> MoveFloor = new HashSet<(int, int, int)>();
-
-    // Spawn data
-    public ValueTuple<int, int, int> SpawnBlock = (-1, -1, -1);
+    public Action<BaseLevel, Vector2> OnClickAction;
+    public Func<BaseLevel, Vector2, float, bool> OnTickAction;
 }

@@ -19,6 +19,12 @@ public partial class BaseLevel
 
     private Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
 
+    public TileMap FloorMap => this.floor;
+    public TileMap BlocksMap => this.blocks;
+    public TileMap LootMap => this.loot;
+    public Header HeaderControl => this.header;
+    public FloatingTextManager FloatingTextManagerControl => this.floatingTextManager;
+
     public override void _Ready()
     {
         base._Ready();
@@ -61,7 +67,6 @@ public partial class BaseLevel
             GD.Print($"{tile} at {cell}");
             var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)];
             this.blocks.SetMeta($"HP_{cell}", definition.HP);
-            this.blocks.SetMeta($"Move_{cell}", random.NextDouble() * definition.MoveDelay);
             var loots = new List<int>();
             if (this.loot.GetCellv(cell) != -1)
             {
@@ -90,48 +95,10 @@ public partial class BaseLevel
         var moveDone = false;
         foreach (var definition in BlocksDefinition.KnownBlocks)
         {
-            if (definition.Value.MoveDelay <= 0)
-            {
-                continue;
-            }
-
             var usedells = blocks.GetUsedCellsById(definition.Key.Item1);
             foreach (Vector2 pos in usedells)
             {
-                var metaName = $"Move_{pos}";
-
-                if ((float)this.blocks.GetMeta(metaName) >= 0)
-                {
-                    this.blocks.SetMeta(metaName, (float)this.blocks.GetMeta(metaName) - delta);
-                    continue;
-                }
-
-                this.blocks.SetMeta(metaName, definition.Value.MoveDelay);
-
-                var possibleMoves = cardinalDirections
-                    .Select(dir => pos + dir)
-                    .Where(cell => definition.Value.MoveFloor.Contains((this.floor.GetCell((int)cell.x, (int)cell.y), 0, 0)))
-                    .Where(cell => this.blocks.GetCell((int)cell.x, (int)cell.y) == -1)
-                    .ToList();
-
-                if (possibleMoves.Count <= 0)
-                {
-                    continue;
-                }
-
-                var move = possibleMoves[random.Next(possibleMoves.Count)];
-                this.blocks.SetCellv(move, this.blocks.GetCellv(pos), autotileCoord: this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y));
-                this.blocks.SetCellv(pos, -1);
-
-                var cellString = pos.ToString();
-                foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(cellString)))
-                {
-                    var metaString = meta.Substring(0, meta.Length - cellString.Length);
-                    this.blocks.SetMeta(metaString + move, this.blocks.GetMeta(meta));
-                    this.blocks.SetMeta(meta, null);
-                }
-
-                moveDone = true;
+                moveDone = definition.Value.OnTickAction?.Invoke(this, pos, delta) ?? false;
             }
         }
         if (moveDone)
@@ -310,40 +277,7 @@ public partial class BaseLevel
 
         var metaName = $"HP_{pos}";
 
-        var enemyAttack = definition.Attack;
-        if (enemyAttack > 0)
-        {
-            if (enemyAttack > this.header.CurrentHp)
-            {
-                floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-this.header.CurrentHp).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 0, 0));
-                currentFloatingsDelay += floatingDelay;
-                this.header.CurrentHp = 0;
-                var buff = this.header.AddBuff(Buff.Dead);
-                floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (Control)buff.Duplicate(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2);
-                currentFloatingsDelay += floatingDelay;
-            }
-            else
-            {
-                this.header.CurrentHp -= (uint)enemyAttack;
-                floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-enemyAttack).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 0, 0));
-                currentFloatingsDelay += floatingDelay;
-            }
-        }
-
-        var spawnBlock = definition.SpawnBlock;
-        if (spawnBlock.Item1 >= 0)
-        {
-            var possibleSpawns = cardinalDirections
-                .Select(dir => pos + dir)
-                .Where(cell => this.blocks.GetCell((int)cell.x, (int)cell.y) == -1)
-                .ToList();
-
-            if (possibleSpawns.Count > 0)
-            {
-                var spawn = possibleSpawns[random.Next(possibleSpawns.Count)];
-                this.blocks.SetCellv(spawn, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
-            }
-        }
+        definition.OnClickAction?.Invoke(this, pos);
 
         var currentHp = (int)this.blocks.GetMeta(metaName);
 
