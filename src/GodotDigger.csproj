@@ -10,5 +10,6 @@
     </PackageReference>
     <PackageReference Include="GodotAnalysersAttribute" Version="2.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="BrainAI" Version="8.0.0" />
   </ItemGroup>
 </Project>

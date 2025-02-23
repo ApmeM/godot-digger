@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BrainAI.Pathfinding;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseLevel.tscn")]
-public partial class BaseLevel
+public partial class BaseLevel : IUnweightedGraph<Vector2>
 {
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
@@ -64,7 +65,6 @@ public partial class BaseLevel
         foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
             var tile = this.blocks.GetCellv(cell);
-            GD.Print($"{tile} at {cell}");
             var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)];
             this.blocks.SetMeta($"HP_{cell}", definition.HP);
             var loots = new List<int>();
@@ -387,5 +387,13 @@ public partial class BaseLevel
     public void AddBuff(Buff staminaRegen)
     {
         this.header.AddBuff(staminaRegen);
+    }
+
+    public void GetNeighbors(Vector2 node, ICollection<Vector2> result)
+    {
+        if (this.blocks.GetCellv(node - Vector2.Down) == -1 && this.floor.GetCellv(node - Vector2.Down) != -1) result.Add(node - Vector2.Down);
+        if (this.blocks.GetCellv(node - Vector2.Left) == -1 && this.floor.GetCellv(node - Vector2.Left) != -1) result.Add(node - Vector2.Left);
+        if (this.blocks.GetCellv(node - Vector2.Right) == -1 && this.floor.GetCellv(node - Vector2.Right) != -1) result.Add(node - Vector2.Right);
+        if (this.blocks.GetCellv(node - Vector2.Up) == -1 && this.floor.GetCellv(node - Vector2.Up) != -1) result.Add(node - Vector2.Up);
     }
 }
