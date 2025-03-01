@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using BrainAI.Pathfinding;
 using Godot;
 
@@ -19,7 +20,6 @@ public static class Blocks
     public static ValueTuple<int, int, int> Fish = (11, 0, 0);
     public static ValueTuple<int, int, int> Wasp = (12, 0, 0);
     public static ValueTuple<int, int, int> WaspNest = (13, 0, 0);
-
     public static ValueTuple<int, int, int> StairsUp = (18, 0, 0);
     public static ValueTuple<int, int, int> StairsDown = (17, 0, 0);
     public static ValueTuple<int, int, int> Sign = (16, 0, 0);
@@ -30,7 +30,6 @@ public static class Blocks
     public static ValueTuple<int, int, int> Grandma = (21, 0, 0);
     public static ValueTuple<int, int, int> Door = (22, 0, 0);
     public static ValueTuple<int, int, int> Slime = (23, 0, 0);
-
 }
 
 public class BlocksDefinition
@@ -107,6 +106,12 @@ public class BlocksDefinition
         }
 
         var move = possibleMoves[random.Next(possibleMoves.Count)];
+        Move(level, pos, move);
+        return true;
+    }
+
+    private static void Move(BaseLevel level, Vector2 pos, Vector2 move)
+    {
         level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
         level.BlocksMap.SetCellv(pos, -1);
 
@@ -117,20 +122,6 @@ public class BlocksDefinition
             level.BlocksMap.SetMeta(metaString + move, level.BlocksMap.GetMeta(meta));
             level.BlocksMap.SetMeta(meta, null);
         }
-        return true;
-    }
-
-    private static void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
-    {
-        var loot = level.LootMap.GetCellv(pos);
-        if (loot == -1)
-        {
-            return;
-        }
-        var metaLootName = $"Loot_{pos}";
-        var loots = (int[])level.BlocksMap.GetMeta(metaLootName);
-        level.BlocksMap.SetMeta(metaLootName, loots.Concat(new[] { loot }).ToArray());
-        level.LootMap.SetCellv(pos, -1);
     }
 
     private static bool OnTickMoveToLoot(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
@@ -153,7 +144,6 @@ public class BlocksDefinition
         var metaPathName = $"Path_{pos}";
         if (!level.BlocksMap.HasMeta(metaPathName) || ((Vector2[])level.BlocksMap.GetMeta(metaPathName)).Length == 0)
         {
-            GD.Print("test");
             var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
             pathfinder.Search(pos, level.LootMap.GetUsedCells().Cast<Vector2>().ToHashSet());
             level.BlocksMap.SetMeta(metaPathName, pathfinder.ResultPath.Skip(1).ToArray());
@@ -167,18 +157,21 @@ public class BlocksDefinition
 
         var move = path[0];
         level.BlocksMap.SetMeta(metaPathName, path.Skip(1).ToArray());
-
-        level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
-        level.BlocksMap.SetCellv(pos, -1);
-
-        var cellString = pos.ToString();
-        foreach (var meta in level.BlocksMap.GetMetaList().Where(a => a.EndsWith(cellString)))
-        {
-            var metaString = meta.Substring(0, meta.Length - cellString.Length);
-            level.BlocksMap.SetMeta(metaString + move, level.BlocksMap.GetMeta(meta));
-            level.BlocksMap.SetMeta(meta, null);
-        }
+        Move(level, pos, move);
         return true;
+    }
+
+    private static void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
+    {
+        var loot = level.LootMap.GetCellv(pos);
+        if (loot == -1)
+        {
+            return;
+        }
+        var metaLootName = $"Loot_{pos}";
+        var loots = (int[])level.BlocksMap.GetMeta(metaLootName);
+        level.BlocksMap.SetMeta(metaLootName, loots.Concat(new[] { loot }).ToArray());
+        level.LootMap.SetCellv(pos, -1);
     }
 
     public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
