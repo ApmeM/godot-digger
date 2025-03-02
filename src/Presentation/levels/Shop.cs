@@ -27,10 +27,9 @@ public partial class Shop
 
         this.bagInventory.TryChangeCount(Loot.Gold.Item1, (int)price);
         this.shopInventory.ClearItems();
-        UpdateCost(null, null);
     }
 
-    private void UpdateCost(InventorySlot from, InventorySlot to)
+    private void UpdateCost(InventorySlot slot, int itemId, int from, int to)
     {
         var price = CalculatePrice();
         if (price == 0)
