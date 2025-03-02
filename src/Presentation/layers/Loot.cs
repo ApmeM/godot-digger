@@ -27,6 +27,8 @@ public static class Loot
     public static ValueTuple<int, int, int> WeaponPickaxe = (21, 0, 0);
     public static ValueTuple<int, int, int> ChestCloth = (22, 0, 0);
     public static ValueTuple<int, int, int> Boots = (23, 0, 0);
+    public static ValueTuple<int, int, int> Bag3 = (24, 0, 0);
+    public static ValueTuple<int, int, int> Bag1 = (25, 0, 0);
 }
 
 public enum ItemType
@@ -41,6 +43,7 @@ public enum ItemType
     Pants = 8,
     Boots = 9,
     Potion = 10,
+    Bag = 11,
 }
 
 public class LootDefinition
@@ -69,10 +72,13 @@ public class LootDefinition
         { Loot.WeaponPickaxe,   new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Weapon, DigPower = 2} },
         { Loot.ChestCloth,      new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Chest} },
         { Loot.Boots,           new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Boots, NumberOfTurns = 10} },
+        { Loot.Bag3,            new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Bag, AdditionalSlots = 3} },
+        { Loot.Bag1,            new LootDefinition{Price=1,  MaxCount = 1, ItemType = ItemType.Bag, AdditionalSlots = 1} },
     };
 
     public Dictionary<ValueTuple<int, int, int>, ValueTuple<int, int, int>> MergeActions = new Dictionary<(int, int, int), (int, int, int)>();
 
+    public int AdditionalSlots;
     public int MaxCount;
     public int DigPower;
     public int NumberOfTurns;

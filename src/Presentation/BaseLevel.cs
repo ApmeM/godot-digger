@@ -42,6 +42,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
         this.bagInventory.Connect(nameof(Inventory.DragOnAnotherItemType), this, nameof(InventoryTryMergeItems));
+        this.bagSlot.Connect(nameof(InventorySlot.ItemCountChanged), this, nameof(BagChanged));
         this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
         this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
 
@@ -59,7 +60,9 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.equipmentInventory.Config = Resources;
 
         this.bagInventory.Config = Resources;
-        this.bagInventory.Size = 3;
+
+        this.bagSlot.AcceptedTypes.Add((int)ItemType.Bag);
+        this.bagSlot.Config = Resources;
 
         this.CharacteristicsChanged();
 
@@ -118,12 +121,27 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.CharacteristicsChanged();
     }
 
+    private async void BagChanged(int itemId, int from, int to)
+    {
+        await this.ToSignal(GetTree().CreateTimer(0.01f), CommonSignals.Timeout); // Hack to update bag size after all signals handled.
+        this.CharacteristicsChanged();
+    }
+
     private void CharacteristicsChanged()
     {
         var character = new Character();
         this.equipmentInventory.ApplyEquipment(character);
+        if (this.bagSlot.ItemId >= 0)
+        {
+            var definition = LootDefinition.KnownLoot[(this.bagSlot.ItemId, 0, 0)];
+            character.DigPower += (uint)definition.DigPower;
+            character.MaxStamina += (uint)definition.NumberOfTurns;
+            character.BagSlots += (uint)definition.AdditionalSlots;
+        }
         this.header.ApplyBuffs(character);
         this.header.Character = character;
+        
+        this.bagInventory.Size = character.BagSlots;
     }
 
     protected void InventoryUseItem(InventorySlot slot)
@@ -417,13 +435,18 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         f.StorePascalString(JsonConvert.SerializeObject(this.blocks.GetMetaList().Select(a => (a, JsonConvert.SerializeObject(this.blocks.GetMeta(a)))).ToList()));
         f.Close();
 
+        this.header.Save();
+
+        f = new File();
+        f.Open($"user://Bag.dat", File.ModeFlags.Write);
+        f.StorePascalString(JsonConvert.SerializeObject(this.bagSlot.GetItem()));
+        f.Close();
+
         f = new File();
         f.Open($"user://Invenory.dat", File.ModeFlags.Write);
         f.StorePascalString(JsonConvert.SerializeObject(this.equipmentInventory.GetItems()));
         f.StorePascalString(JsonConvert.SerializeObject(this.bagInventory.GetItems()));
         f.Close();
-
-        this.header.Save();
     }
 
     public virtual void Load()
@@ -464,14 +487,22 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             f.Close();
         }
 
-        if (f.FileExists($"user://Invenory.dat"))
+        this.header.Load();
+
+        if (f.FileExists($"user://Bag.dat"))
         {
-            f.Open($"user://Invenory.dat", File.ModeFlags.Read);
-            this.equipmentInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
-            this.bagInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
+            f.Open($"user://Bag.dat", File.ModeFlags.Read);
+            var bag = JsonConvert.DeserializeObject<(int, int)>(f.GetPascalString());
+            this.bagSlot.ForceSetCount(bag.Item1, bag.Item2);
             f.Close();
         }
 
-        this.header.Load();
+        if (f.FileExists($"user://Invenory.dat"))
+        {
+            f.Open($"user://Invenory.dat", File.ModeFlags.Read);
+            this.equipmentInventory.ForceSetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
+            this.bagInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
+            f.Close();
+        }
     }
 }
