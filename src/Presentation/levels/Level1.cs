@@ -23,14 +23,12 @@ public partial class Level1
     {
         if (pos == new Vector2(4, 12))
         {
-            signLabel.Text = "Welcome to our glorious city (Currently abandoned).\nTutorial: wood pile requires to click twice to clean.";
-            signPopup.Show();
+            this.ShowPopup("Welcome to our glorious city (Currently abandoned).\nTutorial: wood pile requires to click twice to clean.");
             return;
         }
         if (pos == new Vector2(0, 18))
         {
-            signLabel.Text = "Tutorial: Click on the grass above to open the road.";
-            signPopup.Show();
+            this.ShowPopup("Tutorial: Click on the grass above to open the road.");
             return;
         }
         if (pos == new Vector2(17, 1))
@@ -59,8 +57,7 @@ public partial class Level1
             );
             if (result)
             {
-                signLabel.Text = "Thank you young man.";
-                signPopup.Show();
+                this.ShowPopup("Thank you young man.");
             }
             return;
         }
@@ -74,8 +71,7 @@ public partial class Level1
                 );
                 if (result)
                 {
-                    signLabel.Text = "Thanks.";
-                    signPopup.Show();
+                    this.ShowPopup("Thanks.");
                     this.blocks.SetCellv(pos, Blocks.BlacksmithHouse.Item1, autotileCoord: new Vector2(Blocks.BlacksmithHouse.Item2, Blocks.BlacksmithHouse.Item3));
                 }
                 return;
@@ -93,8 +89,7 @@ public partial class Level1
             );
             if (result)
             {
-                signLabel.Text = "Thanks. Take your bread.";
-                signPopup.Show();
+                this.ShowPopup("Thanks. Take your bread.");
             }
             return;
         }

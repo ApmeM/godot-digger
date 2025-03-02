@@ -194,6 +194,13 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.bagInventoryPopup.Show();
     }
 
+    public async void ShowPopup(string text)
+    {
+        this.signLabel.Text = text;
+        signPopup.Show();
+        await ToSignal(this.questRequirements, nameof(CustomPopup.PopupClosed));
+    }
+
     public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
     {
         var inventory = this.bagInventory;
