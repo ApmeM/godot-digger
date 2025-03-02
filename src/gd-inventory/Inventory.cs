@@ -87,8 +87,8 @@ public partial class Inventory
                 {
                     var toDelete = this.slotContainer.GetChildCount() - value;
                     var emptyList = this.slotContainer.GetChildren().OfType<InventorySlot>().Where(a => !a.HasItem()).ToList();
-                    var deleteNonEmpty = Math.Max(0, toDelete - emptyList.Count);
-                    var deleteEmpty = Math.Max(0, emptyList.Count - toDelete);
+                    var deleteEmpty = Math.Min(toDelete, emptyList.Count);
+                    var deleteNonEmpty = toDelete - deleteEmpty;
 
                     for (var i = 0; i < deleteEmpty; i++)
                     {
@@ -234,7 +234,7 @@ public partial class Inventory
     public void SetItems(List<(int, int)> items)
     {
         var slots = this.slotContainer.GetChildren().OfType<InventorySlot>().ToList();
-        for (var i = 0; i < items.Count; i++)
+        for (var i = 0; i < Math.Min(items.Count, slots.Count); i++)
         {
             slots[i].ForceSetCount(items[i].Item1, items[i].Item2);
         }
