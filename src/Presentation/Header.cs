@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
+using Newtonsoft.Json;
 
 [SceneReference("Header.tscn")]
 [Tool]
@@ -168,8 +171,32 @@ public partial class Header
         }
     }
 
-    internal void AddBuff(object dead)
+    public void Save()
     {
-        throw new NotImplementedException();
+        var f = new File();
+        f.Open($"user://Header.dat", File.ModeFlags.Write);
+        f.StorePascalString(JsonConvert.SerializeObject(this.CurrentHp));
+        f.StorePascalString(JsonConvert.SerializeObject(this.hpLastUpdate));
+        f.StorePascalString(JsonConvert.SerializeObject(this.CurrentStamina));
+        f.StorePascalString(JsonConvert.SerializeObject(this.staminaLastUpdate));
+        f.StorePascalString(JsonConvert.SerializeObject(this.buffContainer.GetChildren().Cast<BaseBuff>().Select(a => a.Name).ToList()));
+
+        f.Close();
+    }
+
+    public void Load()
+    {
+        var f = new File();
+
+        if (f.FileExists($"user://Header.dat"))
+        {
+            f.Open($"user://Header.dat", File.ModeFlags.Read);
+            this.CurrentHp = JsonConvert.DeserializeObject<uint>(f.GetPascalString());
+            this.hpLastUpdate = JsonConvert.DeserializeObject<DateTime>(f.GetPascalString());
+            this.CurrentStamina = JsonConvert.DeserializeObject<uint>(f.GetPascalString());
+            this.staminaLastUpdate = JsonConvert.DeserializeObject<DateTime>(f.GetPascalString());
+            JsonConvert.DeserializeObject<List<string>>(f.GetPascalString()).ForEach(a => this.AddBuff((Buff)Enum.Parse(typeof(Buff), a)));
+            f.Close();
+        }
     }
 }

@@ -191,7 +191,7 @@ public partial class Inventory
         var before = this.slotContainer.GetChildren()
             .OfType<InventorySlot>()
             .Where(a => a.HasItem())
-            .Select(a => new {slot = a, item = a.GetItem()})
+            .Select(a => new { slot = a, item = a.GetItem() })
             .ToList();
 
         foreach (var item in items)
@@ -227,9 +227,17 @@ public partial class Inventory
     {
         return this.slotContainer.GetChildren()
             .OfType<InventorySlot>()
-            .Where(a => a.HasItem())
             .Select(a => a.GetItem())
             .ToList();
+    }
+
+    public void SetItems(List<(int, int)> items)
+    {
+        var slots = this.slotContainer.GetChildren().OfType<InventorySlot>().ToList();
+        for (var i = 0; i < items.Count; i++)
+        {
+            slots[i].ForceSetCount(items[i].Item1, items[i].Item2);
+        }
     }
 
     public int GetItemCount(int item)

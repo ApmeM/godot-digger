@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Godot;
+using Newtonsoft.Json;
 
 [SceneReference("Level1.tscn")]
 public partial class Level1
@@ -94,5 +96,28 @@ public partial class Level1
             return;
         }
         base.CustomBlockClicked(pos);
+    }
+
+    public override void Save()
+    {
+        base.Save();
+
+        var f = new File();
+        f.Open($"user://Stash.dat", File.ModeFlags.Write);
+        f.StorePascalString(JsonConvert.SerializeObject(this.stashInventory.GetItems()));
+        f.Close();
+    }
+
+    public override void Load()
+    {
+        base.Load();
+
+        var f = new File();
+        if (f.FileExists($"user://Stash.dat"))
+        {
+            f.Open($"user://Stash.dat", File.ModeFlags.Read);
+            this.stashInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
+            f.Close();
+        }
     }
 }

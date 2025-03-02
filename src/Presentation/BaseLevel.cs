@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
 using GodotDigger.Presentation.Utils;
+using Newtonsoft.Json;
 
 [SceneReference("BaseLevel.tscn")]
 public partial class BaseLevel : IUnweightedGraph<Vector2>
@@ -402,5 +403,75 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         if (this.blocks.GetCellv(node - Vector2.Left) == -1 && this.floor.GetCellv(node - Vector2.Left) != -1) result.Add(node - Vector2.Left);
         if (this.blocks.GetCellv(node - Vector2.Right) == -1 && this.floor.GetCellv(node - Vector2.Right) != -1) result.Add(node - Vector2.Right);
         if (this.blocks.GetCellv(node - Vector2.Up) == -1 && this.floor.GetCellv(node - Vector2.Up) != -1) result.Add(node - Vector2.Up);
+    }
+
+    public virtual void Save()
+    {
+        var f = new File();
+        f.Open($"user://SaveLevel_{this.Name}.dat", File.ModeFlags.Write);
+        f.StorePascalString(JsonConvert.SerializeObject(this.floor.GetUsedCells().Cast<Vector2>().Select(a => (a, this.floor.GetCellv(a))).ToList()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.constructions.GetUsedCells().Cast<Vector2>().Select(a => (a, this.constructions.GetCellv(a))).ToList()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.loot.GetUsedCells().Cast<Vector2>().Select(a => (a, this.loot.GetCellv(a))).ToList()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.blocks.GetUsedCells().Cast<Vector2>().Select(a => (a, this.blocks.GetCellv(a))).ToList()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.blocks.GetMetaList().Select(a => (a, JsonConvert.SerializeObject(this.blocks.GetMeta(a)))).ToList()));
+        f.Close();
+
+        f = new File();
+        f.Open($"user://Invenory.dat", File.ModeFlags.Write);
+        f.StorePascalString(JsonConvert.SerializeObject(this.equipmentInventory.GetItems()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.bagInventory.GetItems()));
+        f.Close();
+
+        this.header.Save();
+    }
+
+    public virtual void Load()
+    {
+        var f = new File();
+        if (f.FileExists($"user://SaveLevel_{this.Name}.dat"))
+        {
+            this.floor.Clear();
+            this.constructions.Clear();
+            this.loot.Clear();
+            this.blocks.Clear();
+            this.fog.Clear();
+
+            f.Open($"user://SaveLevel_{this.Name}.dat", File.ModeFlags.Read);
+            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
+            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.constructions.SetCellv(a.Item1, a.Item2));
+            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
+            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
+            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
+            JsonConvert.DeserializeObject<List<(string, string)>>(f.GetPascalString()).ForEach(a =>
+                {
+                    var name = a.Item1;
+                    if (name.StartsWith("HP_"))
+                    {
+                        this.blocks.SetMeta(a.Item1, JsonConvert.DeserializeObject<uint>(a.Item2));
+                    }
+                    else
+                    if (name.StartsWith("Loot_"))
+                    {
+                        this.blocks.SetMeta(a.Item1, JsonConvert.DeserializeObject<List<int>>(a.Item2));
+                    }
+                    else
+                    if (name.StartsWith("Move_"))
+                    {
+                        this.blocks.SetMeta(a.Item1, JsonConvert.DeserializeObject<float>(a.Item2));
+                    }
+                });
+            f.Close();
+        }
+
+        if (f.FileExists($"user://Invenory.dat"))
+        {
+            f.Open($"user://Invenory.dat", File.ModeFlags.Read);
+            this.equipmentInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
+            this.bagInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
+            f.Close();
+        }
+
+        this.header.Load();
     }
 }

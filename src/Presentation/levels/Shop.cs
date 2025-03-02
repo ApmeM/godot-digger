@@ -45,6 +45,10 @@ public partial class Shop
         var money = 0L;
         foreach (var item in items)
         {
+            if (item.Item1 < 0)
+            {
+                continue;
+            }
             var tileId = item.Item1;
             money += LootDefinition.KnownLoot[(tileId, 0, 0)].Price * item.Item2;
         }

@@ -130,7 +130,7 @@ public class BlocksDefinition
         var metaName = $"Move_{pos}";
         if (!level.BlocksMap.HasMeta(metaName))
         {
-            level.BlocksMap.SetMeta(metaName, random.NextDouble() * moveDelay);
+            level.BlocksMap.SetMeta(metaName, (float)random.NextDouble() * moveDelay);
         }
 
         if ((float)level.BlocksMap.GetMeta(metaName) >= 0)
