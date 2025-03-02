@@ -63,17 +63,21 @@ Title = "Inventory"
 disabled = true
 
 [node name="CustomPopupContainer" parent="BagInventoryPopup" index="1"]
-margin_left = 112.0
-margin_top = 78.0
-margin_right = 216.0
-margin_bottom = 176.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -198.0
+margin_top = -258.0
+margin_right = 198.0
+margin_bottom = 55.0
 
 [node name="HeaderCenter" parent="BagInventoryPopup/CustomPopupContainer" index="0"]
-margin_right = 188.0
+margin_right = 396.0
 
 [node name="HeaderMargin" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 48.0
-margin_right = 139.0
+margin_left = 152.0
+margin_right = 243.0
 
 [node name="TitleBackground" parent="BagInventoryPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
 margin_right = 91.0
@@ -86,51 +90,57 @@ margin_right = 81.0
 text = "Inventory"
 
 [node name="PopupContainer" parent="BagInventoryPopup/CustomPopupContainer" index="1"]
-margin_right = 188.0
-margin_bottom = 386.0
+margin_right = 396.0
+margin_bottom = 313.0
 
 [node name="MarginContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer" index="0"]
-margin_right = 188.0
-margin_bottom = 365.0
+margin_right = 396.0
+margin_bottom = 292.0
 
 [node name="PopupOuterBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
-margin_right = 188.0
-margin_bottom = 365.0
+margin_right = 396.0
+margin_bottom = 292.0
 
 [node name="PopupOuterMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
-margin_right = 188.0
-margin_bottom = 365.0
+margin_right = 396.0
+margin_bottom = 292.0
 
 [node name="PopupInnerBackground" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
-margin_right = 179.0
-margin_bottom = 356.0
+margin_right = 387.0
+margin_bottom = 283.0
 
 [node name="ContentMargin" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
-margin_right = 179.0
-margin_bottom = 356.0
+margin_right = 387.0
+margin_bottom = 283.0
 
-[node name="InventoriesContainer" type="VBoxContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+[node name="DifferentInventoriesContainer" type="VBoxContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
 margin_left = 9.0
 margin_top = 9.0
-margin_right = 161.0
-margin_bottom = 338.0
+margin_right = 369.0
+margin_bottom = 265.0
 
-[node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 8 )]
-margin_left = 0.0
+[node name="InventoriesContainer" type="HBoxContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer"]
+margin_right = 360.0
+margin_bottom = 256.0
+
+[node name="EquipmentInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer" instance=ExtResource( 76 )]
 margin_top = 0.0
-margin_right = 152.0
-margin_bottom = 69.0
+margin_bottom = 256.0
+
+[node name="BagInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer" instance=ExtResource( 8 )]
+margin_left = 156.0
+margin_top = 0.0
+margin_right = 360.0
+margin_bottom = 256.0
 DropOnAnotherItemType = 4
-Size = 3
+Size = 4
 SizePerRow = 4
 Title = "Bag"
 
-[node name="EquipmentInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" instance=ExtResource( 76 )]
-
 [node name="CloseButton" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="2"]
 visible = true
-margin_left = 132.0
-margin_right = 179.0
+margin_left = 340.0
+margin_right = 387.0
 
 [node name="SignPopup" parent="." instance=ExtResource( 7 )]
 visible = false

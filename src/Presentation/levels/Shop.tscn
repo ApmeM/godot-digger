@@ -22,22 +22,25 @@ tile_data = PoolIntArray( 458753, 10, 0, 458754, 10, 0, 458755, 10, 0, 458756, 1
 [node name="Fog" parent="." index="4"]
 tile_data = PoolIntArray( 786437, 1, 0 )
 
-[node name="ShopInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" index="1" instance=ExtResource( 3 )]
+[node name="ShopInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer" index="1" instance=ExtResource( 3 )]
 visible = false
 margin_left = 0.0
-margin_top = 0.0
-margin_right = 256.0
-margin_bottom = 121.0
-Size = 10
-SizePerRow = 5
-Title = "Stash"
+margin_top = 260.0
+margin_right = 360.0
+margin_bottom = 381.0
+Size = 14
+SizePerRow = 7
+Title = "Shop (Drag items to sell)"
 
-[node name="ShopSellButton" type="Button" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/InventoriesContainer" index="2"]
+[node name="ShopSellButton" type="Button" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer" index="2"]
 visible = false
-margin_top = 91.0
-margin_right = 152.0
-margin_bottom = 111.0
+margin_top = 260.0
+margin_right = 360.0
+margin_bottom = 280.0
 text = "Close"
+
+[node name="DraggableCamera" parent="." index="9"]
+current = false
 
 [editable path="BagInventoryPopup"]
 [editable path="SignPopup"]
