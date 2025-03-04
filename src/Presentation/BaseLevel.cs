@@ -263,7 +263,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         var success = inventory.TryChangeCountsOrCancel(
             requirements
                 .Select(a => (a.Item1.Item1, -(int)a.Item2))
-                .Union(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))));
+                .Concat(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))));
 
         return success;
     }
