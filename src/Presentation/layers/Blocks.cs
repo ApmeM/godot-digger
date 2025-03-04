@@ -30,6 +30,7 @@ public static class Blocks
     public static ValueTuple<int, int, int> Grandma = (21, 0, 0);
     public static ValueTuple<int, int, int> Door = (22, 0, 0);
     public static ValueTuple<int, int, int> Slime = (23, 0, 0);
+    public static ValueTuple<int, int, int> Tree2 = (25, 0, 0);
 }
 
 public class BlocksDefinition
@@ -183,6 +184,7 @@ public class BlocksDefinition
         { Blocks.Blacksmith,      new BlocksDefinition{                          } },
         { Blocks.RedHat,          new BlocksDefinition{                          } },
         { Blocks.Tree,            new BlocksDefinition{HP = 3                    } },
+        { Blocks.Tree2,           new BlocksDefinition{HP = 3                    } },
         { Blocks.Wolf,            new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 4);},         OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 5, Floor.Ground, Floor.Tiles);} }},
         { Blocks.Wall,            new BlocksDefinition{                          } },
         { Blocks.Fish,            new BlocksDefinition{                                                                                                     OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 1, Floor.Water);} }},
