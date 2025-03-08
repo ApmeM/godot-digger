@@ -38,24 +38,42 @@ public class BlocksDefinition
 {
     private static Random random = new Random();
 
-    public void OnClickMove(BaseLevel level, Vector2 pos)
+    public bool OnClickMove(BaseLevel level, Vector2 pos)
     {
-        if (AttackPower > 0)
+        var isDead = false;
+        if (this.HP > 0)
         {
-            OnClickAttack(level, pos, AttackPower);
+            isDead = OnClickDefend(level, pos);
         }
-        if (SpawnEnemy.Item1 >= 0)
+        if (this.AttackPower > 0)
         {
-            OnClickSpawn(level, pos, SpawnEnemy);
+            OnClickAttack(level, pos);
         }
+        if (this.SpawnEnemy.HasValue)
+        {
+            OnClickSpawn(level, pos);
+        }
+        return isDead;
     }
 
-    private static void OnClickAttack(BaseLevel level, Vector2 pos, int power)
+    private bool OnClickDefend(BaseLevel level, Vector2 pos)
     {
         const float floatingDelay = 0.3f;
         var currentFloatingsDelay = 0f;
 
-        if (power > level.HeaderControl.CurrentHp)
+        var hitPower = Math.Min(this.HP, level.HeaderControl.Character.DigPower);
+        this.HP -= hitPower;
+        level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-hitPower).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 1, 0));
+        currentFloatingsDelay += floatingDelay;
+        return this.HP == 0;
+    }
+
+    private void OnClickAttack(BaseLevel level, Vector2 pos)
+    {
+        const float floatingDelay = 0.3f;
+        var currentFloatingsDelay = 0f;
+
+        if (this.AttackPower > level.HeaderControl.CurrentHp)
         {
             level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-level.HeaderControl.CurrentHp).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
             currentFloatingsDelay += floatingDelay;
@@ -66,13 +84,13 @@ public class BlocksDefinition
         }
         else
         {
-            level.HeaderControl.CurrentHp -= (uint)power;
-            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-power).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
+            level.HeaderControl.CurrentHp -= (uint)this.AttackPower;
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-this.AttackPower).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
             currentFloatingsDelay += floatingDelay;
         }
     }
 
-    private static void OnClickSpawn(BaseLevel level, Vector2 pos, ValueTuple<int, int, int> spawnBlock)
+    private void OnClickSpawn(BaseLevel level, Vector2 pos)
     {
         var possibleSpawns = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(dir => pos + dir)
@@ -82,14 +100,15 @@ public class BlocksDefinition
         if (possibleSpawns.Count > 0)
         {
             var spawn = possibleSpawns[random.Next(possibleSpawns.Count)];
-            level.BlocksMap.SetCellv(spawn, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
+            level.Meta[spawn] = BlocksDefinition.KnownBlocks[this.SpawnEnemy.Value].Clone();
+            level.BlocksMap.SetCellv(spawn, this.SpawnEnemy.Value.Item1, autotileCoord: new Vector2(this.SpawnEnemy.Value.Item2, this.SpawnEnemy.Value.Item3));
         }
     }
 
     public bool OnTickMove(BaseLevel level, Vector2 pos, float delta)
     {
-        var result = OnTickCanAct(level, pos, delta, this.MoveDelay) &&
-                (this.MoveToLoot && OnTickMoveToLootInternal(level, pos) || OnTickRandomMoveInternal(level, pos, this.MoveFloors)) &&
+        var result = OnTickCanAct(delta) &&
+                (this.MoveToLoot && OnTickMoveToLootInternal(level, pos) || OnTickRandomMoveInternal(level, pos)) &&
                 OnTickFollowPath(level, pos);
         if (this.CanPickLoot)
         {
@@ -98,29 +117,34 @@ public class BlocksDefinition
         return result;
     }
 
-    private static bool OnTickCanAct(BaseLevel level, Vector2 pos, float delta, float moveDelay)
+    private bool OnTickCanAct(float delta)
     {
-        var metaName = $"Move_{pos}";
-        if (!level.BlocksMap.HasMeta(metaName))
+        if (this.MoveDelay == 0)
         {
-            level.BlocksMap.SetMeta(metaName, random.NextDouble() * moveDelay);
-        }
-
-        if ((float)level.BlocksMap.GetMeta(metaName) >= 0)
-        {
-            level.BlocksMap.SetMeta(metaName, (float)level.BlocksMap.GetMeta(metaName) - delta);
             return false;
         }
 
-        level.BlocksMap.SetMeta(metaName, moveDelay);
-        return true;
+        if (this.CurrentMoveDelay == 0)
+        {
+            this.CurrentMoveDelay = (float)random.NextDouble() * this.MoveDelay;
+        }
+
+        this.CurrentMoveDelay -= delta;
+
+        if (this.CurrentMoveDelay <= 0)
+        {
+            this.CurrentMoveDelay = this.MoveDelay;
+            return true;
+        }
+
+        return false;
     }
 
-    private static bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos, HashSet<(int, int, int)> moveFloors)
+    private bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos)
     {
         var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(dir => pos + dir)
-            .Where(cell => moveFloors.Contains((level.FloorMap.GetCell((int)cell.x, (int)cell.y), 0, 0)))
+            .Where(cell => this.MoveFloors.Contains((level.FloorMap.GetCell((int)cell.x, (int)cell.y), 0, 0)))
             .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1)
             .ToList();
 
@@ -129,34 +153,26 @@ public class BlocksDefinition
             return false;
         }
 
-        var move = possibleMoves[random.Next(possibleMoves.Count)];
-        level.BlocksMap.SetMeta($"Path_{pos}", move);
+        this.Path = possibleMoves[random.Next(possibleMoves.Count)];
         return true;
     }
 
-    private static bool OnTickFollowPath(BaseLevel level, Vector2 pos)
+    private bool OnTickFollowPath(BaseLevel level, Vector2 pos)
     {
-        var move = (Vector2)level.BlocksMap.GetMeta($"Path_{pos}");
+        var move = this.Path;
+
+        level.Meta[move] = level.Meta[pos];
 
         level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
         level.BlocksMap.SetCellv(pos, -1);
 
-        var cellString = pos.ToString();
-        foreach (var meta in level.BlocksMap.GetMetaList().Where(a => a.EndsWith(cellString)))
-        {
-            var metaString = meta.Substring(0, meta.Length - cellString.Length);
-            level.BlocksMap.SetMeta(metaString + move, level.BlocksMap.GetMeta(meta));
-            level.BlocksMap.SetMeta(meta, null);
-        }
+        level.Meta.Remove(pos);
 
         return true;
     }
 
-    private static bool OnTickMoveToLootInternal(BaseLevel level, Vector2 pos)
+    private bool OnTickMoveToLootInternal(BaseLevel level, Vector2 pos)
     {
-        var metaPathName = $"Path_{pos}";
-        level.BlocksMap.RemoveMeta(metaPathName);
-
         var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
         pathfinder.Search(pos, level.LootMap.GetUsedCells().Cast<Vector2>().ToHashSet());
         var path = pathfinder.ResultPath;
@@ -166,20 +182,20 @@ public class BlocksDefinition
             return false;
         }
 
-        level.BlocksMap.SetMeta(metaPathName, path.Skip(1).Take(1).FirstOrDefault());
+        this.Path = path.Skip(1).Take(1).FirstOrDefault();
         return true;
     }
 
-    private static void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
+    private void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
     {
         var loot = level.LootMap.GetCellv(pos);
         if (loot == -1)
         {
             return;
         }
-        var metaLootName = $"Loot_{pos}";
-        var loots = (int[])level.BlocksMap.GetMeta(metaLootName);
-        level.BlocksMap.SetMeta(metaLootName, loots.Concat(new[] { loot }).ToArray());
+
+        this.Loot.Add((loot, 0, 0));
+        GD.Print(this.Loot.Count);
         level.LootMap.SetCellv(pos, -1);
     }
 
@@ -200,7 +216,7 @@ public class BlocksDefinition
         { Blocks.WaspNest,        new BlocksDefinition{HP = 3, SpawnEnemy = Blocks.Wasp} },
         { Blocks.StairsUp,        new BlocksDefinition{} },
         { Blocks.StairsDown,      new BlocksDefinition{} },
-        { Blocks.Sign,            new BlocksDefinition{        FogBlocker = false} },
+        { Blocks.Sign,            new BlocksDefinition{        NoFogBlocker = true} },
         { Blocks.Woodcutter,      new BlocksDefinition{} },
         { Blocks.BlacksmithHouse, new BlocksDefinition{} },
         { Blocks.Inn,             new BlocksDefinition{} },
@@ -210,13 +226,33 @@ public class BlocksDefinition
         { Blocks.Slime,           new BlocksDefinition{HP = 2, AttackPower = 1,  MoveDelay = 2, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}, CanPickLoot = true, MoveToLoot = true }},
     };
 
+    public BlocksDefinition Clone()
+    {
+        return new BlocksDefinition
+        {
+            HP = this.HP,
+            NoFogBlocker = this.NoFogBlocker,
+            MoveDelay = this.MoveDelay,
+            CanPickLoot = this.CanPickLoot,
+            MoveToLoot = this.MoveToLoot,
+            MoveFloors = new HashSet<(int, int, int)>(this.MoveFloors),
+            AttackPower = this.AttackPower,
+            SpawnEnemy = this.SpawnEnemy,
+            IsDead = this.IsDead,
+            Loot = new List<(int, int, int)>(this.Loot)
+        };
+    }
 
     public uint HP;
-    public bool FogBlocker = true;
-    public float MoveDelay = float.PositiveInfinity;
-    public bool CanPickLoot = false;
-    public bool MoveToLoot = false;
+    public bool NoFogBlocker;
+    public float MoveDelay;
+    public float CurrentMoveDelay;
+    public bool CanPickLoot;
+    public bool MoveToLoot;
     public HashSet<(int, int, int)> MoveFloors = new HashSet<(int, int, int)>();
     public int AttackPower;
-    public (int, int, int) SpawnEnemy = (-1, -1, -1);
+    public (int, int, int)? SpawnEnemy;
+    public bool IsDead;
+    public List<(int, int, int)> Loot = new List<(int, int, int)>();
+    public Vector2 Path;
 }

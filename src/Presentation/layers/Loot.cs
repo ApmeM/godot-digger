@@ -58,7 +58,7 @@ public class LootDefinition
         { Loot.Gold,            new LootDefinition{Price=1,  MaxCount = 1000} },
         { Loot.PotionEmpty,     new LootDefinition{Price=1,  MaxCount = 1, MergeActions = new Dictionary<(int, int, int), (int, int, int)>{{Loot.StaminaPlant, Loot.PotionLightBlue}} }},
         { Loot.PotionBlack,     new LootDefinition{Price=1,  MaxCount = 1} },
-        { Loot.PotionBlue,      new LootDefinition{Price=1,  MaxCount = 1, UseAction = (level)=>{level.AddBuff(Buff.StaminaRegen);} } },
+        { Loot.PotionBlue,      new LootDefinition{Price=1,  MaxCount = 1, UseAction = (level)=>{level.HeaderControl.AddBuff(Buff.StaminaRegen);} } },
         { Loot.PotionBrown,     new LootDefinition{Price=1,  MaxCount = 1} },
         { Loot.PotionGray,      new LootDefinition{Price=1,  MaxCount = 1} },
         { Loot.PotionGreen,     new LootDefinition{Price=1,  MaxCount = 1} },

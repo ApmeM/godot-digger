@@ -27,6 +27,8 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     public Header HeaderControl => this.header;
     public FloatingTextManager FloatingTextManagerControl => this.floatingTextManager;
 
+    public Dictionary<Vector2, BlocksDefinition> Meta = new Dictionary<Vector2, BlocksDefinition>();
+
     public override void _Ready()
     {
         base._Ready();
@@ -69,15 +71,13 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
             var tile = this.blocks.GetCellv(cell);
-            var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)];
-            this.blocks.SetMeta($"HP_{cell}", definition.HP);
-            var loots = new List<int>();
+            var definition = BlocksDefinition.KnownBlocks[(tile, 0, 0)].Clone();
             if (this.loot.GetCellv(cell) != -1)
             {
-                loots.Add(this.loot.GetCellv(cell));
+                definition.Loot.Add((this.loot.GetCellv(cell), 0, 0));
                 this.loot.SetCellv(cell, -1);
             }
-            this.blocks.SetMeta($"Loot_{cell}", loots);
+            this.Meta[cell] = definition;
         }
 
         foreach (Vector2 cell in this.floor.GetUsedCells())
@@ -97,14 +97,13 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     {
         base._Process(delta);
         var moveDone = false;
-        foreach (var definition in BlocksDefinition.KnownBlocks)
+
+        foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
-            var usedells = blocks.GetUsedCellsById(definition.Key.Item1);
-            foreach (Vector2 pos in usedells)
-            {
-                moveDone = definition.Value.OnTickMove(this, pos, delta);
-            }
+            var definition = this.Meta[cell];
+            moveDone |= definition.OnTickMove(this, cell, delta);
         }
+
         if (moveDone)
         {
             ReFogMap();
@@ -140,7 +139,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         }
         this.header.ApplyBuffs(character);
         this.header.Character = character;
-        
+
         this.bagInventory.Size = character.BagSlots;
     }
 
@@ -272,9 +271,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     {
         GD.Print($"Clicked on a block at {pos}, no custom action defined, dig it.");
 
-        var blocksCell = this.blocks.GetCellv(pos);
-        var blocksCellTile = this.blocks.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-
         if (!header.Character.CanDig)
         {
             return;
@@ -285,7 +281,8 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             floatingTextManager.ShowValue("Too tired", this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(0.60f, 0.85f, 0.91f));
             return;
         }
-        var definition = BlocksDefinition.KnownBlocks[(blocksCell, (int)blocksCellTile.x, (int)blocksCellTile.y)];
+
+        var definition = Meta[pos];
 
         if (definition.HP == 0)
         {
@@ -301,54 +298,42 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
         this.header.CurrentStamina--;
 
-        var metaName = $"HP_{pos}";
-
-        definition.OnClickMove(this, pos);
-
-        var currentHp = (int)this.blocks.GetMeta(metaName);
-
-        var digPower = this.header.Character.DigPower;
-        if (currentHp > digPower)
+        var isDead = definition.OnClickMove(this, pos);
+        if (isDead)
         {
-            floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-digPower).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 1, 0));
-            currentFloatingsDelay += floatingDelay;
-            this.blocks.SetMeta(metaName, currentHp - digPower);
-            return;
-        }
+            var loots = definition.Loot;
 
-        floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-currentHp).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(1, 1, 0));
-        currentFloatingsDelay += floatingDelay;
-
-        var loots = (int[])this.blocks.GetMeta($"Loot_{pos}");
-
-        foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
-        {
-            this.blocks.SetMeta(meta, null);
-        }
-        this.blocks.SetMeta(metaName, null);
-        this.blocks.SetCellv(pos, -1);
-
-        foreach (var loot in loots)
-        {
-            if (this.loot.GetCellv(pos) == -1 && this.blocks.GetCellv(pos) == -1)
+            // Clear block and its meta 
+            this.blocks.SetCellv(pos, -1);
+            foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
             {
-                this.loot.SetCellv(pos, loot);
-                continue;
+                this.blocks.SetMeta(meta, null);
             }
 
-            foreach (var dir in cardinalDirections)
+            // Drop loot
+            foreach (var loot in loots)
             {
-                if (this.loot.GetCellv(pos + dir) == -1 && this.blocks.GetCellv(pos + dir) == -1)
+                if (this.loot.GetCellv(pos) == -1 && this.blocks.GetCellv(pos) == -1)
                 {
-                    this.loot.SetCellv(pos + dir, loot);
-                    break;
+                    this.loot.SetCellv(pos, loot.Item1, autotileCoord: new Vector2(loot.Item2, loot.Item3));
+                    continue;
+                }
+
+                foreach (var dir in cardinalDirections)
+                {
+                    if (this.loot.GetCellv(pos + dir) == -1 && this.blocks.GetCellv(pos + dir) == -1)
+                    {
+                        this.loot.SetCellv(pos + dir, loot.Item1, autotileCoord: new Vector2(loot.Item2, loot.Item3));
+                        break;
+                    }
                 }
             }
-        }
 
-        foreach (var dir in cardinalDirections)
-        {
-            UnFogCell(pos + dir);
+            // Unfog nearby cells
+            foreach (var dir in cardinalDirections)
+            {
+                UnFogCell(pos + dir);
+            }
         }
     }
 
@@ -356,7 +341,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     {
         foreach (Vector2 cell in this.fog.GetUsedCellsById(Fog.NoFog.Item1))
         {
-            this.fog.SetCellv(cell, Fog.Basic.Item1);
+            this.fog.SetCellv(cell, Fog.Basic.Item1, autotileCoord: new Vector2(Fog.Basic.Item2, Fog.Basic.Item3));
         }
 
         foreach (Vector2 pos in this.fog.GetUsedCellsById(Fog.UnfogStart.Item1))
@@ -386,7 +371,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
             this.fog.SetCellv(cell, Fog.NoFog.Item1);
 
-            if (this.blocks.GetCellv(cell) != -1 && BlocksDefinition.KnownBlocks[(this.blocks.GetCellv(cell), 0, 0)].FogBlocker)  // Blocks are not removed from the cell
+            if (this.blocks.GetCellv(cell) != -1 && !this.Meta[cell].NoFogBlocker)  // Blocks are not removed from the cell
             {
                 continue;
             }
@@ -410,11 +395,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         }
     }
 
-    public void AddBuff(Buff staminaRegen)
-    {
-        this.header.AddBuff(staminaRegen);
-    }
-
     public void GetNeighbors(Vector2 node, ICollection<Vector2> result)
     {
         if (this.blocks.GetCellv(node - Vector2.Down) == -1 && this.floor.GetCellv(node - Vector2.Down) != -1) result.Add(node - Vector2.Down);
@@ -432,7 +412,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         f.StorePascalString(JsonConvert.SerializeObject(this.loot.GetUsedCells().Cast<Vector2>().Select(a => (a, this.loot.GetCellv(a))).ToList()));
         f.StorePascalString(JsonConvert.SerializeObject(this.blocks.GetUsedCells().Cast<Vector2>().Select(a => (a, this.blocks.GetCellv(a))).ToList()));
         f.StorePascalString(JsonConvert.SerializeObject(this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.blocks.GetMetaList().Select(a => (a, JsonConvert.SerializeObject(this.blocks.GetMeta(a)))).ToList()));
+        f.StorePascalString(JsonConvert.SerializeObject(this.Meta.ToList()));
         f.Close();
 
         this.header.Save();
@@ -466,24 +446,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
             JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
             JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
-            JsonConvert.DeserializeObject<List<(string, string)>>(f.GetPascalString()).ForEach(a =>
-                {
-                    var name = a.Item1;
-                    if (name.StartsWith("HP_"))
-                    {
-                        this.blocks.SetMeta(a.Item1, JsonConvert.DeserializeObject<uint>(a.Item2));
-                    }
-                    else
-                    if (name.StartsWith("Loot_"))
-                    {
-                        this.blocks.SetMeta(a.Item1, JsonConvert.DeserializeObject<List<int>>(a.Item2));
-                    }
-                    else
-                    if (name.StartsWith("Move_"))
-                    {
-                        this.blocks.SetMeta(a.Item1, JsonConvert.DeserializeObject<float>(a.Item2));
-                    }
-                });
+            this.Meta = JsonConvert.DeserializeObject<List<KeyValuePair<Vector2, BlocksDefinition>>>(f.GetPascalString()).ToDictionary(a => a.Key, a => a.Value);
             f.Close();
         }
 
