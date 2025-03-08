@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -37,6 +38,18 @@ public class BlocksDefinition
 {
     private static Random random = new Random();
 
+    public void OnClickMove(BaseLevel level, Vector2 pos)
+    {
+        if (AttackPower > 0)
+        {
+            OnClickAttack(level, pos, AttackPower);
+        }
+        if (SpawnEnemy.Item1 >= 0)
+        {
+            OnClickSpawn(level, pos, SpawnEnemy);
+        }
+    }
+
     private static void OnClickAttack(BaseLevel level, Vector2 pos, int power)
     {
         const float floatingDelay = 0.3f;
@@ -59,7 +72,7 @@ public class BlocksDefinition
         }
     }
 
-    private static void OnCickSpawn(BaseLevel level, Vector2 pos, ValueTuple<int, int, int> spawnBlock)
+    private static void OnClickSpawn(BaseLevel level, Vector2 pos, ValueTuple<int, int, int> spawnBlock)
     {
         var possibleSpawns = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(dir => pos + dir)
@@ -71,6 +84,18 @@ public class BlocksDefinition
             var spawn = possibleSpawns[random.Next(possibleSpawns.Count)];
             level.BlocksMap.SetCellv(spawn, spawnBlock.Item1, autotileCoord: new Vector2(spawnBlock.Item2, spawnBlock.Item3));
         }
+    }
+
+    public bool OnTickMove(BaseLevel level, Vector2 pos, float delta)
+    {
+        var result = OnTickCanAct(level, pos, delta, this.MoveDelay) &&
+                (this.MoveToLoot && OnTickMoveToLootInternal(level, pos) || OnTickRandomMoveInternal(level, pos, this.MoveFloors)) &&
+                OnTickFollowPath(level, pos);
+        if (this.CanPickLoot)
+        {
+            OnTickTryGrabLoot(level, pos);
+        }
+        return result;
     }
 
     private static bool OnTickCanAct(BaseLevel level, Vector2 pos, float delta, float moveDelay)
@@ -91,12 +116,11 @@ public class BlocksDefinition
         return true;
     }
 
-    private static bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos, params (int, int, int)[] moveFloors)
+    private static bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos, HashSet<(int, int, int)> moveFloors)
     {
-        var moveFloor = new HashSet<(int, int, int)>(moveFloors);
         var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(dir => pos + dir)
-            .Where(cell => moveFloor.Contains((level.FloorMap.GetCell((int)cell.x, (int)cell.y), 0, 0)))
+            .Where(cell => moveFloors.Contains((level.FloorMap.GetCell((int)cell.x, (int)cell.y), 0, 0)))
             .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1)
             .ToList();
 
@@ -146,20 +170,6 @@ public class BlocksDefinition
         return true;
     }
 
-    private static bool OnTickRandomMove(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
-    {
-        return OnTickCanAct(level, pos, delta, moveDelay) &&
-               OnTickRandomMoveInternal(level, pos, moveFloors) &&
-               OnTickFollowPath(level, pos);
-    }
-
-    private static bool OnTickMoveToLoot(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
-    {
-        return OnTickCanAct(level, pos, delta, moveDelay) &&
-                (OnTickMoveToLootInternal(level, pos) || OnTickRandomMoveInternal(level, pos, moveFloors)) &&
-                OnTickFollowPath(level, pos);
-    }
-
     private static void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
     {
         var loot = level.LootMap.GetCellv(pos);
@@ -174,37 +184,39 @@ public class BlocksDefinition
     }
 
     public static Dictionary<ValueTuple<int, int, int>, BlocksDefinition> KnownBlocks = new Dictionary<ValueTuple<int, int, int>, BlocksDefinition>{
-        { Blocks.Wood,            new BlocksDefinition{HP = 2                    } },
-        { Blocks.Steel,           new BlocksDefinition{HP = 3                    } },
-        { Blocks.Wardrobe,        new BlocksDefinition{HP = 4                    } },
-        { Blocks.Grass,           new BlocksDefinition{HP = 1                    } },
-        { Blocks.Shopkeeper,      new BlocksDefinition{                          } },
-        { Blocks.Blacksmith,      new BlocksDefinition{                          } },
-        { Blocks.RedHat,          new BlocksDefinition{                          } },
-        { Blocks.Tree,            new BlocksDefinition{HP = 3                    } },
-        { Blocks.Tree2,           new BlocksDefinition{HP = 3                    } },
-        { Blocks.Wolf,            new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 4);},         OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 5, Floor.Ground, Floor.Tiles);} }},
-        { Blocks.Wall,            new BlocksDefinition{                          } },
-        { Blocks.Fish,            new BlocksDefinition{                                                                                                     OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 1, Floor.Water);} }},
-        { Blocks.Wasp,            new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 10);},        OnTickAction = (level, pos, delta) => {return OnTickRandomMove(level, pos, delta, 0.5f, Floor.Ground, Floor.Tiles, Floor.Water);} }},
-        { Blocks.WaspNest,        new BlocksDefinition{HP = 3,                     OnClickAction = (level, pos) => {OnCickSpawn(level, pos, Blocks.Wasp);}} },
-        { Blocks.StairsUp,        new BlocksDefinition{                          } },
-        { Blocks.StairsDown,      new BlocksDefinition{                          } },
+        { Blocks.Wood,            new BlocksDefinition{HP = 2,} },
+        { Blocks.Steel,           new BlocksDefinition{HP = 3,} },
+        { Blocks.Wardrobe,        new BlocksDefinition{HP = 4,} },
+        { Blocks.Grass,           new BlocksDefinition{HP = 1,} },
+        { Blocks.Shopkeeper,      new BlocksDefinition{} },
+        { Blocks.Blacksmith,      new BlocksDefinition{} },
+        { Blocks.RedHat,          new BlocksDefinition{} },
+        { Blocks.Tree,            new BlocksDefinition{HP = 3,} },
+        { Blocks.Tree2,           new BlocksDefinition{HP = 3,} },
+        { Blocks.Wolf,            new BlocksDefinition{HP = 2, AttackPower = 4,  MoveDelay = 5,    MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles} }},
+        { Blocks.Wall,            new BlocksDefinition{} },
+        { Blocks.Fish,            new BlocksDefinition{                          MoveDelay = 1,    MoveFloors = new HashSet<(int, int, int)>{Floor.Water} }},
+        { Blocks.Wasp,            new BlocksDefinition{HP = 2, AttackPower = 10, MoveDelay = 0.5f, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles, Floor.Water} }},
+        { Blocks.WaspNest,        new BlocksDefinition{HP = 3, SpawnEnemy = Blocks.Wasp} },
+        { Blocks.StairsUp,        new BlocksDefinition{} },
+        { Blocks.StairsDown,      new BlocksDefinition{} },
         { Blocks.Sign,            new BlocksDefinition{        FogBlocker = false} },
-        { Blocks.Woodcutter,      new BlocksDefinition{                          } },
-        { Blocks.BlacksmithHouse, new BlocksDefinition{                          } },
-        { Blocks.Inn,             new BlocksDefinition{                          } },
-        { Blocks.Stash,           new BlocksDefinition{                          } },
-        { Blocks.Grandma,         new BlocksDefinition{                          } },
-        { Blocks.Door,            new BlocksDefinition{                          } },
-        { Blocks.Slime,           new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 1);},         OnTickAction = (level, pos, delta) => {OnTickTryGrabLoot(level, pos); return OnTickMoveToLoot(level, pos, delta, 2, Floor.Ground, Floor.Tiles);} }},
+        { Blocks.Woodcutter,      new BlocksDefinition{} },
+        { Blocks.BlacksmithHouse, new BlocksDefinition{} },
+        { Blocks.Inn,             new BlocksDefinition{} },
+        { Blocks.Stash,           new BlocksDefinition{} },
+        { Blocks.Grandma,         new BlocksDefinition{} },
+        { Blocks.Door,            new BlocksDefinition{} },
+        { Blocks.Slime,           new BlocksDefinition{HP = 2, AttackPower = 1,  MoveDelay = 2, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}, CanPickLoot = true, MoveToLoot = true }},
     };
 
 
     public uint HP;
-
     public bool FogBlocker = true;
-
-    public Action<BaseLevel, Vector2> OnClickAction;
-    public Func<BaseLevel, Vector2, float, bool> OnTickAction;
+    public float MoveDelay = float.PositiveInfinity;
+    public bool CanPickLoot = false;
+    public bool MoveToLoot = false;
+    public HashSet<(int, int, int)> MoveFloors = new HashSet<(int, int, int)>();
+    public int AttackPower;
+    public (int, int, int) SpawnEnemy = (-1, -1, -1);
 }

@@ -102,7 +102,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             var usedells = blocks.GetUsedCellsById(definition.Key.Item1);
             foreach (Vector2 pos in usedells)
             {
-                moveDone = definition.Value.OnTickAction?.Invoke(this, pos, delta) ?? false;
+                moveDone = definition.Value.OnTickMove(this, pos, delta);
             }
         }
         if (moveDone)
@@ -303,7 +303,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
         var metaName = $"HP_{pos}";
 
-        definition.OnClickAction?.Invoke(this, pos);
+        definition.OnClickMove(this, pos);
 
         var currentHp = (int)this.blocks.GetMeta(metaName);
 
