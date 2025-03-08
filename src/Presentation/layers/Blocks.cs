@@ -73,7 +73,7 @@ public class BlocksDefinition
         }
     }
 
-    private static bool OnTickRandomMove(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
+    private static bool OnTickCanAct(BaseLevel level, Vector2 pos, float delta, float moveDelay)
     {
         var metaName = $"Move_{pos}";
         if (!level.BlocksMap.HasMeta(metaName))
@@ -88,11 +88,10 @@ public class BlocksDefinition
         }
 
         level.BlocksMap.SetMeta(metaName, moveDelay);
-
-        return OnTickRandomMoveInternal(level, pos, delta, moveDelay, moveFloors);
+        return true;
     }
 
-    private static bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
+    private static bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos, params (int, int, int)[] moveFloors)
     {
         var moveFloor = new HashSet<(int, int, int)>(moveFloors);
         var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
@@ -107,12 +106,14 @@ public class BlocksDefinition
         }
 
         var move = possibleMoves[random.Next(possibleMoves.Count)];
-        Move(level, pos, move);
+        level.BlocksMap.SetMeta($"Path_{pos}", move);
         return true;
     }
 
-    private static void Move(BaseLevel level, Vector2 pos, Vector2 move)
+    private static bool OnTickFollowPath(BaseLevel level, Vector2 pos)
     {
+        var move = (Vector2)level.BlocksMap.GetMeta($"Path_{pos}");
+
         level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
         level.BlocksMap.SetCellv(pos, -1);
 
@@ -123,43 +124,40 @@ public class BlocksDefinition
             level.BlocksMap.SetMeta(metaString + move, level.BlocksMap.GetMeta(meta));
             level.BlocksMap.SetMeta(meta, null);
         }
+
+        return true;
+    }
+
+    private static bool OnTickMoveToLootInternal(BaseLevel level, Vector2 pos)
+    {
+        var metaPathName = $"Path_{pos}";
+        level.BlocksMap.RemoveMeta(metaPathName);
+
+        var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
+        pathfinder.Search(pos, level.LootMap.GetUsedCells().Cast<Vector2>().ToHashSet());
+        var path = pathfinder.ResultPath;
+
+        if (path == null || path.Count == 0)
+        {
+            return false;
+        }
+
+        level.BlocksMap.SetMeta(metaPathName, path.Skip(1).Take(1).FirstOrDefault());
+        return true;
+    }
+
+    private static bool OnTickRandomMove(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
+    {
+        return OnTickCanAct(level, pos, delta, moveDelay) &&
+               OnTickRandomMoveInternal(level, pos, moveFloors) &&
+               OnTickFollowPath(level, pos);
     }
 
     private static bool OnTickMoveToLoot(BaseLevel level, Vector2 pos, float delta, float moveDelay, params (int, int, int)[] moveFloors)
     {
-        var moveFloor = new HashSet<(int, int, int)>(moveFloors);
-        var metaName = $"Move_{pos}";
-        if (!level.BlocksMap.HasMeta(metaName))
-        {
-            level.BlocksMap.SetMeta(metaName, (float)random.NextDouble() * moveDelay);
-        }
-
-        if ((float)level.BlocksMap.GetMeta(metaName) >= 0)
-        {
-            level.BlocksMap.SetMeta(metaName, (float)level.BlocksMap.GetMeta(metaName) - delta);
-            return false;
-        }
-
-        level.BlocksMap.SetMeta(metaName, moveDelay);
-
-        var metaPathName = $"Path_{pos}";
-        if (!level.BlocksMap.HasMeta(metaPathName) || ((Vector2[])level.BlocksMap.GetMeta(metaPathName)).Length == 0)
-        {
-            var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
-            pathfinder.Search(pos, level.LootMap.GetUsedCells().Cast<Vector2>().ToHashSet());
-            level.BlocksMap.SetMeta(metaPathName, pathfinder.ResultPath.Skip(1).ToArray());
-        }
-
-        var path = (Vector2[])level.BlocksMap.GetMeta(metaPathName);
-        if (path.Length == 0)
-        {
-            return OnTickRandomMoveInternal(level, pos, delta, moveDelay, moveFloors);
-        }
-
-        var move = path[0];
-        level.BlocksMap.SetMeta(metaPathName, path.Skip(1).ToArray());
-        Move(level, pos, move);
-        return true;
+        return OnTickCanAct(level, pos, delta, moveDelay) &&
+                (OnTickMoveToLootInternal(level, pos) || OnTickRandomMoveInternal(level, pos, moveFloors)) &&
+                OnTickFollowPath(level, pos);
     }
 
     private static void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
@@ -201,6 +199,7 @@ public class BlocksDefinition
         { Blocks.Door,            new BlocksDefinition{                          } },
         { Blocks.Slime,           new BlocksDefinition{HP = 2,                     OnClickAction = (level, pos) => {OnClickAttack(level, pos, 1);},         OnTickAction = (level, pos, delta) => {OnTickTryGrabLoot(level, pos); return OnTickMoveToLoot(level, pos, delta, 2, Floor.Ground, Floor.Tiles);} }},
     };
+
 
     public uint HP;
 
