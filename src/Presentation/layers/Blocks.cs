@@ -38,12 +38,16 @@ public class BlocksDefinition
 {
     private static Random random = new Random();
 
-    public bool OnClickMove(BaseLevel level, Vector2 pos)
+    public void OnClickMove(BaseLevel level, Vector2 pos)
     {
-        var isDead = false;
+        if (this.IsDead)
+        {
+            return;
+        }
+
         if (this.HP > 0)
         {
-            isDead = OnClickDefend(level, pos);
+            this.IsDead |= OnClickDefend(level, pos);
         }
         if (this.AttackPower > 0)
         {
@@ -53,7 +57,17 @@ public class BlocksDefinition
         {
             OnClickSpawn(level, pos);
         }
-        return isDead;
+        this.IsAgressive = true;
+        if (this.Group >= 0)
+        {
+            foreach (var kvp in level.Meta)
+            {
+                if (this.Group == kvp.Value.Group)
+                {
+                    kvp.Value.IsAgressive = true;
+                }
+            }
+        }
     }
 
     private bool OnClickDefend(BaseLevel level, Vector2 pos)
@@ -107,14 +121,76 @@ public class BlocksDefinition
 
     public bool OnTickMove(BaseLevel level, Vector2 pos, float delta)
     {
-        var result = OnTickCanAct(delta) &&
-                (this.MoveToLoot && OnTickMoveToLootInternal(level, pos) || OnTickRandomMoveInternal(level, pos)) &&
-                OnTickFollowPath(level, pos);
+        if (this.IsDead)
+        {
+            return false;
+        }
+
+        if (!OnTickCanAct(delta))
+        {
+            return false;
+        }
+
+        Vector2? path = null;
+        if (this.IsAgressive && path == null && this.AttackPower > 0)
+        {
+            path = GetPathToOtherGroup(level, pos);
+        }
+        if (this.MoveToLoot && path == null)
+        {
+            path = GetPathToLoot(level, pos);
+        }
+        if (path == null)
+        {
+            path = GetPathToRandomLocation(level, pos);
+        }
+        if (path != null)
+        {
+            OnTickFollowPath(level, pos, path.Value);
+            pos = path.Value;
+        }
         if (this.CanPickLoot)
         {
             OnTickTryGrabLoot(level, pos);
         }
-        return result;
+        if (this.IsAgressive && this.AttackPower > 0)
+        {
+            OnTickTryAttackOtherGroup(level, pos);
+        }
+        return path != null;
+    }
+
+    private void OnTickTryAttackOtherGroup(BaseLevel level, Vector2 pos)
+    {
+        const float floatingDelay = 0.3f;
+        var currentFloatingsDelay = 0f;
+
+        var opponent = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+            .Select(a => a + pos)
+            .Where(a => level.Meta.ContainsKey(a))
+            .Select(a => (a, level.Meta[a]))
+            .Where(a => a.Item2.Group != this.Group)
+            .Where(a => a.Item2.Group != -1)
+            .OrderBy(a => a.Item2.HP)
+            .FirstOrDefault();
+
+        if (opponent.Item2 == null)
+        {
+            return;
+        }
+        var hitPower = (uint)Math.Min(opponent.Item2.HP, this.AttackPower);
+        opponent.Item2.HP -= hitPower;
+        level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-hitPower).ToString(), level.BlocksMap.MapToWorld(opponent.Item1) + level.BlocksMap.CellSize / 2, new Color(1, 1, 0));
+        currentFloatingsDelay += floatingDelay;
+        if (opponent.Item2.HP == 0)
+        {
+            var buffPath = $"res://Presentation/buffs/{Buff.Dead}.tscn";
+            var buffInstance = ResourceLoader.Load<PackedScene>(buffPath).Instance<BaseBuff>();
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, buffInstance, level.BlocksMap.MapToWorld(opponent.Item1) + level.BlocksMap.CellSize / 2);
+            currentFloatingsDelay += floatingDelay;
+
+            opponent.Item2.IsDead |= true;
+        }
     }
 
     private bool OnTickCanAct(float delta)
@@ -140,7 +216,7 @@ public class BlocksDefinition
         return false;
     }
 
-    private bool OnTickRandomMoveInternal(BaseLevel level, Vector2 pos)
+    private Vector2? GetPathToRandomLocation(BaseLevel level, Vector2 pos)
     {
         var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(dir => pos + dir)
@@ -150,40 +226,58 @@ public class BlocksDefinition
 
         if (possibleMoves.Count <= 0)
         {
-            return false;
+            return null;
         }
 
-        this.Path = possibleMoves[random.Next(possibleMoves.Count)];
-        return true;
+        return possibleMoves[random.Next(possibleMoves.Count)];
     }
 
-    private bool OnTickFollowPath(BaseLevel level, Vector2 pos)
-    {
-        var move = this.Path;
-
-        level.Meta[move] = level.Meta[pos];
-
-        level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
-        level.BlocksMap.SetCellv(pos, -1);
-
-        level.Meta.Remove(pos);
-
-        return true;
-    }
-
-    private bool OnTickMoveToLootInternal(BaseLevel level, Vector2 pos)
+    private Vector2? GetPathToLoot(BaseLevel level, Vector2 pos)
     {
         var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
         pathfinder.Search(pos, level.LootMap.GetUsedCells().Cast<Vector2>().ToHashSet());
         var path = pathfinder.ResultPath;
 
-        if (path == null || path.Count == 0)
+        if (path == null || path.Count < 2)
         {
-            return false;
+            return null;
         }
 
-        this.Path = path.Skip(1).Take(1).FirstOrDefault();
-        return true;
+        return path.Skip(1).Take(1).FirstOrDefault();
+    }
+
+    private Vector2? GetPathToOtherGroup(BaseLevel level, Vector2 pos)
+    {
+        var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
+        pathfinder.Search(pos, level.Meta
+            .Where(a => a.Value.Group != this.Group)
+            .Where(a => a.Value.Group >= 0)
+            .Select(a => a.Key)
+            .SelectMany(a => new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }.Select(b => b + a))
+            .ToHashSet());
+        var path = pathfinder.ResultPath;
+
+        if (path == null || path.Count < 2 )
+        {
+            return null;
+        }
+
+        return path.Skip(1).Take(1).FirstOrDefault();
+    }
+
+    private void OnTickFollowPath(BaseLevel level, Vector2 pos, Vector2 move)
+    {
+        level.Meta[move] = level.Meta[pos];
+
+        if (level.BlocksMap.GetCellv(move) != -1)
+        {
+            GD.Print(move);
+        }
+
+        level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
+        level.BlocksMap.SetCellv(pos, -1);
+
+        level.Meta.Remove(pos);
     }
 
     private void OnTickTryGrabLoot(BaseLevel level, Vector2 pos)
@@ -195,7 +289,6 @@ public class BlocksDefinition
         }
 
         this.Loot.Add((loot, 0, 0));
-        GD.Print(this.Loot.Count);
         level.LootMap.SetCellv(pos, -1);
     }
 
@@ -209,7 +302,7 @@ public class BlocksDefinition
         { Blocks.RedHat,          new BlocksDefinition{} },
         { Blocks.Tree,            new BlocksDefinition{HP = 3,} },
         { Blocks.Tree2,           new BlocksDefinition{HP = 3,} },
-        { Blocks.Wolf,            new BlocksDefinition{HP = 2, AttackPower = 4,  MoveDelay = 5,    MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles} }},
+        { Blocks.Wolf,            new BlocksDefinition{HP = 2, /* IsAgressive = true, */ AttackPower = 4,  MoveDelay = 5,    MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles} }},
         { Blocks.Wall,            new BlocksDefinition{} },
         { Blocks.Fish,            new BlocksDefinition{                          MoveDelay = 1,    MoveFloors = new HashSet<(int, int, int)>{Floor.Water} }},
         { Blocks.Wasp,            new BlocksDefinition{HP = 2, AttackPower = 10, MoveDelay = 0.5f, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles, Floor.Water} }},
@@ -239,7 +332,8 @@ public class BlocksDefinition
             AttackPower = this.AttackPower,
             SpawnEnemy = this.SpawnEnemy,
             IsDead = this.IsDead,
-            Loot = new List<(int, int, int)>(this.Loot)
+            Loot = new List<(int, int, int)>(this.Loot),
+            Group = this.Group
         };
     }
 
@@ -254,5 +348,6 @@ public class BlocksDefinition
     public (int, int, int)? SpawnEnemy;
     public bool IsDead;
     public List<(int, int, int)> Loot = new List<(int, int, int)>();
-    public Vector2 Path;
+    public int Group;
+    public bool IsAgressive = true;
 }

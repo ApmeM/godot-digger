@@ -77,6 +77,10 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
                 definition.Loot.Add((this.loot.GetCellv(cell), 0, 0));
                 this.loot.SetCellv(cell, -1);
             }
+
+            definition.Group = this.groups.GetCellv(cell);
+            this.groups.SetCellv(cell, -1);
+
             this.Meta[cell] = definition;
         }
 
@@ -102,6 +106,11 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         {
             var definition = this.Meta[cell];
             moveDone |= definition.OnTickMove(this, cell, delta);
+        }
+
+        foreach (var def in this.Meta.Where(a => a.Value.IsDead).ToList())
+        {
+            DoDead(def.Value, def.Key);
         }
 
         if (moveDone)
@@ -298,42 +307,48 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
         this.header.CurrentStamina--;
 
-        var isDead = definition.OnClickMove(this, pos);
-        if (isDead)
+        definition.OnClickMove(this, pos);
+        if (definition.IsDead)
         {
-            var loots = definition.Loot;
+            DoDead(definition, pos);
+        }
+    }
 
-            // Clear block and its meta 
-            this.blocks.SetCellv(pos, -1);
-            foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
+    private void DoDead(BlocksDefinition definition, Vector2 pos)
+    {
+        var loots = definition.Loot;
+
+        // Clear block and its meta 
+        this.blocks.SetCellv(pos, -1);
+        this.Meta.Remove(pos);
+        foreach (var meta in this.blocks.GetMetaList().Where(a => a.EndsWith(pos.ToString())))
+        {
+            this.blocks.SetMeta(meta, null);
+        }
+
+        // Drop loot
+        foreach (var loot in loots)
+        {
+            if (this.loot.GetCellv(pos) == -1 && this.blocks.GetCellv(pos) == -1)
             {
-                this.blocks.SetMeta(meta, null);
+                this.loot.SetCellv(pos, loot.Item1, autotileCoord: new Vector2(loot.Item2, loot.Item3));
+                continue;
             }
 
-            // Drop loot
-            foreach (var loot in loots)
-            {
-                if (this.loot.GetCellv(pos) == -1 && this.blocks.GetCellv(pos) == -1)
-                {
-                    this.loot.SetCellv(pos, loot.Item1, autotileCoord: new Vector2(loot.Item2, loot.Item3));
-                    continue;
-                }
-
-                foreach (var dir in cardinalDirections)
-                {
-                    if (this.loot.GetCellv(pos + dir) == -1 && this.blocks.GetCellv(pos + dir) == -1)
-                    {
-                        this.loot.SetCellv(pos + dir, loot.Item1, autotileCoord: new Vector2(loot.Item2, loot.Item3));
-                        break;
-                    }
-                }
-            }
-
-            // Unfog nearby cells
             foreach (var dir in cardinalDirections)
             {
-                UnFogCell(pos + dir);
+                if (this.loot.GetCellv(pos + dir) == -1 && this.blocks.GetCellv(pos + dir) == -1)
+                {
+                    this.loot.SetCellv(pos + dir, loot.Item1, autotileCoord: new Vector2(loot.Item2, loot.Item3));
+                    break;
+                }
             }
+        }
+
+        // Unfog nearby cells
+        foreach (var dir in cardinalDirections)
+        {
+            UnFogCell(pos + dir);
         }
     }
 

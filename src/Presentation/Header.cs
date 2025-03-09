@@ -105,7 +105,7 @@ public partial class Header
     public BaseBuff AddBuff(Buff buff)
     {
         var buffPath = $"res://Presentation/buffs/{buff}.tscn";
-        var buffInstance = ResourceLoader.Load<PackedScene>($"res://Presentation/buffs/{buff}.tscn").Instance<BaseBuff>();
+        var buffInstance = ResourceLoader.Load<PackedScene>(buffPath).Instance<BaseBuff>();
         buffInstance.Connect(nameof(BaseBuff.BuffRemoved), this, nameof(BuffRemoved), new Godot.Collections.Array { buffInstance });
         buffInstance.Connect(CommonSignals.Pressed, this, nameof(BuffClicked), new Godot.Collections.Array { buffInstance });
         this.buffContainer.AddChild(buffInstance);
