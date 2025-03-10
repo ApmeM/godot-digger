@@ -45,66 +45,42 @@ public class BlocksDefinition
             return;
         }
 
-        if (this.HP > 0)
+        var player = new BlocksDefinition
         {
-            this.IsDead |= OnClickDefend(level, pos);
-        }
-        if (this.AttackPower > 0)
-        {
-            OnClickAttack(level, pos);
-        }
-        if (this.SpawnEnemy.HasValue)
-        {
-            OnClickSpawn(level, pos);
-        }
-        this.IsAgressive = true;
-        if (this.Group >= 0)
-        {
-            foreach (var kvp in level.Meta)
-            {
-                if (this.Group == kvp.Value.Group)
-                {
-                    kvp.Value.IsAgressive = true;
-                }
-            }
-        }
-    }
+            HP = level.HeaderControl.CurrentHp,
+            AttackPower = (int)level.HeaderControl.Character.DigPower,
+            ShouldShowDead = true
+        };
 
-    private bool OnClickDefend(BaseLevel level, Vector2 pos)
-    {
         const float floatingDelay = 0.3f;
         var currentFloatingsDelay = 0f;
-
-        var hitPower = Math.Min(this.HP, level.HeaderControl.Character.DigPower);
-        this.HP -= hitPower;
-        level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-hitPower).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 1, 0));
-        currentFloatingsDelay += floatingDelay;
-        return this.HP == 0;
-    }
-
-    private void OnClickAttack(BaseLevel level, Vector2 pos)
-    {
-        const float floatingDelay = 0.3f;
-        var currentFloatingsDelay = 0f;
-
-        if (this.AttackPower > level.HeaderControl.CurrentHp)
+        var actions1 = Battle(level, this, player, pos);
+        var popupPos1 = level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2;
+        foreach (var action in actions1)
         {
-            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-level.HeaderControl.CurrentHp).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
-            currentFloatingsDelay += floatingDelay;
-            level.HeaderControl.CurrentHp = 0;
-            var buff = level.HeaderControl.AddBuff(Buff.Dead);
-            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (Control)buff.Duplicate(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2);
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, action, popupPos1);
             currentFloatingsDelay += floatingDelay;
         }
-        else
+        GD.Print($"before: {this.HP}");
+
+        currentFloatingsDelay = 0f;
+        var actions2 = Battle(level, player, this, pos);
+        var popupPos2 = level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2;
+        foreach (var action in actions2)
         {
-            level.HeaderControl.CurrentHp -= (uint)this.AttackPower;
-            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-this.AttackPower).ToString(), level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2, new Color(1, 0, 0));
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, action, popupPos2);
             currentFloatingsDelay += floatingDelay;
+        }
+        GD.Print($"after: {this.HP}");
+
+        level.HeaderControl.CurrentHp = player.HP;
+        if (player.IsDead)
+        {
+            level.HeaderControl.AddBuff(Buff.Dead);
         }
     }
 
-    private void OnClickSpawn(BaseLevel level, Vector2 pos)
+    private static void OnClickSpawn(BaseLevel level, BlocksDefinition definition, Vector2 pos)
     {
         var possibleSpawns = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(dir => pos + dir)
@@ -114,8 +90,10 @@ public class BlocksDefinition
         if (possibleSpawns.Count > 0)
         {
             var spawn = possibleSpawns[random.Next(possibleSpawns.Count)];
-            level.Meta[spawn] = BlocksDefinition.KnownBlocks[this.SpawnEnemy.Value].Clone();
-            level.BlocksMap.SetCellv(spawn, this.SpawnEnemy.Value.Item1, autotileCoord: new Vector2(this.SpawnEnemy.Value.Item2, this.SpawnEnemy.Value.Item3));
+            level.Meta[spawn] = BlocksDefinition.KnownBlocks[definition.SpawnEnemy.Value].Clone();
+            level.Meta[spawn].Group = definition.Group;
+            level.Meta[spawn].IsAgressive = definition.IsAgressive;
+            level.BlocksMap.SetCellv(spawn, definition.SpawnEnemy.Value.Item1, autotileCoord: new Vector2(definition.SpawnEnemy.Value.Item2, definition.SpawnEnemy.Value.Item3));
         }
     }
 
@@ -162,9 +140,6 @@ public class BlocksDefinition
 
     private void OnTickTryAttackOtherGroup(BaseLevel level, Vector2 pos)
     {
-        const float floatingDelay = 0.3f;
-        var currentFloatingsDelay = 0f;
-
         var opponent = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
             .Select(a => a + pos)
             .Where(a => level.Meta.ContainsKey(a))
@@ -178,19 +153,72 @@ public class BlocksDefinition
         {
             return;
         }
-        var hitPower = (uint)Math.Min(opponent.Item2.HP, this.AttackPower);
-        opponent.Item2.HP -= hitPower;
-        level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, (-hitPower).ToString(), level.BlocksMap.MapToWorld(opponent.Item1) + level.BlocksMap.CellSize / 2, new Color(1, 1, 0));
-        currentFloatingsDelay += floatingDelay;
-        if (opponent.Item2.HP == 0)
-        {
-            var buffPath = $"res://Presentation/buffs/{Buff.Dead}.tscn";
-            var buffInstance = ResourceLoader.Load<PackedScene>(buffPath).Instance<BaseBuff>();
-            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, buffInstance, level.BlocksMap.MapToWorld(opponent.Item1) + level.BlocksMap.CellSize / 2);
-            currentFloatingsDelay += floatingDelay;
 
-            opponent.Item2.IsDead |= true;
+        const float floatingDelay = 0.3f;
+        var currentFloatingsDelay = 0f;
+        var actions1 = Battle(level, this, opponent.Item2, opponent.Item1);
+        var popupPos1 = level.BlocksMap.MapToWorld(opponent.Item1) + level.BlocksMap.CellSize / 2;
+        foreach (var action in actions1)
+        {
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, action, popupPos1);
+            currentFloatingsDelay += floatingDelay;
         }
+
+        currentFloatingsDelay = 0f;
+        var actions2 = Battle(level, opponent.Item2, this, pos);
+        var popupPos2 = level.BlocksMap.MapToWorld(pos) + level.BlocksMap.CellSize / 2;
+        foreach (var action in actions2)
+        {
+            level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, action, popupPos2);
+            currentFloatingsDelay += floatingDelay;
+        }
+    }
+
+    private static List<Control> Battle(BaseLevel level, BlocksDefinition attacker, BlocksDefinition defender, Vector2 defenderPos)
+    {
+        var result = new List<Control>();
+
+        if (attacker.AttackPower > 0 && defender.HP > 0)
+        {
+            var hitPower = (uint)Math.Min(attacker.AttackPower, defender.HP);
+            defender.HP -= hitPower;
+            var label = (Label)level.FloatingTextManagerControl.defaultControl.Duplicate();
+            label.Text = $"-{hitPower}";
+            label.Modulate = new Color(1, 0, 0);
+            result.Add(label);
+            if (defender.HP == 0)
+            {
+                defender.IsDead |= true;
+                if (defender.ShouldShowDead)
+                {
+                    var buffPath = $"res://Presentation/buffs/{Buff.Dead}.tscn";
+                    var buffInstance = ResourceLoader.Load<PackedScene>(buffPath).Instance<BaseBuff>();
+                    result.Add(buffInstance);
+                }
+            }
+        }
+
+        if (defender.SpawnEnemy.HasValue)
+        {
+            OnClickSpawn(level, defender, defenderPos);
+        }
+
+        if (!defender.IsAgressive)
+        {
+            defender.IsAgressive = true;
+            if (defender.Group >= 0)
+            {
+                foreach (var kvp in level.Meta)
+                {
+                    if (defender.Group == kvp.Value.Group)
+                    {
+                        kvp.Value.IsAgressive = true;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     private bool OnTickCanAct(float delta)
@@ -257,7 +285,7 @@ public class BlocksDefinition
             .ToHashSet());
         var path = pathfinder.ResultPath;
 
-        if (path == null || path.Count < 2 )
+        if (path == null || path.Count < 2)
         {
             return null;
         }
@@ -302,11 +330,11 @@ public class BlocksDefinition
         { Blocks.RedHat,          new BlocksDefinition{} },
         { Blocks.Tree,            new BlocksDefinition{HP = 3,} },
         { Blocks.Tree2,           new BlocksDefinition{HP = 3,} },
-        { Blocks.Wolf,            new BlocksDefinition{HP = 2, /* IsAgressive = true, */ AttackPower = 4,  MoveDelay = 5,    MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles} }},
+        { Blocks.Wolf,            new BlocksDefinition{HP = 2, ShouldShowDead = true, IsAgressive = true, AttackPower = 4,  MoveDelay = 5,    MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles} }},
         { Blocks.Wall,            new BlocksDefinition{} },
         { Blocks.Fish,            new BlocksDefinition{                          MoveDelay = 1,    MoveFloors = new HashSet<(int, int, int)>{Floor.Water} }},
-        { Blocks.Wasp,            new BlocksDefinition{HP = 2, AttackPower = 10, MoveDelay = 0.5f, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles, Floor.Water} }},
-        { Blocks.WaspNest,        new BlocksDefinition{HP = 3, SpawnEnemy = Blocks.Wasp} },
+        { Blocks.Wasp,            new BlocksDefinition{HP = 2, ShouldShowDead = true, AttackPower = 1, MoveDelay = 0.5f, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles, Floor.Water} }},
+        { Blocks.WaspNest,        new BlocksDefinition{HP = 3, ShouldShowDead = true, SpawnEnemy = Blocks.Wasp} },
         { Blocks.StairsUp,        new BlocksDefinition{} },
         { Blocks.StairsDown,      new BlocksDefinition{} },
         { Blocks.Sign,            new BlocksDefinition{        NoFogBlocker = true} },
@@ -316,7 +344,7 @@ public class BlocksDefinition
         { Blocks.Stash,           new BlocksDefinition{} },
         { Blocks.Grandma,         new BlocksDefinition{} },
         { Blocks.Door,            new BlocksDefinition{} },
-        { Blocks.Slime,           new BlocksDefinition{HP = 2, AttackPower = 1,  MoveDelay = 2, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}, CanPickLoot = true, MoveToLoot = true }},
+        { Blocks.Slime,           new BlocksDefinition{HP = 2, ShouldShowDead = true, AttackPower = 1,  MoveDelay = 2, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}, CanPickLoot = true, MoveToLoot = true }},
     };
 
     public BlocksDefinition Clone()
@@ -333,7 +361,8 @@ public class BlocksDefinition
             SpawnEnemy = this.SpawnEnemy,
             IsDead = this.IsDead,
             Loot = new List<(int, int, int)>(this.Loot),
-            Group = this.Group
+            Group = this.Group,
+            ShouldShowDead = this.ShouldShowDead
         };
     }
 
@@ -349,5 +378,6 @@ public class BlocksDefinition
     public bool IsDead;
     public List<(int, int, int)> Loot = new List<(int, int, int)>();
     public int Group;
-    public bool IsAgressive = true;
+    public bool IsAgressive = false;
+    public bool ShouldShowDead = false;
 }

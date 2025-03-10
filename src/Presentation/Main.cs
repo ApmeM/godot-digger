@@ -26,7 +26,7 @@ public partial class Main
         var game = levelScene.Instance<BaseLevel>();
         game.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
         this.gamePosition.AddChild(game);
-        game.Load();
+        // game.Load();
     }
 
     public override void _Input(InputEvent @event)
