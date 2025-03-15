@@ -61,7 +61,6 @@ public class BlocksDefinition
             level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, action, popupPos1);
             currentFloatingsDelay += floatingDelay;
         }
-        GD.Print($"before: {this.HP}");
 
         currentFloatingsDelay = 0f;
         var actions2 = Battle(level, player, this, pos);
@@ -71,7 +70,6 @@ public class BlocksDefinition
             level.FloatingTextManagerControl.ShowValueDelayed(currentFloatingsDelay, action, popupPos2);
             currentFloatingsDelay += floatingDelay;
         }
-        GD.Print($"after: {this.HP}");
 
         level.HeaderControl.CurrentHp = player.HP;
         if (player.IsDead)
@@ -296,11 +294,6 @@ public class BlocksDefinition
     private void OnTickFollowPath(BaseLevel level, Vector2 pos, Vector2 move)
     {
         level.Meta[move] = level.Meta[pos];
-
-        if (level.BlocksMap.GetCellv(move) != -1)
-        {
-            GD.Print(move);
-        }
 
         level.BlocksMap.SetCellv(move, level.BlocksMap.GetCellv(pos), autotileCoord: level.BlocksMap.GetCellAutotileCoord((int)pos.x, (int)pos.y));
         level.BlocksMap.SetCellv(pos, -1);

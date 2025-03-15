@@ -92,16 +92,17 @@ public partial class Inventory
 
                     for (var i = 0; i < deleteEmpty; i++)
                     {
-                        this.slotContainer.RemoveChild(emptyList[i]);
-                        emptyList[i].QueueFree();
+                        var child = emptyList[i];
+                        child.QueueFree();
+                        this.slotContainer.RemoveChild(child);
                     }
 
                     for (var i = 0; i < deleteNonEmpty - value; i++)
                     {
                         GD.Print("Forced to remove slot with items.");
                         var child = this.slotContainer.GetChild(0);
-                        this.slotContainer.RemoveChild(child);
                         child.QueueFree();
+                        this.slotContainer.RemoveChild(child);
                     }
                 }
             }

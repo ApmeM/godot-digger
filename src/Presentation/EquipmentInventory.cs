@@ -57,7 +57,7 @@ public partial class EquipmentInventory
     {
         character.DigPower = (uint)(character.DigPower + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum()));
         character.MaxStamina = (uint)(character.MaxStamina + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].NumberOfTurns).Sum()));
-        character.BagSlots =  (uint)(character.BagSlots + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].AdditionalSlots).Sum()));
+        character.BagSlots = (uint)(character.BagSlots + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].AdditionalSlots).Sum()));
     }
 
     public List<(int, int)> GetItems()
@@ -75,5 +75,19 @@ public partial class EquipmentInventory
         {
             slots[i].ForceSetCount(items[i].Item1, items[i].Item2);
         }
+    }
+
+    public void ClearItems()
+    {
+        foreach (InventorySlot slot in this.GetChildren().OfType<InventorySlot>())
+        {
+            if (!slot.HasItem())
+            {
+                continue;
+            }
+
+            slot.ClearItem();
+        }
+
     }
 }

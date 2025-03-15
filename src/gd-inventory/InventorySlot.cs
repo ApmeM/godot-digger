@@ -43,11 +43,7 @@ public partial class InventorySlot
 
             if (this.IsInsideTree())
             {
-                if (this.lootContainer.GetChildCount() > 0)
-                {
-                    this.lootContainer.ClearChildren();
-                    this.lootContainer.RemoveChild(this.lootContainer.GetChild(0));
-                }
+                this.lootContainer.RemoveChildren();
                 this.slotTypePlaceholder.Visible = itemId == -1;
                 if (itemId != -1)
                 {

@@ -98,26 +98,38 @@ public partial class Level1
         base.CustomBlockClicked(pos);
     }
 
-    public override void Save()
+    public class CustomData
     {
-        base.Save();
-
-        var f = new File();
-        f.Open($"user://Stash.dat", File.ModeFlags.Write);
-        f.StorePascalString(JsonConvert.SerializeObject(this.stashInventory.GetItems()));
-        f.Close();
+        public List<(int, int)> Stash;
     }
 
-    public override void Load()
+    public override LevelDump GetLevelDump()
     {
-        base.Load();
-
-        var f = new File();
-        if (f.FileExists($"user://Stash.dat"))
+        var dump = base.GetLevelDump();
+        dump.CustomData = new CustomData
         {
-            f.Open($"user://Stash.dat", File.ModeFlags.Read);
-            this.stashInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
-            f.Close();
+            Stash = this.stashInventory.GetItems()
+        };
+        return dump;
+    }
+
+    public override void LoadLevelDump(LevelDump levelDump)
+    {
+        base.LoadLevelDump(levelDump);
+
+        if (levelDump == null)
+        {
+            return;
+        }
+
+        var customData = (CustomData)levelDump.CustomData;
+        if (customData != null)
+        {
+            this.stashInventory.SetItems(customData.Stash);
+        }
+        else
+        {
+            this.stashInventory.ClearItems();
         }
     }
 }

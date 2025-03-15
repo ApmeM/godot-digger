@@ -233,7 +233,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         var inventory = this.bagInventory;
 
         this.questRequirements.Content = description;
-        this.requirementsList.ClearChildren();
+        this.requirementsList.RemoveChildren();
 
         var isEnough = true;
         foreach (var req in requirements)
@@ -418,69 +418,74 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         if (this.blocks.GetCellv(node - Vector2.Up) == -1 && this.floor.GetCellv(node - Vector2.Up) != -1) result.Add(node - Vector2.Up);
     }
 
-    public virtual void Save()
+    public virtual LevelDump GetLevelDump()
     {
-        var f = new File();
-        f.Open($"user://SaveLevel_{this.Name}.dat", File.ModeFlags.Write);
-        f.StorePascalString(JsonConvert.SerializeObject(this.floor.GetUsedCells().Cast<Vector2>().Select(a => (a, this.floor.GetCellv(a))).ToList()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.constructions.GetUsedCells().Cast<Vector2>().Select(a => (a, this.constructions.GetCellv(a))).ToList()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.loot.GetUsedCells().Cast<Vector2>().Select(a => (a, this.loot.GetCellv(a))).ToList()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.blocks.GetUsedCells().Cast<Vector2>().Select(a => (a, this.blocks.GetCellv(a))).ToList()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.Meta.ToList()));
-        f.Close();
-
-        this.header.Save();
-
-        f = new File();
-        f.Open($"user://Bag.dat", File.ModeFlags.Write);
-        f.StorePascalString(JsonConvert.SerializeObject(this.bagSlot.GetItem()));
-        f.Close();
-
-        f = new File();
-        f.Open($"user://Invenory.dat", File.ModeFlags.Write);
-        f.StorePascalString(JsonConvert.SerializeObject(this.equipmentInventory.GetItems()));
-        f.StorePascalString(JsonConvert.SerializeObject(this.bagInventory.GetItems()));
-        f.Close();
+        return new LevelDump
+        {
+            Floor = this.floor.GetUsedCells().Cast<Vector2>().Select(a => (a, this.floor.GetCellv(a))).ToList(),
+            Constructions = this.constructions.GetUsedCells().Cast<Vector2>().Select(a => (a, this.constructions.GetCellv(a))).ToList(),
+            Loot = this.loot.GetUsedCells().Cast<Vector2>().Select(a => (a, this.loot.GetCellv(a))).ToList(),
+            Blocks = this.blocks.GetUsedCells().Cast<Vector2>().Select(a => (a, this.blocks.GetCellv(a))).ToList(),
+            Fog = this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList(),
+            Meta = this.Meta.ToList(),
+        };
     }
 
-    public virtual void Load()
+    public InventoryDump GetInventoryDump()
     {
-        var f = new File();
-        if (f.FileExists($"user://SaveLevel_{this.Name}.dat"))
+        return new InventoryDump
         {
-            this.floor.Clear();
-            this.constructions.Clear();
-            this.loot.Clear();
-            this.blocks.Clear();
-            this.fog.Clear();
+            Bag = this.bagSlot.GetItem(),
+            Equipment = this.equipmentInventory.GetItems(),
+            Inventory = this.bagInventory.GetItems(),
+        };
+    }
 
-            f.Open($"user://SaveLevel_{this.Name}.dat", File.ModeFlags.Read);
-            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
-            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.constructions.SetCellv(a.Item1, a.Item2));
-            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
-            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
-            JsonConvert.DeserializeObject<List<(Vector2, int)>>(f.GetPascalString()).ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
-            this.Meta = JsonConvert.DeserializeObject<List<KeyValuePair<Vector2, BlocksDefinition>>>(f.GetPascalString()).ToDictionary(a => a.Key, a => a.Value);
-            f.Close();
+    public virtual void LoadLevelDump(LevelDump levelDump)
+    {
+        if (levelDump == null)
+        {
+            return;
         }
 
-        this.header.Load();
+        this.floor.Clear();
+        this.constructions.Clear();
+        this.loot.Clear();
+        this.blocks.Clear();
+        this.fog.Clear();
+        this.groups.Clear();
 
-        if (f.FileExists($"user://Bag.dat"))
+        levelDump.Floor.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
+        levelDump.Constructions.ForEach(a => this.constructions.SetCellv(a.Item1, a.Item2));
+        levelDump.Loot.ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
+        levelDump.Blocks.ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
+        levelDump.Fog.ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
+        this.Meta = levelDump.Meta.ToDictionary(a => a.Key, a => a.Value);
+    }
+    public void LoadInventoryDump(InventoryDump inventoryDump)
+    {
+        this.bagSlot.ClearItem();
+        this.equipmentInventory.ClearItems();
+        this.bagInventory.ClearItems();
+
+        if (inventoryDump == null)
         {
-            f.Open($"user://Bag.dat", File.ModeFlags.Read);
-            var bag = JsonConvert.DeserializeObject<(int, int)>(f.GetPascalString());
-            this.bagSlot.ForceSetCount(bag.Item1, bag.Item2);
-            f.Close();
+            return;
         }
 
-        if (f.FileExists($"user://Invenory.dat"))
+        if (inventoryDump.Bag != default)
         {
-            f.Open($"user://Invenory.dat", File.ModeFlags.Read);
-            this.equipmentInventory.ForceSetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
-            this.bagInventory.SetItems(JsonConvert.DeserializeObject<List<(int, int)>>(f.GetPascalString()));
-            f.Close();
+            this.bagSlot.ForceSetCount(inventoryDump.Bag.Item1, inventoryDump.Bag.Item2);
+        }
+
+        if (inventoryDump.Equipment != null)
+        {
+            this.equipmentInventory.ForceSetItems(inventoryDump.Equipment);
+        }
+
+        if (inventoryDump.Inventory != null)
+        {
+            this.bagInventory.SetItems(inventoryDump.Inventory);
         }
     }
 }

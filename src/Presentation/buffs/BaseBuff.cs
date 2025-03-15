@@ -17,6 +17,16 @@ public partial class BaseBuff
         }
     }
 
+    public double Progress
+    {
+        get => this.textureProgress.Value;
+        set
+        {
+            this.textureProgress.Value = value;
+            this.timer.WaitTime = (float)(this.timer.WaitTime * value) / 100;
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();

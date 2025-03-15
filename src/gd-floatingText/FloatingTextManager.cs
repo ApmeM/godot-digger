@@ -49,8 +49,8 @@ public partial class FloatingTextManager
         await ToSignal(t, "tween_all_completed");
 
         node.QueueFree();
-        t.QueueFree();
         RemoveChild(node);
+        t.QueueFree();
         RemoveChild(t);
     }
 

@@ -104,10 +104,16 @@ public partial class Header
 
     public BaseBuff AddBuff(Buff buff)
     {
+        return this.AddBuff(buff, 0);
+    }
+
+    public BaseBuff AddBuff(Buff buff, double progress)
+    {
         var buffPath = $"res://Presentation/buffs/{buff}.tscn";
         var buffInstance = ResourceLoader.Load<PackedScene>(buffPath).Instance<BaseBuff>();
         buffInstance.Connect(nameof(BaseBuff.BuffRemoved), this, nameof(BuffRemoved), new Godot.Collections.Array { buffInstance });
         buffInstance.Connect(CommonSignals.Pressed, this, nameof(BuffClicked), new Godot.Collections.Array { buffInstance });
+        buffInstance.Progress = progress;
         this.buffContainer.AddChild(buffInstance);
         this.EmitSignal(nameof(BuffsChanged));
         return buffInstance;
@@ -121,6 +127,7 @@ public partial class Header
 
     private void BuffRemoved(BaseBuff buff)
     {
+        buff.QueueFree();
         this.buffContainer.RemoveChild(buff);
         this.EmitSignal(nameof(BuffsChanged));
     }
@@ -171,32 +178,43 @@ public partial class Header
         }
     }
 
-    public void Save()
+    public HeaderDump GetHeaderDump()
     {
-        var f = new File();
-        f.Open($"user://Header.dat", File.ModeFlags.Write);
-        f.StorePascalString(JsonConvert.SerializeObject(this.CurrentHp));
-        f.StorePascalString(JsonConvert.SerializeObject(this.hpLastUpdate));
-        f.StorePascalString(JsonConvert.SerializeObject(this.CurrentStamina));
-        f.StorePascalString(JsonConvert.SerializeObject(this.staminaLastUpdate));
-        f.StorePascalString(JsonConvert.SerializeObject(this.buffContainer.GetChildren().Cast<BaseBuff>().Select(a => a.Name).ToList()));
-
-        f.Close();
+        return new HeaderDump
+        {
+            CurrentHP = this.CurrentHp,
+            HPLastUpdate = this.hpLastUpdate,
+            CurrentStaina = this.CurrentStamina,
+            StaminaLastupdate = this.staminaLastUpdate,
+            Buffs = this.buffContainer
+                        .GetChildren()
+                        .Cast<BaseBuff>()
+                        .Select(a => new BuffDump
+                        {
+                            Name = a.Name,
+                            Progress = a.Progress
+                        }).ToList()
+        };
     }
 
-    public void Load()
+    public void LoadHeaderDump(HeaderDump header)
     {
-        var f = new File();
-
-        if (f.FileExists($"user://Header.dat"))
+        if (header != null)
         {
-            f.Open($"user://Header.dat", File.ModeFlags.Read);
-            this.CurrentHp = JsonConvert.DeserializeObject<uint>(f.GetPascalString());
-            this.hpLastUpdate = JsonConvert.DeserializeObject<DateTime>(f.GetPascalString());
-            this.CurrentStamina = JsonConvert.DeserializeObject<uint>(f.GetPascalString());
-            this.staminaLastUpdate = JsonConvert.DeserializeObject<DateTime>(f.GetPascalString());
-            JsonConvert.DeserializeObject<List<string>>(f.GetPascalString()).ForEach(a => this.AddBuff((Buff)Enum.Parse(typeof(Buff), a)));
-            f.Close();
+            this.CurrentHp = header.CurrentHP;
+            this.hpLastUpdate = header.HPLastUpdate;
+            this.CurrentStamina = header.CurrentStaina;
+            this.staminaLastUpdate = header.StaminaLastupdate;
+            header.Buffs.ForEach(a => this.AddBuff((Buff)Enum.Parse(typeof(Buff), a.Name)));
+        }
+        else
+        {
+            this.CurrentHp = 100;
+            this.hpLastUpdate = DateTime.Now;
+            this.CurrentStamina = 10;
+            this.staminaLastUpdate = DateTime.Now;
+            this.buffContainer.FreeChildren();
+            this.EmitSignal(nameof(BuffsChanged));
         }
     }
 }

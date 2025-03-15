@@ -21,7 +21,7 @@ public partial class AchievementList
 
     public async void ReloadList()
     {
-        this.achievementsContainer.ClearChildren();
+        this.achievementsContainer.RemoveChildren();
         this.loadingContainer.Visible = true;
 
         var achievements = await GetRepository().GetForList();
