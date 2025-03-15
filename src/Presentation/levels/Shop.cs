@@ -84,7 +84,8 @@ public partial class Shop
         var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
         var price = LootDefinition.KnownLoot[(tileId, (int)coord.x, (int)coord.y)].Price;
-        var result = await ShowQuestPopup("To buy:",
+        var result = await questPopup.ShowQuestPopup("To buy:",
+            this.bagInventory,
             new[] { (Loot.Gold, price) },
             new ValueTuple<ValueTuple<int, int, int>, uint>[] { });
         if (!result)

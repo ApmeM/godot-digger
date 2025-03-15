@@ -53,7 +53,8 @@ public partial class Level1
         }
         if (pos == new Vector2(24, 17))
         {
-            var result = await ShowQuestPopup("Did you bring me a bread from my daughter RedHat?",
+            var result = await questPopup.ShowQuestPopup("Did you bring me a bread from my daughter RedHat?",
+                this.bagInventory,
                 new[] { (Loot.Bread, 1u) },
                 new[] { (Loot.Gold, 1u) }
             );
@@ -67,7 +68,8 @@ public partial class Level1
         {
             if (this.blocks.GetCellv(pos) == Blocks.Shopkeeper.Item1)
             {
-                var result = await ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.",
+                var result = await questPopup.ShowQuestPopup("Hi stranger, I'm a shop keeper without shop.\nCan you please bring me wood \nand I'll build a shop with useful items for you.\n\nTutorial: wood can be found in \n wood piles or in a forest.",
+                    this.bagInventory,
                     new[] { (Loot.Wood, 1u) },
                     new[] { (Loot.Gold, 1u) }
                 );
@@ -85,7 +87,8 @@ public partial class Level1
         }
         if (pos == new Vector2(9, 13))
         {
-            var result = await ShowQuestPopup("Hi strong man, I afraid to go to my grandma through the forrest. There are a lot of wolfs. For each wolf skin I'll gibe you a bread that is very tasty (doubleclick on it from the inventory).",
+            var result = await questPopup.ShowQuestPopup("Hi strong man, I afraid to go to my grandma through the forrest. There are a lot of wolfs. For each wolf skin I'll gibe you a bread that is very tasty (doubleclick on it from the inventory).",
+                this.bagInventory,
                 new[] { (Loot.WolfSkin, 1u) },
                 new[] { (Loot.Bread, 1u) }
             );
