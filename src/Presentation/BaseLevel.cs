@@ -422,7 +422,10 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             Loot = this.loot.GetUsedCells().Cast<Vector2>().Select(a => (a, this.loot.GetCellv(a))).ToList(),
             Blocks = this.blocks.GetUsedCells().Cast<Vector2>().Select(a => (a, this.blocks.GetCellv(a))).ToList(),
             Fog = this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList(),
+            Groups = this.groups.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList(),
             Meta = this.Meta.ToList(),
+            CameraZoom = this.draggableCamera.Zoom,
+            CameraPos = this.draggableCamera.Position
         };
     }
 
@@ -450,12 +453,15 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.fog.Clear();
         this.groups.Clear();
 
-        levelDump.Floor.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
-        levelDump.Constructions.ForEach(a => this.constructions.SetCellv(a.Item1, a.Item2));
-        levelDump.Loot.ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
-        levelDump.Blocks.ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
-        levelDump.Fog.ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
+        levelDump.Floor?.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
+        levelDump.Constructions?.ForEach(a => this.constructions.SetCellv(a.Item1, a.Item2));
+        levelDump.Loot?.ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
+        levelDump.Blocks?.ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
+        levelDump.Fog?.ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
+        levelDump.Groups?.ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
         this.Meta = levelDump.Meta.ToDictionary(a => a.Key, a => a.Value);
+        this.draggableCamera.Position = levelDump.CameraPos;
+        this.draggableCamera.Zoom = levelDump.CameraZoom;
     }
     public void LoadInventoryDump(InventoryDump inventoryDump)
     {
