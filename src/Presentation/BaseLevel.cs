@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
 using GodotDigger.Presentation.Utils;
-using Newtonsoft.Json;
 
 [SceneReference("BaseLevel.tscn")]
 public partial class BaseLevel : IUnweightedGraph<Vector2>
@@ -15,11 +14,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
     protected Dictionary<int, InventorySlot.InventorySlotConfig> Resources = new Dictionary<int, InventorySlot.InventorySlotConfig>();
 
-    public Header Stamina => this.header;
-
-    public Random random = new Random();
-
-    private Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
+    public readonly Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
 
     public TileMap FloorMap => this.floor;
     public TileMap BlocksMap => this.blocks;

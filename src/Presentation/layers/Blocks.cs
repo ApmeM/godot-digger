@@ -80,7 +80,7 @@ public class BlocksDefinition
 
     private static void OnClickSpawn(BaseLevel level, BlocksDefinition definition, Vector2 pos)
     {
-        var possibleSpawns = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+        var possibleSpawns = level.cardinalDirections
             .Select(dir => pos + dir)
             .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1)
             .ToList();
@@ -138,7 +138,7 @@ public class BlocksDefinition
 
     private void OnTickTryAttackOtherGroup(BaseLevel level, Vector2 pos)
     {
-        var opponent = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+        var opponent = level.cardinalDirections
             .Select(a => a + pos)
             .Where(a => level.Meta.ContainsKey(a))
             .Select(a => (a, level.Meta[a]))
@@ -244,7 +244,7 @@ public class BlocksDefinition
 
     private Vector2? GetPathToRandomLocation(BaseLevel level, Vector2 pos)
     {
-        var possibleMoves = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }
+        var possibleMoves = level.cardinalDirections
             .Select(dir => pos + dir)
             .Where(cell => this.MoveFloors.Contains((level.FloorMap.GetCell((int)cell.x, (int)cell.y), 0, 0)))
             .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1)
@@ -279,7 +279,7 @@ public class BlocksDefinition
             .Where(a => a.Value.Group != this.Group)
             .Where(a => a.Value.Group >= 0)
             .Select(a => a.Key)
-            .SelectMany(a => new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right }.Select(b => b + a))
+            .SelectMany(a => level.cardinalDirections.Select(b => b + a))
             .ToHashSet());
         var path = pathfinder.ResultPath;
 
