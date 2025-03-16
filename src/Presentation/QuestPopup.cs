@@ -10,6 +10,9 @@ public partial class QuestPopup
     [Export]
     public NodePath BagInventoryPath;
 
+    [Export]
+    public TileSet LootTileSet;
+
     public override void _Ready()
     {
         base._Ready();
@@ -18,7 +21,7 @@ public partial class QuestPopup
 
     public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
     {
-        var inventory = this.GetNode<Inventory>(this.BagInventoryPath);
+        var inventory = this.GetNode<BagInventoryPopup>(this.BagInventoryPath);
 
         this.Content = description;
         this.requirementsList.RemoveChildren();
@@ -27,9 +30,10 @@ public partial class QuestPopup
         foreach (var req in requirements)
         {
             var lootId = req.Item1.Item1;
+
             this.requirementsList.AddChild(new TextureRect
             {
-                Texture = inventory.Config[lootId].Texture
+                Texture = this.LootTileSet.TileGetTexture(lootId)
             });
 
             var existing = inventory.GetItemCount(lootId);

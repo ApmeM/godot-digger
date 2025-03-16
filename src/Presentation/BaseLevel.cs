@@ -13,9 +13,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     public readonly Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
 
     public Header HeaderControl;
-    public Inventory BagInventory;
-    public CustomPopup BagInventoryPopup;
-    public Dictionary<int, InventorySlot.InventorySlotConfig> Resources;
+    public BagInventoryPopup BagInventoryPopup;
 
     public TileMap FloorMap => this.floor;
     public TileMap BlocksMap => this.blocks;
@@ -60,7 +58,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             }
         }
 
-        this.questPopup.BagInventoryPath = this.BagInventory.GetPath();
+        this.questPopup.BagInventoryPath = this.BagInventoryPopup.GetPath();
 
         ReFogMap();
 
@@ -265,7 +263,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
         var lootId = this.loot.GetCellv(pos);
 
-        if (this.BagInventory.TryChangeCount(lootId, 1) == 0)
+        if (this.BagInventoryPopup.TryChangeCount(lootId, 1) == 0)
         {
             this.loot.SetCellv(pos, -1);
         }

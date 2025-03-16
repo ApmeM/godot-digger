@@ -10,10 +10,10 @@ public partial class Shop
         base._Ready();
         this.FillMembers();
 
-        this.GetParent().GetParent<Main>().ConfigureInventory(this.shopInventory);
+        this.BagInventoryPopup.ConfigureInventory(this.shopInventory);
 
         this.shopInventory.Connect(nameof(Inventory.ItemCountChanged), this, nameof(UpdateCost));
-        this.shopInventory.Config = Resources;
+        this.shopInventory.Config = this.BagInventoryPopup.Config;
         this.shopSellButton.Connect(CommonSignals.Pressed, this, nameof(SellButtonClicked));
     }
 
@@ -32,7 +32,7 @@ public partial class Shop
             return;
         }
 
-        this.BagInventory.TryChangeCount(Loot.Gold.Item1, (int)price);
+        this.BagInventoryPopup.TryChangeCount(Loot.Gold.Item1, (int)price);
         this.shopInventory.ClearItems();
     }
 

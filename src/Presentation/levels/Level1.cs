@@ -9,9 +9,9 @@ public partial class Level1
         base._Ready();
         this.FillMembers();
 
-        this.GetParent().GetParent<Main>().ConfigureInventory(this.stashInventory);
+        this.BagInventoryPopup.ConfigureInventory(this.stashInventory);
 
-        foreach (var slot in Resources)
+        foreach (var slot in this.BagInventoryPopup.Config)
         {
             this.stashInventory.Config.Add(slot.Key, new InventorySlot.InventorySlotConfig
             {

@@ -76,7 +76,7 @@ align = 1
 
 [node name="QuestPopup" parent="." instance=ExtResource( 14 )]
 visible = false
-BagInventoryPath = null
+LootTileSet = ExtResource( 1 )
 
 [node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
 position = Vector2( 241, 400 )
