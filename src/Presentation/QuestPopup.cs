@@ -7,14 +7,19 @@ using GodotDigger.Presentation.Utils;
 [SceneReference("QuestPopup.tscn")]
 public partial class QuestPopup
 {
+    [Export]
+    public NodePath BagInventoryPath;
+
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
     }
 
-    public async Task<bool> ShowQuestPopup(string description, Inventory inventory, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
+    public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
     {
+        var inventory = this.GetNode<Inventory>(this.BagInventoryPath);
+
         this.Content = description;
         this.requirementsList.RemoveChildren();
 

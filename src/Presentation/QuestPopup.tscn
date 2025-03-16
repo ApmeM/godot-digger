@@ -9,6 +9,7 @@ script = ExtResource( 3 )
 CloseOnClickOutside = false
 Title = "Quest"
 Content = "Quest Content"
+BagInventoryPath = null
 
 [node name="PopupContainer" parent="CustomPopupContainer" index="1"]
 margin_bottom = 159.0

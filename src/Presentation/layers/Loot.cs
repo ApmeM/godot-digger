@@ -86,5 +86,5 @@ public class LootDefinition
     public ItemType ItemType { get; set; }
 
     public uint Price { get; set; }
-    public Action<BaseLevel> UseAction { get; set; }
+    public Action<Main> UseAction { get; set; }
 }

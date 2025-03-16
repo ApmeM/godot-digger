@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -11,9 +10,17 @@ public partial class Shop
         base._Ready();
         this.FillMembers();
 
+        this.GetParent().GetParent<Main>().ConfigureInventory(this.shopInventory);
+
         this.shopInventory.Connect(nameof(Inventory.ItemCountChanged), this, nameof(UpdateCost));
         this.shopInventory.Config = Resources;
         this.shopSellButton.Connect(CommonSignals.Pressed, this, nameof(SellButtonClicked));
+    }
+
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+        this.shopInventory.QueueFree();
     }
 
     private void SellButtonClicked()
@@ -21,11 +28,11 @@ public partial class Shop
         var price = CalculatePrice();
         if (price == 0)
         {
-            this.bagInventoryPopup.Close();
+            this.BagInventoryPopup.Close();
             return;
         }
 
-        this.bagInventory.TryChangeCount(Loot.Gold.Item1, (int)price);
+        this.BagInventory.TryChangeCount(Loot.Gold.Item1, (int)price);
         this.shopInventory.ClearItems();
     }
 
@@ -66,12 +73,12 @@ public partial class Shop
         {
             this.shopInventory.Visible = true;
             this.shopSellButton.Visible = true;
-            this.bagInventoryPopup.CloseOnClickButton = false;
-            this.bagInventoryPopup.Show();
-            await this.ToSignal(this.bagInventoryPopup, nameof(CustomPopup.PopupClosed));
+            this.BagInventoryPopup.CloseOnClickButton = false;
+            this.BagInventoryPopup.Show();
+            await this.ToSignal(this.BagInventoryPopup, nameof(CustomPopup.PopupClosed));
             this.shopInventory.Visible = false;
             this.shopSellButton.Visible = false;
-            this.bagInventoryPopup.CloseOnClickButton = true;
+            this.BagInventoryPopup.CloseOnClickButton = true;
             return;
         }
 
@@ -85,7 +92,6 @@ public partial class Shop
 
         var price = LootDefinition.KnownLoot[(tileId, (int)coord.x, (int)coord.y)].Price;
         var result = await questPopup.ShowQuestPopup("To buy:",
-            this.bagInventory,
             new[] { (Loot.Gold, price) },
             new ValueTuple<ValueTuple<int, int, int>, uint>[] { });
         if (!result)

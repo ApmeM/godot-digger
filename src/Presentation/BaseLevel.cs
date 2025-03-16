@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseLevel.tscn")]
 public partial class BaseLevel : IUnweightedGraph<Vector2>
@@ -12,14 +10,16 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
 
-    protected Dictionary<int, InventorySlot.InventorySlotConfig> Resources = new Dictionary<int, InventorySlot.InventorySlotConfig>();
-
     public readonly Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
+
+    public Header HeaderControl;
+    public Inventory BagInventory;
+    public CustomPopup BagInventoryPopup;
+    public Dictionary<int, InventorySlot.InventorySlotConfig> Resources;
 
     public TileMap FloorMap => this.floor;
     public TileMap BlocksMap => this.blocks;
     public TileMap LootMap => this.loot;
-    public Header HeaderControl => this.header;
     public FloatingTextManager FloatingTextManagerControl => this.floatingTextManager;
 
     public Dictionary<Vector2, BlocksDefinition> Meta = new Dictionary<Vector2, BlocksDefinition>();
@@ -35,33 +35,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
-
-        this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
-        this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
-        this.bagInventory.Connect(nameof(Inventory.DragOnAnotherItemType), this, nameof(InventoryTryMergeItems));
-        this.bagSlot.Connect(nameof(InventorySlot.ItemCountChanged), this, nameof(BagChanged));
-        this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentChanged));
-        this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
-
-        foreach (int id in this.loot.TileSet.GetTilesIds())
-        {
-            var tex = this.loot.TileSet.TileGetTexture(id);
-            var definition = LootDefinition.KnownLoot[(id, 0, 0)];
-            this.Resources.Add(id, new InventorySlot.InventorySlotConfig
-            {
-                Texture = tex,
-                MaxCount = definition.MaxCount,
-                ItemType = (int)definition.ItemType
-            });
-        }
-        this.equipmentInventory.Config = Resources;
-
-        this.bagInventory.Config = Resources;
-
-        this.bagSlot.AcceptedTypes.Add((int)ItemType.Bag);
-        this.bagSlot.Config = Resources;
-
-        this.CharacteristicsChanged();
 
         foreach (Vector2 cell in this.blocks.GetUsedCells())
         {
@@ -86,6 +59,8 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
                 this.fog.SetCellv(cell, Fog.Basic.Item1, autotileCoord: new Vector2(Fog.Basic.Item2, Fog.Basic.Item3));
             }
         }
+
+        this.questPopup.BagInventoryPath = this.BagInventory.GetPath();
 
         ReFogMap();
 
@@ -112,62 +87,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         {
             ReFogMap();
         }
-    }
-
-    private void BuffsChanged()
-    {
-        this.CharacteristicsChanged();
-    }
-
-    private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
-    {
-        this.CharacteristicsChanged();
-    }
-
-    private async void BagChanged(int itemId, int from, int to)
-    {
-        await this.ToSignal(GetTree().CreateTimer(0.01f), CommonSignals.Timeout); // Hack to update bag size after all signals handled.
-        this.CharacteristicsChanged();
-    }
-
-    private void CharacteristicsChanged()
-    {
-        var character = new Character();
-        this.equipmentInventory.ApplyEquipment(character);
-        if (this.bagSlot.ItemId >= 0)
-        {
-            var definition = LootDefinition.KnownLoot[(this.bagSlot.ItemId, 0, 0)];
-            character.DigPower += (uint)definition.DigPower;
-            character.MaxStamina += (uint)definition.NumberOfTurns;
-            character.BagSlots += (uint)definition.AdditionalSlots;
-        }
-        this.header.ApplyBuffs(character);
-        this.header.Character = character;
-
-        this.bagInventory.Size = character.BagSlots;
-    }
-
-    protected void InventoryUseItem(InventorySlot slot)
-    {
-        var tileId = slot.ItemId;
-        if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
-        {
-            LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
-            slot.TryChangeCount(slot.ItemId, -1);
-        }
-    }
-    protected void InventoryTryMergeItems(InventorySlot fromSlot, InventorySlot toSlot)
-    {
-        if (!LootDefinition.KnownLoot[(toSlot.ItemId, 0, 0)].MergeActions.ContainsKey((fromSlot.ItemId, 0, 0)))
-        {
-            return;
-        }
-
-        var mergeResult = LootDefinition.KnownLoot[(toSlot.ItemId, 0, 0)].MergeActions[(fromSlot.ItemId, 0, 0)];
-        fromSlot.TryChangeCount(fromSlot.ItemId, -1);
-        toSlot.TryChangeCount(toSlot.ItemId, -1);
-
-        toSlot.TryChangeCount(mergeResult.Item1, 1);
     }
 
     private static Action<BaseLevel, Vector2> DoNothing = (level, pos) => { };
@@ -211,11 +130,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         return false;
     }
 
-    private void ShowInventoryPopup()
-    {
-        this.bagInventoryPopup.Show();
-    }
-
     public async void ShowPopup(string text)
     {
         this.signLabel.Text = text;
@@ -227,12 +141,12 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
     {
         GD.Print($"Clicked on a block at {pos}, no custom action defined, dig it.");
 
-        if (!header.Character.CanDig)
+        if (!this.HeaderControl.Character.CanDig)
         {
             return;
         }
 
-        if (this.header.CurrentStamina == 0)
+        if (this.HeaderControl.CurrentStamina == 0)
         {
             floatingTextManager.ShowValue("Too tired", this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(0.60f, 0.85f, 0.91f));
             return;
@@ -252,7 +166,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         floatingTextManager.ShowValueDelayed(currentFloatingsDelay, (-1).ToString(), this.blocks.MapToWorld(pos) + this.blocks.CellSize / 2, new Color(0.60f, 0.85f, 0.91f));
         currentFloatingsDelay += floatingDelay;
 
-        this.header.CurrentStamina--;
+        this.HeaderControl.CurrentStamina--;
 
         definition.OnClickMove(this, pos);
         if (definition.IsDead)
@@ -351,7 +265,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
         var lootId = this.loot.GetCellv(pos);
 
-        if (this.bagInventory.TryChangeCount(lootId, 1) == 0)
+        if (this.BagInventory.TryChangeCount(lootId, 1) == 0)
         {
             this.loot.SetCellv(pos, -1);
         }
@@ -381,16 +295,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         };
     }
 
-    public InventoryDump GetInventoryDump()
-    {
-        return new InventoryDump
-        {
-            Bag = this.bagSlot.GetItem(),
-            Equipment = this.equipmentInventory.GetItems(),
-            Inventory = this.bagInventory.GetItems(),
-        };
-    }
-
     public virtual void LoadLevelDump(LevelDump levelDump)
     {
         if (levelDump == null)
@@ -414,31 +318,5 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.Meta = levelDump.Meta.ToDictionary(a => a.Key, a => a.Value);
         this.draggableCamera.Position = levelDump.CameraPos;
         this.draggableCamera.Zoom = levelDump.CameraZoom;
-    }
-    public void LoadInventoryDump(InventoryDump inventoryDump)
-    {
-        this.bagSlot.ClearItem();
-        this.equipmentInventory.ClearItems();
-        this.bagInventory.ClearItems();
-
-        if (inventoryDump == null)
-        {
-            return;
-        }
-
-        if (inventoryDump.Bag != default)
-        {
-            this.bagSlot.ForceSetCount(inventoryDump.Bag.Item1, inventoryDump.Bag.Item2);
-        }
-
-        if (inventoryDump.Equipment != null)
-        {
-            this.equipmentInventory.ForceSetItems(inventoryDump.Equipment);
-        }
-
-        if (inventoryDump.Inventory != null)
-        {
-            this.bagInventory.SetItems(inventoryDump.Inventory);
-        }
     }
 }
