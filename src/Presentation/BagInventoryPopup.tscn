@@ -9,6 +9,12 @@
 
 [node name="BagInventoryPopup" instance=ExtResource( 1 )]
 script = ExtResource( 6 )
+LootTileSet = null
+
+[node name="CustomPopupContainer" parent="." index="1"]
+margin_left = 52.0
+margin_right = 448.0
+margin_bottom = 351.0
 
 [node name="HeaderCenter" parent="CustomPopupContainer" index="0"]
 margin_right = 396.0
@@ -64,6 +70,7 @@ margin_bottom = 256.0
 margin_right = 204.0
 margin_bottom = 48.0
 ItemTypePlaceholderTexture = ExtResource( 4 )
+DropOnAnotherItemType = 2
 
 [node name="BagInventory" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer/BagContainer" index="1" instance=ExtResource( 3 )]
 margin_left = 0.0

@@ -6,5 +6,5 @@ public class Character
     public float StaminaRecoverySeconds = 20;
     public float HpRecoverySeconds = 5;
     public bool CanDig = true;
-    public uint BagSlots = 3;
+    public uint BagSlots = 4;
 }
