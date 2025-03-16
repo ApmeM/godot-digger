@@ -23,6 +23,8 @@ public partial class Main
 
         this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
         this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
+        this.header.Connect(nameof(Header.Save), this, nameof(Save));
+        this.header.Connect(nameof(Header.Load), this, nameof(Load));
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.BagChanged), this, nameof(BagChanged));
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.EquipmentChanged), this, nameof(EquipmentChanged));
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.UseItem), this, nameof(InventoryUseItem));
@@ -103,23 +105,6 @@ public partial class Main
         CurrentSave.Levels[prevLevel.Name] = prevLevel.GetLevelDump();
         CurrentSave.Header = this.HeaderControl.GetHeaderDump();
         CurrentSave.Inventory = this.bagInventoryPopup.GetInventoryDump();
-    }
-
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed)
-        {
-            if ((KeyList)keyEvent.Scancode == KeyList.F2)
-            {
-                Save("quicksave");
-            }
-
-            if ((KeyList)keyEvent.Scancode == KeyList.F3)
-            {
-                Load("quicksave");
-            }
-        }
     }
 
     public void Save(string name)

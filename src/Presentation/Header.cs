@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
-using Newtonsoft.Json;
 
 [SceneReference("Header.tscn")]
 [Tool]
@@ -17,6 +15,12 @@ public partial class Header
 
     [Signal]
     public delegate void BuffsClicked(string description);
+
+    [Signal]
+    public delegate void Save(string name);
+
+    [Signal]
+    public delegate void Load(string name);
 
     private uint currentStamina = 10;
 
@@ -80,7 +84,6 @@ public partial class Header
         }
     }
 
-
     private DateTime staminaLastUpdate = DateTime.Now;
 
     private DateTime hpLastUpdate = DateTime.Now;
@@ -95,6 +98,12 @@ public partial class Header
         this.CurrentHp = this.currentHp;
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
+        this.quickSaveButton.Connect(CommonSignals.Pressed, this, nameof(QuickSaveClicked));
+    }
+
+    private void QuickSaveClicked()
+    {
+        this.EmitSignal(nameof(Save), "quicksave");
     }
 
     private void OpenInventory()
@@ -215,6 +224,23 @@ public partial class Header
             this.staminaLastUpdate = DateTime.Now;
             this.buffContainer.FreeChildren();
             this.EmitSignal(nameof(BuffsChanged));
+        }
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+        {
+            if ((KeyList)keyEvent.Scancode == KeyList.F2)
+            {
+                this.EmitSignal(nameof(Save), "quicksave");
+            }
+
+            if ((KeyList)keyEvent.Scancode == KeyList.F3)
+            {
+                this.EmitSignal(nameof(Load), "quicksave");
+            }
         }
     }
 }
