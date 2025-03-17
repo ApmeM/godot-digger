@@ -2,8 +2,8 @@ using Godot;
 using GodotDigger.Presentation.Utils;
 using Newtonsoft.Json;
 
-[SceneReference("Main.tscn")]
-public partial class Main
+[SceneReference("Game.tscn")]
+public partial class Game
 {
     private LevelData CurrentSave = new LevelData();
 

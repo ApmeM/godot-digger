@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Presentation/BagInventoryPopup.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Presentation/Header.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Presentation/BaseLevelLoot.tres" type="TileSet" id=3]
+[ext_resource path="res://gd-googlePlay/GodotPlayGameService.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Presentation/Game.cs" type="Script" id=5]
+
+[node name="Game" type="Node"]
+script = ExtResource( 5 )
+
+[node name="Header" parent="." instance=ExtResource( 2 )]
+LootTileSet = ExtResource( 3 )
+
+[node name="BagInventoryPopup" parent="." instance=ExtResource( 1 )]
+visible = false
+LootTileSet = ExtResource( 3 )
+
+[node name="GamePosition" type="Node2D" parent="."]
+
+[node name="GodotPlayGameService" parent="." instance=ExtResource( 4 )]
+margin_bottom = 20.0
+
+[editable path="BagInventoryPopup"]
