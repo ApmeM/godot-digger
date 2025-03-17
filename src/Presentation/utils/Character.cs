@@ -7,4 +7,7 @@ public class Character
     public float HpRecoverySeconds = 5;
     public bool CanDig = true;
     public uint BagSlots = 4;
+
+    public int BagId;
+    public int WeaponId;
 }

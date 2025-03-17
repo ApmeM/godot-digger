@@ -137,6 +137,8 @@ public partial class BagInventoryPopup
 
     public void ApplyEquipment(Character character)
     {
+        character.BagId = this.bagSlot.ItemId;
+        character.WeaponId = this.equipmentInventory.WeaponId;
         this.equipmentInventory.ApplyEquipment(character);
         if (this.bagSlot.ItemId >= 0)
         {

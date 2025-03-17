@@ -66,12 +66,20 @@ stretch_margin_top = 1
 stretch_margin_right = 1
 stretch_margin_bottom = 1
 
-[node name="StaminaIcon" type="TextureRect" parent="."]
+[node name="StaminaIconBack" type="TextureRect" parent="."]
 margin_left = 92.0
 margin_top = 93.0
 margin_right = 126.0
 margin_bottom = 128.0
 texture = ExtResource( 3 )
+expand = true
+
+[node name="StaminaIconFront" type="TextureRect" parent="."]
+visible = false
+margin_left = 92.0
+margin_top = 93.0
+margin_right = 126.0
+margin_bottom = 128.0
 expand = true
 
 [node name="StaminaLabel" type="Label" parent="."]

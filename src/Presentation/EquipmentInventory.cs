@@ -27,6 +27,18 @@ public partial class EquipmentInventory
         }
     }
 
+    public int NeckId => this.neckSlot.ItemId;
+    public int HelmId => this.helmSlot.ItemId;
+    public int WeaponId => this.weaponSlot.ItemId;
+    public int ChestId => this.chestSlot.ItemId;
+    public int ShieldId => this.shieldSlot.ItemId;
+    public int Ring1Id => this.ring1Slot.ItemId;
+    public int BeltId => this.beltSlot.ItemId;
+    public int Ring2Id => this.ring2Slot.ItemId;
+    public int PantsId => this.pantsSlot.ItemId;
+    public int BootsId => this.bootsSlot.ItemId;
+
+
     public override void _Ready()
     {
         this.neckSlot.AcceptedTypes.Add((int)ItemType.Neck);

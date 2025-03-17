@@ -25,6 +25,9 @@ public partial class Header
     private uint currentStamina = 10;
 
     [Export]
+    public TileSet LootTileSet;
+
+    [Export]
     public uint CurrentStamina
     {
         get => currentStamina;
@@ -88,8 +91,26 @@ public partial class Header
 
     private DateTime hpLastUpdate = DateTime.Now;
 
-    public Character Character = new Character();
+    private Character character = new Character();
+    public Character Character
+    {
+        get => character; set
+        {
+            character = value;
 
+            this.inventoryBagItem.Visible = character.BagId > -1;
+            if (character.BagId > -1)
+            {
+                this.inventoryBagItem.Texture = LootTileSet.TileGetTexture(character.BagId);
+            }
+            this.staminaIconFront.Visible = character.WeaponId > -1;
+            this.staminaIconBack.Visible = character.WeaponId == -1;
+            if (character.WeaponId > -1)
+            {
+                this.staminaIconFront.Texture = LootTileSet.TileGetTexture(character.WeaponId);
+            }
+        }
+    }
     public override void _Ready()
     {
         base._Ready();
