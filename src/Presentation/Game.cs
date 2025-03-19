@@ -51,18 +51,17 @@ public partial class Game
 
     private void BuffsChanged()
     {
-        this.CharacteristicsChanged();
+        CallDeferred(nameof(CharacteristicsChanged));
     }
 
     private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
     {
-        this.CharacteristicsChanged();
+        CallDeferred(nameof(CharacteristicsChanged));
     }
 
-    private async void BagChanged(int itemId, int from, int to)
+    private void BagChanged(int itemId, int from, int to)
     {
-        await this.ToSignal(GetTree().CreateTimer(0.01f), CommonSignals.Timeout); // Hack to update bag size after all signals handled.
-        this.CharacteristicsChanged();
+        CallDeferred(nameof(CharacteristicsChanged));
     }
 
     private void ShowInventoryPopup()

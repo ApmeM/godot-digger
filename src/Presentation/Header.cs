@@ -120,11 +120,17 @@ public partial class Header
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
         this.quickSaveButton.Connect(CommonSignals.Pressed, this, nameof(QuickSaveClicked));
+        this.menuButton.Connect(CommonSignals.Pressed, this, nameof(MenuButtonClicked));
     }
 
     private void QuickSaveClicked()
     {
         this.EmitSignal(nameof(Save), "quicksave");
+    }
+
+    private void MenuButtonClicked()
+    {
+        this.GetTree().ChangeScene("res://Presentation/Main.tscn");
     }
 
     private void OpenInventory()

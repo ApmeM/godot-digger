@@ -26,6 +26,7 @@ public partial class GodotPlayGameService : IAchievementRepository
     /// 4. https://github.com/Iakobs/godot-google-play-game-services-android-plugin
     /// This implementation
     /// 
+    /// 5. https://godot.jacobibanez.com/plugin/index.html
     /// </summary>
     public Godot.Object Plugin { get; private set; }
     const string plugin_name = "GodotGooglePlayGameServices";
