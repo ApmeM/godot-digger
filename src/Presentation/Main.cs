@@ -20,7 +20,7 @@ public partial class Main
     {
         var root = this.GetTree().Root;
 
-                // Immediately free the current scene, there is no risk here.
+        // Immediately free the current scene, there is no risk here.
         var currentScene = root.GetChild(0);
         currentScene.QueueFree();
         root.RemoveChild(currentScene);
