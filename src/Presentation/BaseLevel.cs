@@ -106,7 +106,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             TryLayer(this.fog, pos, DoNothing, new HashSet<int> { 2, 1 }) &&
             TryLayer(this.blocks, pos, BlockClicked, new HashSet<int> { -1 }) &&
             TryLayer(this.loot, pos, LootClicked, new HashSet<int> { -1 }) &&
-            TryLayer(this.constructions, pos, DoNothing, new HashSet<int> { -1 }) &&
             TryLayer(this.floor, pos, DoNothing, new HashSet<int> { -1 });
 
         if (result)
@@ -282,7 +281,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         return new LevelDump
         {
             Floor = this.floor.GetUsedCells().Cast<Vector2>().Select(a => (a, this.floor.GetCellv(a))).ToList(),
-            Constructions = this.constructions.GetUsedCells().Cast<Vector2>().Select(a => (a, this.constructions.GetCellv(a))).ToList(),
             Loot = this.loot.GetUsedCells().Cast<Vector2>().Select(a => (a, this.loot.GetCellv(a))).ToList(),
             Blocks = this.blocks.GetUsedCells().Cast<Vector2>().Select(a => (a, this.blocks.GetCellv(a))).ToList(),
             Fog = this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList(),
@@ -301,14 +299,12 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         }
 
         this.floor.Clear();
-        this.constructions.Clear();
         this.loot.Clear();
         this.blocks.Clear();
         this.fog.Clear();
         this.groups.Clear();
 
         levelDump.Floor?.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
-        levelDump.Constructions?.ForEach(a => this.constructions.SetCellv(a.Item1, a.Item2));
         levelDump.Loot?.ForEach(a => this.loot.SetCellv(a.Item1, a.Item2));
         levelDump.Blocks?.ForEach(a => this.blocks.SetCellv(a.Item1, a.Item2));
         levelDump.Fog?.ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));

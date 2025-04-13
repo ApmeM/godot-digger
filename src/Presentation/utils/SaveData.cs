@@ -20,7 +20,6 @@ public class HeaderDump
 public class LevelDump
 {
     public List<(Vector2 a, int)> Floor;
-    public List<(Vector2 a, int)> Constructions;
     public List<(Vector2 a, int)> Loot;
     public List<(Vector2 a, int)> Blocks;
     public List<(Vector2 a, int)> Fog;

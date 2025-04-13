@@ -32,6 +32,8 @@ public static class Blocks
     public static ValueTuple<int, int, int> Door = (22, 0, 0);
     public static ValueTuple<int, int, int> Slime = (23, 0, 0);
     public static ValueTuple<int, int, int> Tree2 = (25, 0, 0);
+    public static ValueTuple<int, int, int> StatueLeft = (26, 0, 0);
+    public static ValueTuple<int, int, int> StatueRight = (27, 0, 0);
 }
 
 public class BlocksDefinition
@@ -336,8 +338,10 @@ public class BlocksDefinition
         { Blocks.Inn,             new BlocksDefinition{} },
         { Blocks.Stash,           new BlocksDefinition{} },
         { Blocks.Grandma,         new BlocksDefinition{} },
-        { Blocks.Door,            new BlocksDefinition{} },
+        { Blocks.Door,            new BlocksDefinition{        NoFogBlocker = true} },
         { Blocks.Slime,           new BlocksDefinition{HP = 2, ShouldShowDead = true, AttackPower = 1,  MoveDelay = 2, MoveFloors = new HashSet<(int, int, int)>{Floor.Ground, Floor.Tiles}, CanPickLoot = true, MoveToLoot = true }},
+        { Blocks.StatueLeft,      new BlocksDefinition{        NoFogBlocker = true} },
+        { Blocks.StatueRight,     new BlocksDefinition{        NoFogBlocker = true} },
     };
 
     public BlocksDefinition Clone()
