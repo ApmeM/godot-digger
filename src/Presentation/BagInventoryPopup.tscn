@@ -9,7 +9,6 @@
 
 [node name="BagInventoryPopup" instance=ExtResource( 1 )]
 script = ExtResource( 6 )
-LootTileSet = null
 
 [node name="CustomPopupContainer" parent="." index="1"]
 margin_left = 52.0

@@ -8,6 +8,6 @@ public class Character
     public bool CanDig = true;
     public uint BagSlots = 4;
 
-    public int BagId;
-    public int WeaponId;
+    public LootDefinition BagId;
+    public LootDefinition WeaponId;
 }

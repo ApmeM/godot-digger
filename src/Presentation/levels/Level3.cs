@@ -8,14 +8,4 @@ public partial class Level3
         base._Ready();
         this.FillMembers();
     }
-
-    public override void CustomBlockClicked(Vector2 pos)
-    {
-        if (pos == new Vector2(2, 2))
-        {
-            this.EmitSignal(nameof(ChangeLevel), "Level2");
-            return;
-        }
-        base.CustomBlockClicked(pos);
-    }
 }

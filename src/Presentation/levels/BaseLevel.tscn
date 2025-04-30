@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Presentation/levels/BaseLevel.cs" type="Script" id=2]
+[ext_resource path="res://Presentation/BaseLevelFloor.tres" type="TileSet" id=4]
+[ext_resource path="res://gd-floatingText/FloatingTextManager.tscn" type="PackedScene" id=9]
+[ext_resource path="res://gd-achievements/AchievementNotifications.tscn" type="PackedScene" id=10]
+[ext_resource path="res://gd-draggableCamera/DraggableCamera.tscn" type="PackedScene" id=11]
+[ext_resource path="res://Presentation/BaseLevelFog.tres" type="TileSet" id=12]
+[ext_resource path="res://Presentation/QuestPopup.tscn" type="PackedScene" id=14]
+
+[node name="BaseLevel" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="Floor" type="TileMap" parent="."]
+tile_set = ExtResource( 4 )
+cell_size = Vector2( 48, 48 )
+cell_y_sort = true
+format = 1
+
+[node name="Fog" type="TileMap" parent="."]
+tile_set = ExtResource( 12 )
+cell_size = Vector2( 48, 48 )
+format = 1
+
+[node name="AchievementNotifications" parent="." instance=ExtResource( 10 )]
+
+[node name="QuestPopup" parent="." instance=ExtResource( 14 )]
+visible = false
+
+[node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
+position = Vector2( 241, 400 )
+minimumZoom = 1.0
+maximumZoom = 2.0
+
+[node name="FloatingTextManager" parent="." instance=ExtResource( 9 )]
+
+[editable path="QuestPopup"]

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://gd-popups/CustomConfirmPopup.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Presentation/assets/TileSets/loot_wood.png" type="Texture" id=2]
+[ext_resource path="res://Presentation/loots/Wood/Wood.png" type="Texture" id=2]
 [ext_resource path="res://Presentation/QuestPopup.cs" type="Script" id=3]
 
 [node name="QuestPopup" instance=ExtResource( 1 )]

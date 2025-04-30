@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Presentation/loots/PotionBrown/PotionBrown.cs" type="Script" id=2]
+[ext_resource path="res://Presentation/loots/BaseLoot.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Presentation/loots/PotionBrown/PotionBrown.png" type="Texture" id=4]
+
+[node name="PotionBrown" instance=ExtResource( 3 )]
+margin_right = 48.0
+margin_bottom = 48.0
+texture_normal = ExtResource( 4 )
+script = ExtResource( 2 )

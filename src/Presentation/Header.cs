@@ -25,9 +25,6 @@ public partial class Header
     private uint currentStamina = 10;
 
     [Export]
-    public TileSet LootTileSet;
-
-    [Export]
     public uint CurrentStamina
     {
         get => currentStamina;
@@ -98,17 +95,13 @@ public partial class Header
         {
             character = value;
 
-            this.inventoryBagItem.Visible = character.BagId > -1;
-            if (character.BagId > -1)
-            {
-                this.inventoryBagItem.Texture = LootTileSet.TileGetTexture(character.BagId);
-            }
-            this.staminaIconFront.Visible = character.WeaponId > -1;
-            this.staminaIconBack.Visible = character.WeaponId == -1;
-            if (character.WeaponId > -1)
-            {
-                this.staminaIconFront.Texture = LootTileSet.TileGetTexture(character.WeaponId);
-            }
+            this.inventoryBagItem.Visible = character.BagId != null;
+            this.inventoryBagItem.Texture = character.BagId?.Image;
+
+            this.staminaIconFront.Visible = character.WeaponId != null;
+            this.staminaIconBack.Visible = character.WeaponId == null;
+
+            this.staminaIconFront.Texture = character.WeaponId?.Image;
         }
     }
     public override void _Ready()
@@ -145,8 +138,7 @@ public partial class Header
 
     public BaseBuff AddBuff(Buff buff, double progress)
     {
-        var buffPath = $"res://Presentation/buffs/{buff}.tscn";
-        var buffInstance = ResourceLoader.Load<PackedScene>(buffPath).Instance<BaseBuff>();
+        var buffInstance = Instantiator.CreateBuff(buff);
         buffInstance.Connect(nameof(BaseBuff.BuffRemoved), this, nameof(BuffRemoved), new Godot.Collections.Array { buffInstance });
         buffInstance.Connect(CommonSignals.Pressed, this, nameof(BuffClicked), new Godot.Collections.Array { buffInstance });
         buffInstance.Progress = progress;

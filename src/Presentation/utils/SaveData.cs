@@ -20,11 +20,7 @@ public class HeaderDump
 public class LevelDump
 {
     public List<(Vector2 a, int)> Floor;
-    public List<(Vector2 a, int)> Loot;
-    public List<(Vector2 a, int)> Blocks;
     public List<(Vector2 a, int)> Fog;
-    public List<(Vector2 a, int)> Groups;
-    public List<KeyValuePair<Vector2, BlocksDefinition>> Meta;
     public object CustomData;
     public Vector2 CameraZoom;
     public Vector2 CameraPos;
@@ -32,6 +28,7 @@ public class LevelDump
 
 public class InventoryDump
 {
+    //ToDo: change loot to string
     public (int, int) Bag;
     public List<(int, int)> Equipment;
     public List<(int, int)> Inventory;

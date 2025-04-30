@@ -10,16 +10,13 @@ public partial class QuestPopup
     [Export]
     public NodePath BagInventoryPath;
 
-    [Export]
-    public TileSet LootTileSet;
-
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
     }
 
-    public async Task<bool> ShowQuestPopup(string description, ValueTuple<ValueTuple<int, int, int>, uint>[] requirements, ValueTuple<ValueTuple<int, int, int>, uint>[] rewards)
+    public async Task<bool> ShowQuestPopup(string description, ValueTuple<string, uint>[] requirements, ValueTuple<string, uint>[] rewards)
     {
         var inventory = this.GetNode<BagInventoryPopup>(this.BagInventoryPath);
 
@@ -29,14 +26,13 @@ public partial class QuestPopup
         var isEnough = true;
         foreach (var req in requirements)
         {
-            var lootId = req.Item1.Item1;
-
+            var definition = LootDefinition.LootByName[req.Item1];
             this.requirementsList.AddChild(new TextureRect
             {
-                Texture = this.LootTileSet.TileGetTexture(lootId)
+                Texture = definition.Image
             });
 
-            var existing = inventory.GetItemCount(lootId);
+            var existing = inventory.GetItemCount(definition.Name);
 
             this.requirementsList.AddChild(new Label
             {
@@ -62,8 +58,8 @@ public partial class QuestPopup
 
         var success = inventory.TryChangeCountsOrCancel(
             requirements
-                .Select(a => (a.Item1.Item1, -(int)a.Item2))
-                .Concat(rewards.Select(a => (a.Item1.Item1, (int)a.Item2))));
+                .Select(a => (a.Item1, -(int)a.Item2))
+                .Concat(rewards.Select(a => (a.Item1, (int)a.Item2))));
 
         return success;
     }

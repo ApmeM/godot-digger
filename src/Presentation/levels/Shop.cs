@@ -9,12 +9,26 @@ public partial class Shop
     {
         base._Ready();
         this.FillMembers();
-
+        
         this.BagInventoryPopup.ConfigureInventory(this.shopInventory);
 
         this.shopInventory.Connect(nameof(Inventory.ItemCountChanged), this, nameof(UpdateCost));
         this.shopInventory.Config = this.BagInventoryPopup.Config;
         this.shopSellButton.Connect(CommonSignals.Pressed, this, nameof(SellButtonClicked));
+
+        this.shopkeeper.Connect(CommonSignals.Pressed, this, nameof(ShopkeeperClicked));
+    }
+
+    private async void ShopkeeperClicked()
+    {
+            this.shopInventory.Visible = true;
+            this.shopSellButton.Visible = true;
+            this.BagInventoryPopup.CloseOnClickButton = false;
+            this.BagInventoryPopup.Show();
+            await this.ToSignal(this.BagInventoryPopup, nameof(CustomPopup.PopupClosed));
+            this.shopInventory.Visible = false;
+            this.shopSellButton.Visible = false;
+            this.BagInventoryPopup.CloseOnClickButton = true;
     }
 
     public override void _ExitTree()
@@ -32,7 +46,7 @@ public partial class Shop
             return;
         }
 
-        this.BagInventoryPopup.TryChangeCount(Loot.Gold.Item1, (int)price);
+        this.BagInventoryPopup.TryChangeCount(nameof(Gold), (int)price);
         this.shopInventory.ClearItems();
     }
 
@@ -55,50 +69,26 @@ public partial class Shop
             {
                 continue;
             }
-            var tileId = item.Item1;
-            money += LootDefinition.KnownLoot[(tileId, 0, 0)].Price * item.Item2;
+            var lootId = item.Item1;
+            money += LootDefinition.LootById[lootId].Price * item.Item2;
         }
 
         return money;
     }
 
-    public override async void CustomBlockClicked(Vector2 pos)
-    {
-        if (pos == new Vector2(5, 12))
-        {
-            this.EmitSignal(nameof(ChangeLevel), "Level1");
-            return;
-        }
-        if (pos == new Vector2(6, 10))
-        {
-            this.shopInventory.Visible = true;
-            this.shopSellButton.Visible = true;
-            this.BagInventoryPopup.CloseOnClickButton = false;
-            this.BagInventoryPopup.Show();
-            await this.ToSignal(this.BagInventoryPopup, nameof(CustomPopup.PopupClosed));
-            this.shopInventory.Visible = false;
-            this.shopSellButton.Visible = false;
-            this.BagInventoryPopup.CloseOnClickButton = true;
-            return;
-        }
+    // ToDo: buy loot
+    // public async void CustomLootClickedAsync(Vector2 pos)
+    // {
+        // var tileId = this.loot.GetCellv(pos);
+        // var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
 
-        base.CustomBlockClicked(pos);
-    }
-
-    public override async void CustomLootClickedAsync(Vector2 pos)
-    {
-        var tileId = this.loot.GetCellv(pos);
-        var coord = this.loot.GetCellAutotileCoord((int)pos.x, (int)pos.y);
-
-        var price = LootDefinition.KnownLoot[(tileId, (int)coord.x, (int)coord.y)].Price;
-        var result = await questPopup.ShowQuestPopup("To buy:",
-            new[] { (Loot.Gold, price) },
-            new ValueTuple<ValueTuple<int, int, int>, uint>[] { });
-        if (!result)
-        {
-            return;
-        }
-
-        base.CustomLootClickedAsync(pos);
-    }
+        // var price = LootDefinition.KnownLoot[(tileId, (int)coord.x, (int)coord.y)].Price;
+        // var result = await questPopup.ShowQuestPopup("To buy:",
+        //     new[] { (Loot.Gold, price) },
+        //     new ValueTuple<ValueTuple<int, int, int>, uint>[] { });
+        // if (!result)
+        // {
+        //     return;
+        // }
+    // }
 }

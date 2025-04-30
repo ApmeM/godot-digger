@@ -32,9 +32,9 @@ public partial class Game
     protected void InventoryUseItem(InventorySlot slot)
     {
         var tileId = slot.ItemId;
-        if (LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction != null)
+        if (LootDefinition.LootById[tileId].UseAction != null)
         {
-            LootDefinition.KnownLoot[(tileId, 0, 0)].UseAction(this);
+            LootDefinition.LootById[tileId].UseAction(this);
             slot.TryChangeCount(slot.ItemId, -1);
         }
     }
@@ -117,7 +117,7 @@ public partial class Game
         }));
         f.Close();
 
-        ((BaseLevel)this.gamePosition.GetChild(0)).ShowPopup("Saved.");
+        GD.Print("Saved.");
     }
 
     public void Load(string name)
@@ -139,7 +139,6 @@ public partial class Game
         f.Close();
 
         ChangeLevel(this.CurrentSave.CurrentLevel);
-
-        ((BaseLevel)this.gamePosition.GetChild(0)).ShowPopup("Loaded.");
+        GD.Print("Loaded.");
     }
 }

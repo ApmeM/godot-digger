@@ -38,7 +38,6 @@ public partial class EquipmentInventory
     public int PantsId => this.pantsSlot.ItemId;
     public int BootsId => this.bootsSlot.ItemId;
 
-
     public override void _Ready()
     {
         this.neckSlot.AcceptedTypes.Add((int)ItemType.Neck);
@@ -63,13 +62,6 @@ public partial class EquipmentInventory
     private void SlotItemCountChanged(int itemId, int from, int to, InventorySlot slot)
     {
         this.EmitSignal(nameof(ItemCountChanged), slot, itemId, from, to);
-    }
-
-    public void ApplyEquipment(Character character)
-    {
-        character.DigPower = (uint)(character.DigPower + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].DigPower).Sum()));
-        character.MaxStamina = (uint)(character.MaxStamina + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].NumberOfTurns).Sum()));
-        character.BagSlots = (uint)(character.BagSlots + Math.Max(0, this.GetChildren().OfType<InventorySlot>().Where(a => a.ItemId >= 0).Select(a => LootDefinition.KnownLoot[(a.ItemId, 0, 0)].AdditionalSlots).Sum()));
     }
 
     public List<(int, int)> GetItems()

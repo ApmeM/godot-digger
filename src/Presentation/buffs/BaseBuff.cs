@@ -12,7 +12,7 @@ public partial class BaseBuff
     {
         get
         {
-            GD.PrintErr($"Buff descripio is not set for {this.GetType()}");
+            GD.PrintErr($"Buff description is not set for {this.GetType()}");
             return "Default description.";
         }
     }
@@ -23,7 +23,7 @@ public partial class BaseBuff
         set
         {
             this.textureProgress.Value = value;
-            this.timer.WaitTime = (float)(this.timer.WaitTime * value) / 100;
+            this.timer.WaitTime = this.timer.WaitTime - (float)(this.timer.WaitTime * value) / 100;
         }
     }
 

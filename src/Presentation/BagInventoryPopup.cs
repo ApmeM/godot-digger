@@ -1,12 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 [SceneReference("BagInventoryPopup.tscn")]
 public partial class BagInventoryPopup
 {
-    [Export]
-    public TileSet LootTileSet;
-
     [Signal]
     public delegate void BagChanged(int itemId, int from, int to);
 
@@ -25,16 +23,13 @@ public partial class BagInventoryPopup
         base._Ready();
         this.FillMembers();
 
-        foreach (int id in this.LootTileSet.GetTilesIds())
+        foreach (var id in LootDefinition.LootByName)
         {
-            var tex = this.LootTileSet.TileGetTexture(id);
-            var definition = LootDefinition.KnownLoot[(id, 0, 0)];
-
-            Config.Add(id, new InventorySlot.InventorySlotConfig
+            Config.Add((int)id.Value.Id, new InventorySlot.InventorySlotConfig
             {
-                Texture = tex,
-                MaxCount = definition.MaxCount,
-                ItemType = (int)definition.ItemType
+                Texture = id.Value.Image,
+                MaxCount = id.Value.MaxCount,
+                ItemType = (int)id.Value.ItemType
             });
         }
 
@@ -69,16 +64,16 @@ public partial class BagInventoryPopup
 
     protected void InventoryTryMergeItems(InventorySlot fromSlot, InventorySlot toSlot)
     {
-        if (!LootDefinition.KnownLoot[(toSlot.ItemId, 0, 0)].MergeActions.ContainsKey((fromSlot.ItemId, 0, 0)))
+        if (!LootDefinition.LootById[toSlot.ItemId].MergeActions.ContainsKey(LootDefinition.LootById[fromSlot.ItemId].Name))
         {
             return;
         }
 
-        var mergeResult = LootDefinition.KnownLoot[(toSlot.ItemId, 0, 0)].MergeActions[(fromSlot.ItemId, 0, 0)];
+        var mergeResult = LootDefinition.LootById[toSlot.ItemId].MergeActions[LootDefinition.LootById[fromSlot.ItemId].Name];
         fromSlot.TryChangeCount(fromSlot.ItemId, -1);
         toSlot.TryChangeCount(toSlot.ItemId, -1);
 
-        toSlot.TryChangeCount(mergeResult.Item1, 1);
+        toSlot.TryChangeCount(LootDefinition.LootByName[mergeResult].Id, 1);
     }
 
     public void LoadInventoryDump(InventoryDump inventoryDump)
@@ -125,32 +120,36 @@ public partial class BagInventoryPopup
         this.differentInventoriesContainer.AddChild(newInventory);
     }
 
-    public int TryChangeCount(int lootId, int count)
+    public int TryChangeCount(string lootId, int count)
     {
-        return this.bagInventory.TryChangeCount(lootId, count);
+        return this.bagInventory.TryChangeCount(LootDefinition.LootByName[lootId].Id, count);
     }
 
-    public int GetItemCount(int lootId)
+    public int GetItemCount(string lootId)
     {
-        return this.bagInventory.GetItemCount(lootId);
+        return this.bagInventory.GetItemCount(LootDefinition.LootByName[lootId].Id);
     }
 
     public void ApplyEquipment(Character character)
     {
-        character.BagId = this.bagSlot.ItemId;
-        character.WeaponId = this.equipmentInventory.WeaponId;
-        this.equipmentInventory.ApplyEquipment(character);
-        if (this.bagSlot.ItemId >= 0)
+        character.BagId = this.bagSlot.ItemId == -1 ? null : LootDefinition.LootById[this.bagSlot.ItemId];
+        character.WeaponId = this.equipmentInventory.WeaponId == -1 ? null : LootDefinition.LootById[this.equipmentInventory.WeaponId];
+
+        var loots = this.equipmentInventory.GetItems()
+            .Where(a => a.Item1 >= 0)
+            .Select(a => LootDefinition.LootById[a.Item1])
+            .ToList();
+
+        foreach (var loot in loots)
         {
-            var definition = LootDefinition.KnownLoot[(this.bagSlot.ItemId, 0, 0)];
-            character.DigPower += (uint)definition.DigPower;
-            character.MaxStamina += (uint)definition.NumberOfTurns;
-            character.BagSlots += (uint)definition.AdditionalSlots;
+            loot.EquipAction(character);
         }
+
+        character.BagId?.EquipAction(character);
     }
 
-    internal bool TryChangeCountsOrCancel(IEnumerable<(int, int)> enumerable)
+    internal bool TryChangeCountsOrCancel(IEnumerable<(string, int)> enumerable)
     {
-        return this.bagInventory.TryChangeCountsOrCancel(enumerable);
+        return this.bagInventory.TryChangeCountsOrCancel(enumerable.Select(a => (LootDefinition.LootByName[a.Item1].Id, a.Item2)));
     }
 }
