@@ -180,8 +180,6 @@ public partial class BaseUnit
         {
             this.DropLoot();
             this.QueueFree();
-
-            level.ReFogMap();
         }
     }
 

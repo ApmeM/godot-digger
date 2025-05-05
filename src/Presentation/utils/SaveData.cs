@@ -20,7 +20,6 @@ public class HeaderDump
 public class LevelDump
 {
     public List<(Vector2 a, int)> Floor;
-    public List<(Vector2 a, int)> Fog;
     public object CustomData;
     public Vector2 CameraZoom;
     public Vector2 CameraPos;

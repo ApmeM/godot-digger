@@ -30,14 +30,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        foreach (Vector2 cell in this.floor.GetUsedCells())
-        {
-            if ((Fog)this.fog.GetCellv(cell) == Fog.Nothing)
-            {
-                this.fog.SetCellv(cell, (int)Fog.Basic);
-            }
-        }
-
         foreach (BaseLoot baseLoot in this.GetTree().GetNodesInGroup(Groups.Loot))
         {
             baseLoot.LevelPath = this.GetPath();
@@ -48,57 +40,7 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             baseUnit.LevelPath = this.GetPath();
         }
 
-        ReFogMap();
-
         this.AddToGroup(Groups.LevelScene);
-    }
-
-    public void ReFogMap()
-    {
-        GD.Print("ReFogMap executed.");
-        foreach (Vector2 cell in this.fog.GetUsedCellsById((int)Fog.NoFog))
-        {
-            this.fog.SetCellv(cell, (int)Fog.Basic);
-        }
-
-        foreach (Vector2 pos in this.fog.GetUsedCellsById((int)Fog.UnfogStart))
-        {
-            foreach (var dir in cardinalDirections)
-            {
-                UnFogCell(pos + dir);
-            }
-        }
-    }
-
-    protected void UnFogCell(Vector2 cell)
-    {
-        var queue = new Queue<Vector2>();
-        queue.Enqueue(cell);
-
-        while (queue.Any())
-        {
-            cell = queue.Dequeue();
-
-            var fog = (Fog)this.fog.GetCellv(cell);
-
-            if (fog == Fog.Nothing || fog == Fog.NoFog || fog == Fog.UnfogStart)
-            {
-                continue;
-            }
-
-            this.fog.SetCellv(cell, (int)Fog.NoFog);
-
-            // ToDo: UnFogCell Take blocks into account
-            // if (this.blocks.GetCellv(cell) != -1 && !this.Meta[cell].NoFogBlocker)
-            // {
-            //     continue;
-            // }
-
-            foreach (var dir in cardinalDirections)
-            {
-                queue.Enqueue(cell + dir);
-            }
-        }
     }
 
     public void GetNeighbors(Vector2 node, ICollection<Vector2> result)
@@ -114,7 +56,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         return new LevelDump
         {
             Floor = this.floor.GetUsedCells().Cast<Vector2>().Select(a => (a, this.floor.GetCellv(a))).ToList(),
-            Fog = this.fog.GetUsedCells().Cast<Vector2>().Select(a => (a, this.fog.GetCellv(a))).ToList(),
             CameraZoom = this.draggableCamera.Zoom,
             CameraPos = this.draggableCamera.Position
         };
@@ -128,10 +69,8 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         }
 
         this.floor.Clear();
-        this.fog.Clear();
 
         levelDump.Floor?.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
-        levelDump.Fog?.ForEach(a => this.fog.SetCellv(a.Item1, a.Item2));
         this.draggableCamera.Position = levelDump.CameraPos;
         this.draggableCamera.Zoom = levelDump.CameraZoom;
     }

@@ -4,14 +4,14 @@ public class Instantiator
 {
     public static BaseBuff CreateBuff(Buff buff)
     {
-        var path = $"res://Presentation/buffs/{buff}.tscn";
+        var path = $"res://Presentation/buffs/{buff}/{buff}.tscn";
         var scene = ResourceLoader.Load<PackedScene>(path);
         return scene.Instance<BaseBuff>();
     }
 
-    internal static BaseLoot CreateLoot(string dirname)
+    internal static BaseLoot CreateLoot(string loot)
     {
-        var path = $"res://Presentation/loots/{dirname}/{dirname}.tscn";
+        var path = $"res://Presentation/loots/{loot}/{loot}.tscn";
         var scene = ResourceLoader.Load<PackedScene>(path);
         return scene.Instance<BaseLoot>();
     }
