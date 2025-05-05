@@ -10,7 +10,7 @@ public partial class Stash
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(StashPressed));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(StashPressed));
 
         foreach (var id in LootDefinition.LootByName)
         {

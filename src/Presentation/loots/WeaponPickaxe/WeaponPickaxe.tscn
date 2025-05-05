@@ -5,7 +5,9 @@
 [ext_resource path="res://Presentation/loots/WeaponPickaxe/WeaponPickaxe.png" type="Texture" id=4]
 
 [node name="WeaponPickaxe" instance=ExtResource( 3 )]
-margin_right = 48.0
-margin_bottom = 48.0
-texture_normal = ExtResource( 4 )
 script = ExtResource( 2 )
+
+[node name="Texture" parent="." index="0"]
+margin_top = -48.0
+margin_right = 48.0
+texture_normal = ExtResource( 4 )

@@ -29,7 +29,7 @@ public partial class BaseLoot
 
         this.AddToGroup(Groups.Loot);
 
-        this.Connect(CommonSignals.Pressed, this, nameof(LootClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(LootClicked));
     }
 
     private void LootClicked()

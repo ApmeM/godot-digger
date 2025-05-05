@@ -6,7 +6,6 @@
 [ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=4]
 
 [node name="Sign" instance=ExtResource( 2 )]
-texture_normal = ExtResource( 1 )
 script = ExtResource( 3 )
 LevelPath = NodePath("")
 Text = "Text"
@@ -37,5 +36,10 @@ margin_bottom = 51.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Text"
 align = 1
+
+[node name="Texture" parent="." index="1"]
+margin_top = -48.0
+margin_right = 48.0
+texture_normal = ExtResource( 1 )
 
 [editable path="SignPopup"]

@@ -5,5 +5,9 @@
 [ext_resource path="res://Presentation/units/Shopkeeper/Shopkeeper.cs" type="Script" id=3]
 
 [node name="Shopkeeper" instance=ExtResource( 2 )]
-texture_normal = ExtResource( 1 )
 script = ExtResource( 3 )
+
+[node name="Texture" parent="." index="0"]
+margin_top = -48.0
+margin_right = 48.0
+texture_normal = ExtResource( 1 )

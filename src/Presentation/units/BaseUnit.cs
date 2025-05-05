@@ -35,7 +35,7 @@ public partial class BaseUnit
             return;
         }
 
-        var worldPos = this.RectPosition + this.RectSize / 2;
+        var worldPos = this.Position;
 
         if (level.HeaderControl.CurrentStamina == 0)
         {
@@ -50,7 +50,7 @@ public partial class BaseUnit
 
         var hitPower = (uint)Math.Min(this.AttackPower, level.HeaderControl.CurrentHp);
         level.HeaderControl.CurrentHp -= hitPower;
-        level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.RectPosition, new Color(1, 0, 0));
+        level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
 
         if (level.HeaderControl.CurrentHp <= 0)
         {
@@ -66,7 +66,7 @@ public partial class BaseUnit
         {
             var newLoot = Instantiator.CreateLoot(loot);
             newLoot.LevelPath = this.LevelPath;
-            newLoot.RectPosition = this.RectPosition;
+            newLoot.Position = this.Position;
             this.GetParent().AddChild(newLoot);
         }
     }
@@ -74,7 +74,7 @@ public partial class BaseUnit
     protected Vector2? GetPathToRandomLocation(HashSet<Floor> floors)
     {
         var level = this.GetNode<BaseLevel>(this.LevelPath);
-        var pos = level.FloorMap.WorldToMap(this.RectPosition);
+        var pos = level.FloorMap.WorldToMap(this.Position);
 
         var possibleMoves = level.cardinalDirections
             .Select(dir => pos + dir)
@@ -94,12 +94,12 @@ public partial class BaseUnit
     protected Vector2? GetPathToLoot(HashSet<Floor> floors)
     {
         var level = this.GetNode<BaseLevel>(this.LevelPath);
-        var pos = level.FloorMap.WorldToMap(this.RectPosition);
+        var pos = level.FloorMap.WorldToMap(this.Position);
 
         var loots = this.GetTree()
             .GetNodesInGroup(Groups.Loot)
             .Cast<BaseLoot>()
-            .Select(a => level.FloorMap.WorldToMap(a.RectPosition))
+            .Select(a => level.FloorMap.WorldToMap(a.Position))
             .ToHashSet();
 
         var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
@@ -119,10 +119,10 @@ public partial class BaseUnit
         var groupsToAttack = this.AggroAgainst.Except(this.GetGroups().Cast<string>()).ToArray();
 
         var level = this.GetNode<BaseLevel>(this.LevelPath);
-        var pos = level.FloorMap.WorldToMap(this.RectPosition);
+        var pos = level.FloorMap.WorldToMap(this.Position);
         var otherGroups = groupsToAttack
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-            .Select(a => a.RectPosition)
+            .Select(a => a.Position)
             .Select(a => level.FloorMap.WorldToMap(a))
             .ToHashSet();
 
@@ -140,14 +140,14 @@ public partial class BaseUnit
 
     protected bool MoveUnit(Vector2 destination, float speed)
     {
-        var direction = destination - this.RectPosition;
+        var direction = destination - this.Position;
         if (direction.LengthSquared() <= speed * speed)
         {
-            this.RectPosition = destination;
+            this.Position = destination;
             return true;
         }
 
-        this.RectPosition += direction.Normalized() * speed;
+        this.Position += direction.Normalized() * speed;
         return false;
     }
 
@@ -157,7 +157,7 @@ public partial class BaseUnit
 
         var hitPower = (uint)Math.Min(attackPower, this.HP);
         this.HP -= hitPower;
-        level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.RectPosition, new Color(1, 0, 0));
+        level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
 
         if (from != null)
         {
@@ -187,7 +187,7 @@ public partial class BaseUnit
 
     internal bool TryAttackAt(Vector2 at)
     {
-        if ((this.RectPosition - at).LengthSquared() >= (this.RectSize / 4).LengthSquared())
+        if ((this.Position - at).LengthSquared() >= 48*48)
         {
             return false;
         }
@@ -198,7 +198,7 @@ public partial class BaseUnit
 
         var opponent = groupsToAttack
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-            .Where(a => level.FloorMap.WorldToMap(at) == level.FloorMap.WorldToMap(a.RectPosition))
+            .Where(a => level.FloorMap.WorldToMap(at) == level.FloorMap.WorldToMap(a.Position))
             .FirstOrDefault();
 
         if (opponent == null)

@@ -26,7 +26,7 @@ public partial class Sign
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(SignClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(SignClicked));
         this.Text = text;
     }
 

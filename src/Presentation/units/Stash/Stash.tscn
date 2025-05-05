@@ -6,7 +6,6 @@
 [ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=4]
 
 [node name="Stash" instance=ExtResource( 2 )]
-texture_normal = ExtResource( 1 )
 script = ExtResource( 3 )
 
 [node name="StashInventory" parent="." index="0" instance=ExtResource( 4 )]
@@ -18,3 +17,8 @@ margin_bottom = 198.0
 Size = 14
 SizePerRow = 7
 Title = "Stash"
+
+[node name="Texture" parent="." index="1"]
+margin_top = -48.0
+margin_right = 48.0
+texture_normal = ExtResource( 1 )

@@ -15,7 +15,7 @@ public partial class WaspNest
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
     }
 
     public override void GotHit(BaseUnit from, int attackPower)
@@ -23,7 +23,7 @@ public partial class WaspNest
         base.GotHit(from, attackPower);
 
         var instance = Instantiator.CreateUnit("Wasp");
-        instance.RectPosition = this.RectPosition;
+        instance.Position = this.Position;
         instance.LevelPath = this.LevelPath;
         instance.AggroAgainst = this.AggroAgainst;
         foreach (var group in this.GetGroups().Cast<string>().Intersect(Groups.GroupsListForAggro))
@@ -36,7 +36,7 @@ public partial class WaspNest
         if (this.HP <= 0)
         {
             var level = this.GetNode<BaseLevel>(this.LevelPath);
-            level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.RectPosition);
+            level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }
 }

@@ -16,6 +16,6 @@ public partial class Tree2
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
     }
 }

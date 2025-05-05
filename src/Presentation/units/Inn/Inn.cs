@@ -12,7 +12,7 @@ public partial class Inn
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(MoveClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(MoveClicked));
     }
 
     private void MoveClicked()

@@ -19,7 +19,7 @@ public partial class Wolf
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
     }
 
     [Export]
@@ -76,7 +76,7 @@ public partial class Wolf
         if (this.HP <= 0)
         {
             var level = this.GetNode<BaseLevel>(this.LevelPath);
-            level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.RectPosition);
+            level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }
 }

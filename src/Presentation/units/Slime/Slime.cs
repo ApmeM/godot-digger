@@ -17,7 +17,7 @@ public partial class Slime
         base._Ready();
         this.FillMembers();
 
-        this.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
     }
 
     [Export]
@@ -59,7 +59,7 @@ public partial class Slime
             var loots = this.GetTree()
                 .GetNodesInGroup(Groups.Loot)
                 .Cast<BaseLoot>()
-                .Where(a => level.FloorMap.WorldToMap(a.RectPosition) == level.FloorMap.WorldToMap(this.RectPosition))
+                .Where(a => level.FloorMap.WorldToMap(a.Position) == level.FloorMap.WorldToMap(this.Position))
                 .ToList();
 
             foreach (var l in loots)
@@ -81,7 +81,7 @@ public partial class Slime
         if (this.HP <= 0)
         {
             var level = this.GetNode<BaseLevel>(this.LevelPath);
-            level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.RectPosition);
+            level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }
 }
