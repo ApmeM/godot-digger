@@ -38,8 +38,6 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
             }
         }
 
-        this.questPopup.BagInventoryPath = this.BagInventoryPopup.GetPath();
-
         foreach (BaseLoot baseLoot in this.GetTree().GetNodesInGroup(Groups.Loot))
         {
             baseLoot.LevelPath = this.GetPath();

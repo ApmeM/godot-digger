@@ -28,7 +28,7 @@ public class LevelDump
 
 public class InventoryDump
 {
-    //ToDo: change loot to string
+    //ToDo: Save change loot type to string
     public (int, int) Bag;
     public List<(int, int)> Equipment;
     public List<(int, int)> Inventory;

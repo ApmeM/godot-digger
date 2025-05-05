@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level1.cs" type="Script" id=2]
@@ -13,6 +13,8 @@
 [ext_resource path="res://Presentation/loots/Bag3/Bag3.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/units/WoodCutter/WoodCutter.tscn" type="PackedScene" id=12]
 [ext_resource path="res://Presentation/units/StairsDown/StairsDown.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Presentation/units/Redhat/Redhat.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Presentation/units/Grandma/Grandma.tscn" type="PackedScene" id=15]
 
 [node name="Level1" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
@@ -72,10 +74,14 @@ MoveToLevel = "Level2"
 [node name="Stash" parent="Floor" index="15" instance=ExtResource( 4 )]
 position = Vector2( -123, 748 )
 
+[node name="Redhat" parent="Floor" index="16" instance=ExtResource( 14 )]
+position = Vector2( 172, 1061 )
+
+[node name="Grandma" parent="Floor" index="17" instance=ExtResource( 15 )]
+position = Vector2( -85, 646 )
+
 [node name="Fog" parent="." index="1"]
 tile_data = PoolIntArray( 1179648, 1, 0 )
 
-[node name="DraggableCamera" parent="." index="4"]
+[node name="DraggableCamera" parent="." index="3"]
 position = Vector2( 51, 880 )
-
-[editable path="QuestPopup"]
