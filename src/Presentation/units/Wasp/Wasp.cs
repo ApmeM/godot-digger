@@ -29,6 +29,7 @@ public partial class Wasp
     private Vector2? path;
 
     private float currentMoveDelay;
+    private HashSet<Floor> floors = new HashSet<Floor> { Floor.Ground, Floor.Road, Floor.Water };
 
     public override void _Process(float delta)
     {
@@ -40,10 +41,8 @@ public partial class Wasp
             return;
         }
 
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         if (path == null)
         {
-            var floors = new HashSet<Floor> { Floor.Ground, Floor.Tiles, Floor.Water };
             this.path = this.GetPathToOtherGroup(floors) ??
                         this.GetPathToRandomLocation(floors);
             if (this.path == null)
@@ -52,7 +51,7 @@ public partial class Wasp
                 currentMoveDelay = 0;
                 return;
             }
-            path = level.FloorMap.MapToWorld(path.Value);
+            path = level.MapToWorld(path.Value);
         }
 
         if (base.TryAttackAt(path.Value))
@@ -73,7 +72,6 @@ public partial class Wasp
         base.GotHit(from, attackPower);
         if (this.HP <= 0)
         {
-            var level = this.GetNode<BaseLevel>(this.LevelPath);
             level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }

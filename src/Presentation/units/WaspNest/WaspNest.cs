@@ -35,7 +35,6 @@ public partial class WaspNest
 
         if (this.HP <= 0)
         {
-            var level = this.GetNode<BaseLevel>(this.LevelPath);
             level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }

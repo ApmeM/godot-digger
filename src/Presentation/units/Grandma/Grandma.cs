@@ -15,7 +15,6 @@ public partial class Grandma
 
     private async void GrandmaClicked()
     {
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         this.questPopup.BagInventoryPath = level.BagInventoryPopup.GetPath();
 
         var result = await questPopup.ShowQuestPopup("Did you bring me a bread from my grand daughter RedHat?",

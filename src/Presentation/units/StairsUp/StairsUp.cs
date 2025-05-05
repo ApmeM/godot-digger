@@ -23,7 +23,6 @@ public partial class StairsUp
             return;
         }
 
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         level.EmitSignal(nameof(BaseLevel.ChangeLevel), MoveToLevel);
     }
 }

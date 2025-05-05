@@ -18,6 +18,26 @@ public partial class BaseUnit
     [Export]
     public NodePath LevelPath;
 
+    private BaseLevel internalLevel;
+    protected BaseLevel level
+    {
+        get
+        {
+            internalLevel = internalLevel ?? this.GetNode<BaseLevel>(LevelPath);
+            return internalLevel;
+        }
+    }
+
+    private IPathfinder<(Vector2, HashSet<Floor>)> internalPathfinder;
+    protected IPathfinder<(Vector2, HashSet<Floor>)> pathfinder
+    {
+        get
+        {
+            internalPathfinder = internalPathfinder ?? new AStarPathfinder<(Vector2, HashSet<Floor>)>(level);
+            return internalPathfinder;
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();
@@ -28,8 +48,6 @@ public partial class BaseUnit
 
     public void UnitClicked()
     {
-        var level = GetNode<BaseLevel>(LevelPath);
-
         if (!level.HeaderControl.Character.CanDig)
         {
             return;
@@ -73,37 +91,9 @@ public partial class BaseUnit
 
     protected Vector2? GetPathToRandomLocation(HashSet<Floor> floors)
     {
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
-        var pos = level.FloorMap.WorldToMap(this.Position);
-
-        var possibleMoves = level.cardinalDirections
-            .Select(dir => pos + dir)
-            .Where(cell => floors.Contains((Floor)level.FloorMap.GetCell((int)cell.x, (int)cell.y)))
-            // ToDo: GetPathToRandomLocation Should not select blocked locations
-            // .Where(cell => level.BlocksMap.GetCell((int)cell.x, (int)cell.y) == -1) 
-            .ToList();
-
-        if (possibleMoves.Count <= 0)
-        {
-            return null;
-        }
-
-        return possibleMoves[random.Next(possibleMoves.Count)];
-    }
-
-    protected Vector2? GetPathToLoot(HashSet<Floor> floors)
-    {
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
-        var pos = level.FloorMap.WorldToMap(this.Position);
-
-        var loots = this.GetTree()
-            .GetNodesInGroup(Groups.Loot)
-            .Cast<BaseLoot>()
-            .Select(a => level.FloorMap.WorldToMap(a.Position))
-            .ToHashSet();
-
-        var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
-        pathfinder.Search(pos, loots);
+        var pos = level.WorldToMap(this.Position);
+        var dest = pos + level.moveDirections[random.Next(level.moveDirections.Length)];
+        pathfinder.Search((pos, floors), (dest, floors));
         var path = pathfinder.ResultPath;
 
         if (path == null || path.Count < 2)
@@ -111,23 +101,41 @@ public partial class BaseUnit
             return null;
         }
 
-        return path.Skip(1).Take(1).FirstOrDefault();
+        return path[1].Item1;
+    }
+
+    protected Vector2? GetPathToLoot(HashSet<Floor> floors)
+    {
+        var pos = level.WorldToMap(this.Position);
+
+        var loots = this.GetTree()
+            .GetNodesInGroup(Groups.Loot)
+            .Cast<BaseLoot>()
+            .Select(a => (level.WorldToMap(a.Position), floors))
+            .ToHashSet();
+
+        pathfinder.Search((pos, floors), loots);
+        var path = pathfinder.ResultPath;
+
+        if (path == null || path.Count < 2)
+        {
+            return null;
+        }
+
+        return path[1].Item1;
     }
 
     protected Vector2? GetPathToOtherGroup(HashSet<Floor> floors)
     {
         var groupsToAttack = this.AggroAgainst.Except(this.GetGroups().Cast<string>()).ToArray();
 
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
-        var pos = level.FloorMap.WorldToMap(this.Position);
+        var pos = level.WorldToMap(this.Position);
         var otherGroups = groupsToAttack
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-            .Select(a => a.Position)
-            .Select(a => level.FloorMap.WorldToMap(a))
+            .Select(a => (level.WorldToMap(a.Position), floors))
             .ToHashSet();
 
-        var pathfinder = new BreadthFirstPathfinder<Vector2>(level);
-        pathfinder.Search(pos, otherGroups);
+        pathfinder.Search((pos, floors), otherGroups);
         var path = pathfinder.ResultPath;
 
         if (path == null || path.Count < 2)
@@ -135,7 +143,7 @@ public partial class BaseUnit
             return null;
         }
 
-        return path.Skip(1).Take(1).FirstOrDefault();
+        return path[1].Item1;
     }
 
     protected bool MoveUnit(Vector2 destination, float speed)
@@ -153,8 +161,6 @@ public partial class BaseUnit
 
     public virtual void GotHit(BaseUnit from, int attackPower)
     {
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
-
         var hitPower = (uint)Math.Min(attackPower, this.HP);
         this.HP -= hitPower;
         level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
@@ -185,18 +191,16 @@ public partial class BaseUnit
 
     internal bool TryAttackAt(Vector2 at)
     {
-        if ((this.Position - at).LengthSquared() >= 48*48)
+        if ((this.Position - at).LengthSquared() >= 48 * 48)
         {
             return false;
         }
-
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
 
         var groupsToAttack = this.AggroAgainst.Except(this.GetGroups().Cast<string>()).ToArray();
 
         var opponent = groupsToAttack
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-            .Where(a => level.FloorMap.WorldToMap(at) == level.FloorMap.WorldToMap(a.Position))
+            .Where(a => level.WorldToMap(at) == level.WorldToMap(a.Position))
             .FirstOrDefault();
 
         if (opponent == null)

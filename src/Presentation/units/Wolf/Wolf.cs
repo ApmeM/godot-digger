@@ -31,6 +31,7 @@ public partial class Wolf
     private Vector2? path;
 
     private float currentMoveDelay;
+    private HashSet<Floor> floors = new HashSet<Floor> { Floor.Ground, Floor.Road };
 
     public override void _Process(float delta)
     {
@@ -42,10 +43,8 @@ public partial class Wolf
             return;
         }
 
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         if (path == null)
         {
-            var floors = new HashSet<Floor> { Floor.Ground, Floor.Tiles };
             this.path = this.GetPathToOtherGroup(floors) ??
                         this.GetPathToRandomLocation(floors);
             if (this.path == null)
@@ -54,7 +53,7 @@ public partial class Wolf
                 currentMoveDelay = 0;
                 return;
             }
-            path = level.FloorMap.MapToWorld(path.Value);
+            path = level.MapToWorld(path.Value);
         }
 
         if (base.TryAttackAt(path.Value))
@@ -75,7 +74,6 @@ public partial class Wolf
         base.GotHit(from, attackPower);
         if (this.HP <= 0)
         {
-            var level = this.GetNode<BaseLevel>(this.LevelPath);
             level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }

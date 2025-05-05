@@ -50,7 +50,7 @@ position = Vector2( 238, 834 )
 position = Vector2( 99, 1057 )
 
 [node name="Wolf" parent="Floor" index="9" groups=["AttackGroup2"] instance=ExtResource( 6 )]
-position = Vector2( 177, 925 )
+position = Vector2( 13, 930 )
 
 [node name="Sign" parent="Floor" index="10" instance=ExtResource( 7 )]
 position = Vector2( 197, 668 )
@@ -58,7 +58,7 @@ Text = "Welcome to our glorious city (Currently abandoned).
 Tutorial: wood pile requires to click twice to clean."
 
 [node name="WaspNest" parent="Floor" index="11" groups=["AttackGroup1"] instance=ExtResource( 8 )]
-position = Vector2( -45, 780 )
+position = Vector2( 22, 751 )
 
 [node name="Bag3" parent="Floor" index="12" instance=ExtResource( 11 )]
 position = Vector2( -143, 910 )
@@ -80,8 +80,5 @@ position = Vector2( 172, 1061 )
 [node name="Grandma" parent="Floor" index="17" instance=ExtResource( 15 )]
 position = Vector2( -85, 646 )
 
-[node name="Fog" parent="." index="1"]
-tile_data = PoolIntArray( 1179648, 1, 0 )
-
-[node name="DraggableCamera" parent="." index="3"]
+[node name="DraggableCamera" parent="." index="2"]
 position = Vector2( 51, 880 )

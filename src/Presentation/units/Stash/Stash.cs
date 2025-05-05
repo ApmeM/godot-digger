@@ -31,7 +31,6 @@ public partial class Stash
     
     private async void StashPressed()
     {
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         level.BagInventoryPopup.ConfigureInventory(this.stashInventory);
 
         this.stashInventory.Visible = true;

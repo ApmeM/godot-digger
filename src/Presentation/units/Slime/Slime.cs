@@ -29,6 +29,7 @@ public partial class Slime
     private Vector2? path;
 
     private float currentMoveDelay;
+    private HashSet<Floor> floors = new HashSet<Floor> { Floor.Ground, Floor.Road };
 
     public override void _Process(float delta)
     {
@@ -40,10 +41,8 @@ public partial class Slime
             return;
         }
 
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         if (path == null)
         {
-            var floors = new HashSet<Floor> { Floor.Ground, Floor.Tiles };
             this.path = this.GetPathToLoot(floors) ?? this.GetPathToRandomLocation(floors);
             if (this.path == null)
             {
@@ -51,7 +50,7 @@ public partial class Slime
                 currentMoveDelay = 0;
                 return;
             }
-            path = level.FloorMap.MapToWorld(path.Value);
+            path = level.MapToWorld(path.Value);
         }
 
         if (base.MoveUnit(path.Value, Speed * delta))
@@ -59,7 +58,7 @@ public partial class Slime
             var loots = this.GetTree()
                 .GetNodesInGroup(Groups.Loot)
                 .Cast<BaseLoot>()
-                .Where(a => level.FloorMap.WorldToMap(a.Position) == level.FloorMap.WorldToMap(this.Position))
+                .Where(a => level.WorldToMap(a.Position) == level.WorldToMap(this.Position))
                 .ToList();
 
             foreach (var l in loots)
@@ -80,7 +79,6 @@ public partial class Slime
         base.GotHit(from, attackPower);
         if (this.HP <= 0)
         {
-            var level = this.GetNode<BaseLevel>(this.LevelPath);
             level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
         }
     }

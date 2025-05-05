@@ -5,17 +5,25 @@ using BrainAI.Pathfinding;
 using Godot;
 
 [SceneReference("BaseLevel.tscn")]
-public partial class BaseLevel : IUnweightedGraph<Vector2>
+public partial class BaseLevel : IAstarGraph<(Vector2, HashSet<Floor>)>
 {
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
 
-    public readonly Vector2[] cardinalDirections = new Vector2[] { Vector2.Down, Vector2.Left, Vector2.Up, Vector2.Right };
+    public readonly Vector2[] moveDirections = new Vector2[] {
+        Vector2.Down,
+        Vector2.Down + Vector2.Left,
+        Vector2.Left,
+        Vector2.Left + Vector2.Up,
+        Vector2.Up,
+        Vector2.Up + Vector2.Right,
+        Vector2.Right,
+        Vector2.Right + Vector2.Down,
+    };
 
     public Header HeaderControl;
     public BagInventoryPopup BagInventoryPopup;
 
-    public TileMap FloorMap => this.floor;
     public FloatingTextManager FloatingTextManagerControl => this.floatingTextManager;
 
     public override void _Ready()
@@ -43,12 +51,35 @@ public partial class BaseLevel : IUnweightedGraph<Vector2>
         this.AddToGroup(Groups.LevelScene);
     }
 
-    public void GetNeighbors(Vector2 node, ICollection<Vector2> result)
+    public void GetNeighbors((Vector2, HashSet<Floor>) node, ICollection<(Vector2, HashSet<Floor>)> result)
     {
-        if (/* this.blocks.GetCellv(node - Vector2.Down) == -1 &&  */this.floor.GetCellv(node - Vector2.Down) != -1) result.Add(node - Vector2.Down);
-        if (/* this.blocks.GetCellv(node - Vector2.Left) == -1 &&  */this.floor.GetCellv(node - Vector2.Left) != -1) result.Add(node - Vector2.Left);
-        if (/* this.blocks.GetCellv(node - Vector2.Right) == -1 &&  */this.floor.GetCellv(node - Vector2.Right) != -1) result.Add(node - Vector2.Right);
-        if (/* this.blocks.GetCellv(node - Vector2.Up) == -1 &&  */this.floor.GetCellv(node - Vector2.Up) != -1) result.Add(node - Vector2.Up);
+        foreach (var dir in moveDirections)
+        {
+            if (/* this.blocks.GetCellv(node - dir) == -1 &&  */node.Item2.Contains((Floor)this.floor.GetCellv(node.Item1 - dir)))
+            {
+                result.Add((node.Item1 - dir, node.Item2));
+            }
+        }
+    }
+
+    public int Heuristic((Vector2, HashSet<Floor>) node, (Vector2, HashSet<Floor>) goal)
+    {
+        return (int)(node.Item1 - goal.Item1).Length();
+    }
+
+    public int Cost((Vector2, HashSet<Floor>) from, (Vector2, HashSet<Floor>) to)
+    {
+        return (int)(from.Item1 - to.Item1).Length();
+    }
+
+    public Vector2 MapToWorld(Vector2 mapPos)
+    {
+        return this.floor.MapToWorld(mapPos);
+    }
+
+    public Vector2 WorldToMap(Vector2 mapPos)
+    {
+        return this.floor.WorldToMap(mapPos);
     }
 
     public virtual LevelDump GetLevelDump()

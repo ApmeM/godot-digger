@@ -22,6 +22,16 @@ public partial class BaseLoot
     public Action<Game> UseAction { get; set; }
     public Action<Character> EquipAction { get; set; }
 
+    private BaseLevel internalLevel;
+    protected BaseLevel level
+    {
+        get
+        {
+            internalLevel = internalLevel ?? this.GetNode<BaseLevel>(LevelPath);
+            return internalLevel;
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();
@@ -34,7 +44,6 @@ public partial class BaseLoot
 
     private void LootClicked()
     {
-        var level = this.GetNode<BaseLevel>(LevelPath);
         if (level.BagInventoryPopup.TryChangeCount(this.LootName, 1) == 0)
         {
             this.QueueFree();

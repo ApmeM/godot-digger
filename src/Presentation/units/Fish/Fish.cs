@@ -20,6 +20,7 @@ public partial class Fish
     private Vector2? path;
 
     private float currentMoveDelay;
+    private HashSet<Floor> floors = new HashSet<Floor> { Floor.Water };
 
     public override void _Process(float delta)
     {
@@ -31,10 +32,8 @@ public partial class Fish
             return;
         }
 
-        var level = this.GetNode<BaseLevel>(this.LevelPath);
         if (path == null)
         {
-            var floors = new HashSet<Floor> { Floor.Water };
             this.path = this.GetPathToRandomLocation(floors);
             if (this.path == null)
             {
@@ -42,7 +41,7 @@ public partial class Fish
                 currentMoveDelay = 0;
                 return;
             }
-            path = level.FloorMap.MapToWorld(path.Value);
+            path = level.MapToWorld(path.Value);
         }
 
         if (base.MoveUnit(path.Value, Speed * delta))
