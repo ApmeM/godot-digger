@@ -74,12 +74,12 @@ public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
 
     public Vector2 MapToWorld(Vector2 mapPos)
     {
-        return this.floor.MapToWorld(mapPos);
+        return this.floor.MapToWorld(mapPos - Vector2.Up);
     }
 
     public Vector2 WorldToMap(Vector2 worldPos)
     {
-        return this.floor.WorldToMap(worldPos);
+        return this.floor.WorldToMap(worldPos) + Vector2.Up;
     }
 
     public virtual LevelDump GetLevelDump()
