@@ -5,7 +5,7 @@ using BrainAI.Pathfinding;
 using Godot;
 
 [SceneReference("BaseLevel.tscn")]
-public partial class BaseLevel : IAstarGraph<(Vector2, HashSet<Floor>)>
+public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
 {
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
@@ -62,14 +62,14 @@ public partial class BaseLevel : IAstarGraph<(Vector2, HashSet<Floor>)>
         }
     }
 
-    public int Heuristic((Vector2, HashSet<Floor>) node, (Vector2, HashSet<Floor>) goal)
-    {
-        return (int)(node.Item1 - goal.Item1).Length();
-    }
-
     public int Cost((Vector2, HashSet<Floor>) from, (Vector2, HashSet<Floor>) to)
     {
         return (int)(from.Item1 - to.Item1).Length();
+    }
+
+    public bool IsReachable(Vector2 pos, HashSet<Floor> floors)
+    {
+        return floors.Contains((Floor)this.floor.GetCellv(pos));
     }
 
     public Vector2 MapToWorld(Vector2 mapPos)
@@ -77,9 +77,9 @@ public partial class BaseLevel : IAstarGraph<(Vector2, HashSet<Floor>)>
         return this.floor.MapToWorld(mapPos);
     }
 
-    public Vector2 WorldToMap(Vector2 mapPos)
+    public Vector2 WorldToMap(Vector2 worldPos)
     {
-        return this.floor.WorldToMap(mapPos);
+        return this.floor.WorldToMap(worldPos);
     }
 
     public virtual LevelDump GetLevelDump()

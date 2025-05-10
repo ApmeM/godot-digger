@@ -45,7 +45,7 @@ public partial class Wolf
 
         if (path == null)
         {
-            this.path = this.GetPathToOtherGroup(floors) ??
+            this.path = this.GetPathToOtherGroup(floors, 10) ??
                         this.GetPathToRandomLocation(floors);
             if (this.path == null)
             {

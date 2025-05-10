@@ -43,7 +43,7 @@ public partial class Wasp
 
         if (path == null)
         {
-            this.path = this.GetPathToOtherGroup(floors) ??
+            this.path = this.GetPathToOtherGroup(floors, 3) ??
                         this.GetPathToRandomLocation(floors);
             if (this.path == null)
             {

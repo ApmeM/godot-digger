@@ -33,10 +33,12 @@ public partial class BaseUnit
     {
         get
         {
-            internalPathfinder = internalPathfinder ?? new AStarPathfinder<(Vector2, HashSet<Floor>)>(level);
+            internalPathfinder = internalPathfinder ?? new WeightedPathfinder<(Vector2, HashSet<Floor>)>(level);
             return internalPathfinder;
         }
     }
+    private List<(Vector2, HashSet<Floor>)> resultPath = new List<(Vector2, HashSet<Floor>)>();
+
 
     public override void _Ready()
     {
@@ -93,15 +95,20 @@ public partial class BaseUnit
     {
         var pos = level.WorldToMap(this.Position);
         var dest = pos + level.moveDirections[random.Next(level.moveDirections.Length)];
-        pathfinder.Search((pos, floors), (dest, floors));
-        var path = pathfinder.ResultPath;
-
-        if (path == null || path.Count < 2)
+        if (!level.IsReachable(dest, floors))
         {
             return null;
         }
 
-        return path[1].Item1;
+        resultPath.Clear();
+        pathfinder.Search((pos, floors), (dest, floors), 10, resultPath);
+
+        if (resultPath == null || resultPath.Count < 2)
+        {
+            return null;
+        }
+
+        return resultPath[1].Item1;
     }
 
     protected Vector2? GetPathToLoot(HashSet<Floor> floors)
@@ -112,20 +119,21 @@ public partial class BaseUnit
             .GetNodesInGroup(Groups.Loot)
             .Cast<BaseLoot>()
             .Select(a => (level.WorldToMap(a.Position), floors))
+            .Where(a => level.IsReachable(a.Item1, floors))
             .ToHashSet();
 
-        pathfinder.Search((pos, floors), loots);
-        var path = pathfinder.ResultPath;
+        resultPath.Clear();
+        pathfinder.Search((pos, floors), loots, 10, resultPath);
 
-        if (path == null || path.Count < 2)
+        if (resultPath == null || resultPath.Count < 2)
         {
             return null;
         }
 
-        return path[1].Item1;
+        return resultPath[1].Item1;
     }
 
-    protected Vector2? GetPathToOtherGroup(HashSet<Floor> floors)
+    protected Vector2? GetPathToOtherGroup(HashSet<Floor> floors, int maxDistance)
     {
         var groupsToAttack = this.AggroAgainst.Except(this.GetGroups().Cast<string>()).ToArray();
 
@@ -133,17 +141,19 @@ public partial class BaseUnit
         var otherGroups = groupsToAttack
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
             .Select(a => (level.WorldToMap(a.Position), floors))
+            .Where(a => level.IsReachable(a.Item1, floors))
+            .Where(a => (a.Item1 - pos).LengthSquared() <= maxDistance * maxDistance)
             .ToHashSet();
 
-        pathfinder.Search((pos, floors), otherGroups);
-        var path = pathfinder.ResultPath;
+        resultPath.Clear();
+        pathfinder.Search((pos, floors), otherGroups, (maxDistance * 2 + 1) * (maxDistance * 2 + 1), resultPath);
 
-        if (path == null || path.Count < 2)
+        if (resultPath == null || resultPath.Count < 2)
         {
             return null;
         }
 
-        return path[1].Item1;
+        return resultPath[1].Item1;
     }
 
     protected bool MoveUnit(Vector2 destination, float speed)
