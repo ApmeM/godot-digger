@@ -14,8 +14,23 @@ public partial class WaspNest
     {
         base._Ready();
         this.FillMembers();
+    }
 
-        this.texture.Connect(CommonSignals.Pressed, this, nameof(UnitClicked));
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        base._UnhandledInput(@event);
+        if (@event is InputEventMouseButton mouse && mouse.IsPressed() && !mouse.IsEcho() && (ButtonList)mouse.ButtonIndex == ButtonList.Left)
+        {
+            var size = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame).GetSize();
+            var rect = new Rect2(this.animatedSprite.Position, size);
+            var mousePos = this.GetLocalMousePosition();
+            
+            if (rect.HasPoint(mousePos))
+            {
+                this.GetTree().SetInputAsHandled();
+                this.UnitClicked();
+            }
+        }
     }
 
     public override void GotHit(BaseUnit from, int attackPower)

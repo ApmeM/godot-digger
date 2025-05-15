@@ -10,8 +10,6 @@ public partial class Stash
         base._Ready();
         this.FillMembers();
 
-        this.texture.Connect(CommonSignals.Pressed, this, nameof(StashPressed));
-
         foreach (var id in LootDefinition.LootByName)
         {
             this.stashInventory.Config.Add((int)id.Value.Id, new InventorySlot.InventorySlotConfig
@@ -23,13 +21,30 @@ public partial class Stash
         }
     }
 
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        base._UnhandledInput(@event);
+        if (@event is InputEventMouseButton mouse && mouse.IsPressed() && !mouse.IsEcho() && (ButtonList)mouse.ButtonIndex == ButtonList.Left)
+        {
+            var size = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame).GetSize();
+            var rect = new Rect2(this.animatedSprite.Position, size);
+            var mousePos = this.GetLocalMousePosition();
+            
+            if (rect.HasPoint(mousePos))
+            {
+                this.GetTree().SetInputAsHandled();
+                this.StashClicked();
+            }
+        }
+    }
+
     public override void _ExitTree()
     {
         base._ExitTree();
         this.stashInventory.QueueFree();
     }
     
-    private async void StashPressed()
+    private async void StashClicked()
     {
         level.BagInventoryPopup.ConfigureInventory(this.stashInventory);
 
