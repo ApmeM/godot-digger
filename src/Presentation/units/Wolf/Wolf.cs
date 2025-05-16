@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("Wolf.tscn")]
 public partial class Wolf
@@ -14,15 +13,20 @@ public partial class Wolf
         AggroAgainst = Groups.GroupsListForAggro.ToHashSet();
     }
 
+    [Export]
+    public float AttackDistance = 100;
+
+    [Export]
+    public int VisionDistance = 10;
 
     [Export]
     public float Speed = 100;
 
     [Export]
     public float MoveDelay = 0;
-    
+
     [Export]
-    public float AttackDelay = 5;
+    public float AttackDelay = 1;
 
     private Vector2? path;
 
@@ -43,7 +47,7 @@ public partial class Wolf
             var size = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame).GetSize();
             var rect = new Rect2(this.animatedSprite.Position, size);
             var mousePos = this.GetLocalMousePosition();
-            
+
             if (rect.HasPoint(mousePos))
             {
                 this.GetTree().SetInputAsHandled();
@@ -51,47 +55,56 @@ public partial class Wolf
             }
         }
     }
-    
+
     public override void _Process(float delta)
     {
         base._Process(delta);
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
 
         currentMoveDelay -= delta;
         if (currentMoveDelay > 0)
         {
+            stateMachine.Travel("Stay");
             return;
         }
 
-        if (path == null)
+        if (path != null)
         {
-            this.path = this.GetPathToOtherGroup(floors, 10) ??
-                        this.GetPathToRandomLocation(floors);
-            if (this.path == null)
+            var dir = (path.Value - this.Position).Normalized();
+            this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
+            this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
+            stateMachine.Travel("Move");
+            if (base.MoveUnit(path.Value, Speed * delta))
             {
                 path = null;
                 currentMoveDelay = MoveDelay;
-                return;
             }
-            path = level.MapToWorld(path.Value);
+            return;
         }
 
-        if (base.TryAttackAt(path.Value))
+        var opponent = base.FindNearestOpponent(AttackDistance);
+        if (opponent != null)
         {
+            var dir = (opponent.Position - this.Position).Normalized();
+            this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
+            this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
+            stateMachine.Travel("Attack");
+
+            opponent?.GotHit(this, this.AttackPower);
+
             currentMoveDelay = AttackDelay;
+            return;
         }
 
-        // var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        // stateMachine.Travel("Move");
-
-        var dir = (path.Value - this.Position).Normalized();
-        this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
-
-        if (base.MoveUnit(path.Value, Speed * delta))
+        this.path = this.GetPathToOtherGroup(floors, VisionDistance) ??
+                    this.GetPathToRandomLocation(floors);
+        if (this.path == null)
         {
             path = null;
             currentMoveDelay = MoveDelay;
             return;
         }
+        path = level.MapToWorld(path.Value);
     }
 
     public override void GotHit(BaseUnit from, int attackPower)

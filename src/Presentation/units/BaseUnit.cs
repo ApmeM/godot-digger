@@ -135,10 +135,9 @@ public partial class BaseUnit
 
     protected Vector2? GetPathToOtherGroup(HashSet<Floor> floors, int maxDistance)
     {
-        var groupsToAttack = this.AggroAgainst.Except(this.GetGroups().Cast<string>()).ToArray();
-
         var pos = level.WorldToMap(this.Position);
-        var otherGroups = groupsToAttack
+        var otherGroups = this.AggroAgainst
+            .Except(this.GetGroups().Cast<string>())
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
             .Select(a => (level.WorldToMap(a.Position), floors))
             .Where(a => level.IsReachable(a.Item1, floors))
@@ -199,26 +198,13 @@ public partial class BaseUnit
         }
     }
 
-    internal bool TryAttackAt(Vector2 at)
+    protected BaseUnit FindNearestOpponent(float attackRange)
     {
-        if ((this.Position - at).LengthSquared() >= 48 * 48)
-        {
-            return false;
-        }
-
-        var groupsToAttack = this.AggroAgainst.Except(this.GetGroups().Cast<string>()).ToArray();
-
-        var opponent = groupsToAttack
+        return this.AggroAgainst
+            .Except(this.GetGroups().Cast<string>())
             .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-            .Where(a => level.WorldToMap(at) == level.WorldToMap(a.Position))
+            .Where(a => (a.Position - this.Position).LengthSquared() < attackRange * attackRange)
+            .OrderBy(a => (a.Position - this.Position).LengthSquared())
             .FirstOrDefault();
-
-        if (opponent == null)
-        {
-            return false;
-        }
-
-        opponent.GotHit(this, this.AttackPower);
-        return true;
     }
 }
