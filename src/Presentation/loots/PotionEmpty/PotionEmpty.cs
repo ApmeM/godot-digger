@@ -9,7 +9,14 @@ public partial class PotionEmpty
         Price = 1;
         MaxCount = 1;
         MergeActions = new Dictionary<string, string>{
-            {nameof(StaminaPlant), nameof(PotionLightBlue)}
+            {nameof(PlantBlue), nameof(PotionBlue)},
+            {nameof(PlantBrown), nameof(PotionBrown)},
+            {nameof(PlantGreen), nameof(PotionGreen)},
+            {nameof(PlantOrange), nameof(PotionOrange)},
+            {nameof(PlantRed), nameof(PotionRed)},
+            {nameof(PlantViolet), nameof(PotionViolet)},
+            {nameof(PlantWhite), nameof(PotionWhite)},
+            {nameof(PlantYellow), nameof(PotionYellow)},
         };
     }
 

@@ -1,10 +1,10 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Presentation/loots/StaminaPlant/StaminaPlant.cs" type="Script" id=2]
+[ext_resource path="res://Presentation/loots/PlantGreen/PlantGreen.cs" type="Script" id=2]
 [ext_resource path="res://Presentation/loots/BaseLoot.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Presentation/loots/StaminaPlant/StaminaPlant.png" type="Texture" id=4]
+[ext_resource path="res://Presentation/loots/PlantGreen/PlantGreen.png" type="Texture" id=4]
 
-[node name="StaminaPlant" instance=ExtResource( 3 )]
+[node name="PlantGreen" instance=ExtResource( 3 )]
 script = ExtResource( 2 )
 
 [node name="Texture" parent="." index="0"]
