@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Godot;
 
 [SceneReference("PotionLightBlue.tscn")]
@@ -10,6 +11,7 @@ public partial class PotionLightBlue
         UseAction = (level) =>
         {
             level.HeaderControl.CurrentStamina += 10;
+            return Task.FromResult(true);
         };
         ItemType = ItemType.Potion;
     }

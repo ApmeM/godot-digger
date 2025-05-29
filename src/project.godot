@@ -24,7 +24,7 @@ config/icon="res://Presentation/icon.png"
 
 [display]
 
-window/size/width=480
+window/size/width=800
 window/size/height=800
 window/dpi/allow_hidpi=true
 window/handheld/orientation="portrait"

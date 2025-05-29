@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
 
@@ -104,5 +105,46 @@ public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
         levelDump.Floor?.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
         this.draggableCamera.Position = levelDump.CameraPos;
         this.draggableCamera.Zoom = levelDump.CameraZoom;
+    }
+
+    [Signal]
+    public delegate void CellClicked(Vector2 cell, bool success);
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (@event is InputEventMouseButton mouseEvent)
+        {
+            if (mouseEvent.Pressed)
+            {
+                if ((ButtonList)mouseEvent.ButtonIndex == ButtonList.Left)
+                {
+                    var floorMousePos = floor.GetLocalMousePosition();
+                    this.EmitSignal(nameof(CellClicked), floorMousePos, true);
+                }
+                if ((ButtonList)mouseEvent.ButtonIndex == ButtonList.Right)
+                {
+                    var floorMousePos = floor.GetLocalMousePosition();
+                    this.EmitSignal(nameof(CellClicked), Vector2.Zero, false);
+                }
+            }
+        }
+    }
+
+    internal void AddUnit(Vector2 position, string unitName)
+    {
+        var unit = Instantiator.CreateUnit(unitName);
+        unit.Position = position;
+        unit.LevelPath = this.GetPath();
+        floor.AddChild(unit);
+    }
+
+    internal async Task<Vector2?> ChoosePosition()
+    {
+        this.BagInventoryPopup.Close();
+        this.selectPosition.Show();
+        var res = await this.ToSignal(this, nameof(CellClicked));
+        this.selectPosition.Hide();
+        this.BagInventoryPopup.Show();
+        return (bool)res[1] ? (Vector2?)res[0] : null;
     }
 }

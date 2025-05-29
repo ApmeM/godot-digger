@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 using GodotDigger.Presentation.Utils;
 
@@ -19,7 +20,7 @@ public partial class BaseLoot
     public ItemType ItemType { get; set; }
 
     public uint Price { get; set; }
-    public Action<Game> UseAction { get; set; }
+    public Func<Game, Task<bool>> UseAction { get; set; }
     public Action<Character> EquipAction { get; set; }
 
     private BaseLevel internalLevel;

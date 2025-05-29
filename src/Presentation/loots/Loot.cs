@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 
 public class LootDefinition
@@ -80,6 +81,6 @@ public class LootDefinition
     public ItemType ItemType { get; set; }
 
     public uint Price { get; set; }
-    public Action<Game> UseAction { get; set; }
+    public Func<Game, Task<bool>> UseAction { get; set; }
     public Action<Character> EquipAction { get; set; }
 }

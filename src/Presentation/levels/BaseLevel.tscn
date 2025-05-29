@@ -1,5 +1,6 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
+[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/BaseLevel.cs" type="Script" id=2]
 [ext_resource path="res://Presentation/floors/BaseLevelFloor.tres" type="TileSet" id=4]
 [ext_resource path="res://gd-floatingText/FloatingTextManager.tscn" type="PackedScene" id=9]
@@ -23,3 +24,38 @@ minimumZoom = 1.0
 maximumZoom = 2.0
 
 [node name="FloatingTextManager" parent="." instance=ExtResource( 9 )]
+
+[node name="SelectPosition" parent="." instance=ExtResource( 1 )]
+visible = false
+CloseOnClickOutside = false
+Title = "Select Position"
+
+[node name="OutsidePopupButton" parent="SelectPosition" index="0"]
+visible = false
+disabled = true
+
+[node name="HeaderMargin" parent="SelectPosition/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 87.0
+margin_right = 220.0
+
+[node name="TitleBackground" parent="SelectPosition/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 133.0
+
+[node name="TitleMargin" parent="SelectPosition/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 133.0
+
+[node name="TitleLabel" parent="SelectPosition/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 123.0
+text = "Select Position"
+
+[node name="Label" type="Label" parent="SelectPosition/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 28.0
+margin_right = 281.0
+margin_bottom = 59.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Left click: Select position
+Right click: Cancel"
+align = 1
+
+[editable path="SelectPosition"]

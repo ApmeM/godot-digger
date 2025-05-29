@@ -7,8 +7,8 @@ public partial class Game
 {
     private LevelData CurrentSave = new LevelData();
 
-
     public Header HeaderControl => this.header;
+    public BaseLevel CurrentLevel => this.gamePosition.GetChildCount() > 0 ? this.gamePosition.GetChild<BaseLevel>(0) : null;
 
     public override void _Ready()
     {
@@ -29,13 +29,16 @@ public partial class Game
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.UseItem), this, nameof(InventoryUseItem));
     }
 
-    protected void InventoryUseItem(InventorySlot slot)
+    protected async void InventoryUseItem(InventorySlot slot)
     {
         var tileId = slot.ItemId;
         if (LootDefinition.LootById[tileId].UseAction != null)
         {
-            LootDefinition.LootById[tileId].UseAction(this);
-            slot.TryChangeCount(slot.ItemId, -1);
+            var isUsed = await LootDefinition.LootById[tileId].UseAction(this);
+            if (isUsed)
+            {
+                slot.TryChangeCount(slot.ItemId, -1);
+            }
         }
     }
 
@@ -90,8 +93,7 @@ public partial class Game
 
     private void LoadCurrentDump()
     {
-        BaseLevel game = (BaseLevel)this.gamePosition.GetChild(0);
-        game.LoadLevelDump(CurrentSave.Levels.ContainsKey(game.Name) ? CurrentSave.Levels[game.Name] : null);
+        CurrentLevel.LoadLevelDump(CurrentSave.Levels.ContainsKey(CurrentLevel.Name) ? CurrentSave.Levels[CurrentLevel.Name] : null);
         this.HeaderControl.LoadHeaderDump(CurrentSave.Header);
         this.bagInventoryPopup.LoadInventoryDump(CurrentSave.Inventory);
     }
@@ -99,8 +101,7 @@ public partial class Game
 
     private void UpdateCurrentDump()
     {
-        BaseLevel prevLevel = (BaseLevel)this.gamePosition.GetChild(0);
-        CurrentSave.Levels[prevLevel.Name] = prevLevel.GetLevelDump();
+        CurrentSave.Levels[CurrentLevel.Name] = CurrentLevel.GetLevelDump();
         CurrentSave.Header = this.HeaderControl.GetHeaderDump();
         CurrentSave.Inventory = this.bagInventoryPopup.GetInventoryDump();
     }
