@@ -12,6 +12,12 @@ _global_script_classes=[  ]
 _global_script_class_icons={
 }
 
+[MonoCustomResourceRegistry]
+
+ClassPrefix=""
+SearchType=0
+ResourceScriptDirectories=[ "res://" ]
+
 [application]
 
 config/name="GodotDigger"
@@ -33,7 +39,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PoolStringArray(  )
+enabled=PoolStringArray( "res://addons/MonoCustomResourceRegistry/plugin.cfg" )
 
 [gdnative]
 

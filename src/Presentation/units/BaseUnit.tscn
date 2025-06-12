@@ -1,6 +1,630 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=66 format=2]
 
 [ext_resource path="res://Presentation/units/BaseUnit.cs" type="Script" id=1]
+[ext_resource path="res://gd-hp/HP.tscn" type="PackedScene" id=2]
+[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Presentation/QuestPopup.tscn" type="PackedScene" id=4]
+
+[sub_resource type="AnimationNodeAnimation" id=156]
+animation = "AttackTopLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=157]
+animation = "AttackTop"
+
+[sub_resource type="AnimationNodeAnimation" id=158]
+animation = "AttackTopRight"
+
+[sub_resource type="AnimationNodeAnimation" id=159]
+animation = "AttackRight"
+
+[sub_resource type="AnimationNodeAnimation" id=160]
+animation = "AttackLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=161]
+animation = "AttackBottomLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=162]
+animation = "AttackBottom"
+
+[sub_resource type="AnimationNodeAnimation" id=163]
+animation = "AttackBottomRight"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id=122]
+blend_point_0/node = SubResource( 156 )
+blend_point_0/pos = Vector2( -1, 1 )
+blend_point_1/node = SubResource( 157 )
+blend_point_1/pos = Vector2( 0, 1 )
+blend_point_2/node = SubResource( 158 )
+blend_point_2/pos = Vector2( 1, 1 )
+blend_point_3/node = SubResource( 159 )
+blend_point_3/pos = Vector2( 1, 0 )
+blend_point_4/node = SubResource( 160 )
+blend_point_4/pos = Vector2( -1, 0 )
+blend_point_5/node = SubResource( 161 )
+blend_point_5/pos = Vector2( -1, -1 )
+blend_point_6/node = SubResource( 162 )
+blend_point_6/pos = Vector2( 0, -1 )
+blend_point_7/node = SubResource( 163 )
+blend_point_7/pos = Vector2( 1, -1 )
+blend_mode = 1
+
+[sub_resource type="AnimationNodeAnimation" id=164]
+animation = "MoveTopLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=165]
+animation = "MoveTop"
+
+[sub_resource type="AnimationNodeAnimation" id=166]
+animation = "MoveTopRight"
+
+[sub_resource type="AnimationNodeAnimation" id=167]
+animation = "MoveRight"
+
+[sub_resource type="AnimationNodeAnimation" id=168]
+animation = "MoveBottomRight"
+
+[sub_resource type="AnimationNodeAnimation" id=169]
+animation = "MoveBottom"
+
+[sub_resource type="AnimationNodeAnimation" id=170]
+animation = "MoveBottomLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=171]
+animation = "MoveLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=172]
+animation = "MoveTopLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=173]
+animation = "MoveTop"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id=76]
+blend_point_0/node = SubResource( 164 )
+blend_point_0/pos = Vector2( -1, 1 )
+blend_point_1/node = SubResource( 165 )
+blend_point_1/pos = Vector2( 0, 1 )
+blend_point_2/node = SubResource( 166 )
+blend_point_2/pos = Vector2( 1, 1 )
+blend_point_3/node = SubResource( 167 )
+blend_point_3/pos = Vector2( 1, 0 )
+blend_point_4/node = SubResource( 168 )
+blend_point_4/pos = Vector2( 1, -1 )
+blend_point_5/node = SubResource( 169 )
+blend_point_5/pos = Vector2( 0, -1 )
+blend_point_6/node = SubResource( 170 )
+blend_point_6/pos = Vector2( -1, -1 )
+blend_point_7/node = SubResource( 171 )
+blend_point_7/pos = Vector2( -1, 0 )
+blend_point_8/node = SubResource( 172 )
+blend_point_8/pos = Vector2( -1, 1 )
+blend_point_9/node = SubResource( 173 )
+blend_point_9/pos = Vector2( 0, 1 )
+blend_mode = 1
+
+[sub_resource type="AnimationNodeAnimation" id=174]
+animation = "StayTopLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=175]
+animation = "StayTop"
+
+[sub_resource type="AnimationNodeAnimation" id=176]
+animation = "StayTopRight"
+
+[sub_resource type="AnimationNodeAnimation" id=177]
+animation = "StayLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=178]
+animation = "StayBottomLeft"
+
+[sub_resource type="AnimationNodeAnimation" id=179]
+animation = "StayBottom"
+
+[sub_resource type="AnimationNodeAnimation" id=180]
+animation = "StayBottomRight"
+
+[sub_resource type="AnimationNodeAnimation" id=181]
+animation = "StayRight"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id=125]
+blend_point_0/node = SubResource( 174 )
+blend_point_0/pos = Vector2( -1, 1 )
+blend_point_1/node = SubResource( 175 )
+blend_point_1/pos = Vector2( 0, 1 )
+blend_point_2/node = SubResource( 176 )
+blend_point_2/pos = Vector2( 1, 1 )
+blend_point_3/node = SubResource( 177 )
+blend_point_3/pos = Vector2( -1, 0 )
+blend_point_4/node = SubResource( 178 )
+blend_point_4/pos = Vector2( -1, -1 )
+blend_point_5/node = SubResource( 179 )
+blend_point_5/pos = Vector2( 0, -1 )
+blend_point_6/node = SubResource( 180 )
+blend_point_6/pos = Vector2( 1, -1 )
+blend_point_7/node = SubResource( 181 )
+blend_point_7/pos = Vector2( 1, 0 )
+blend_mode = 1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=123]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=126]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=127]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=128]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=154]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=155]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachine" id=182]
+states/Attack/node = SubResource( 122 )
+states/Attack/position = Vector2( 506, 164 )
+states/Move/node = SubResource( 76 )
+states/Move/position = Vector2( 250, 156 )
+states/Stay/node = SubResource( 125 )
+states/Stay/position = Vector2( 392, 249 )
+transitions = [ "Move", "Attack", SubResource( 123 ), "Move", "Stay", SubResource( 126 ), "Stay", "Move", SubResource( 127 ), "Stay", "Attack", SubResource( 128 ), "Attack", "Move", SubResource( 154 ), "Attack", "Stay", SubResource( 155 ) ]
+start_node = "Stay"
+graph_offset = Vector2( 0, 76.56 )
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=183]
+
+[sub_resource type="Animation" id=184]
+resource_name = "AttackBottom"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackBottom" ]
+}
+
+[sub_resource type="Animation" id=185]
+resource_name = "AttackBottomLeft"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackBottomLeft" ]
+}
+
+[sub_resource type="Animation" id=186]
+resource_name = "AttackBottomRight"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackBottomRight" ]
+}
+
+[sub_resource type="Animation" id=187]
+resource_name = "AttackLeft"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackLeft" ]
+}
+
+[sub_resource type="Animation" id=188]
+resource_name = "AttackRight"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackRight" ]
+}
+
+[sub_resource type="Animation" id=189]
+resource_name = "AttackTop"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackTop" ]
+}
+
+[sub_resource type="Animation" id=190]
+resource_name = "AttackTopLeft"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackTopLeft" ]
+}
+
+[sub_resource type="Animation" id=191]
+resource_name = "AttackTopRight"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "AttackTopRight" ]
+}
+
+[sub_resource type="Animation" id=192]
+resource_name = "MoveBottom"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveBottom" ]
+}
+
+[sub_resource type="Animation" id=193]
+resource_name = "MoveBottomLeft"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveBottomLeft" ]
+}
+
+[sub_resource type="Animation" id=194]
+resource_name = "MoveBottomRight"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveBottomRight" ]
+}
+
+[sub_resource type="Animation" id=195]
+resource_name = "MoveLeft"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveLeft" ]
+}
+
+[sub_resource type="Animation" id=196]
+resource_name = "MoveRight"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveRight" ]
+}
+
+[sub_resource type="Animation" id=197]
+resource_name = "MoveTop"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveTop" ]
+}
+
+[sub_resource type="Animation" id=198]
+resource_name = "MoveTopLeft"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveTopLeft" ]
+}
+
+[sub_resource type="Animation" id=199]
+resource_name = "MoveTopRight"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "MoveTopRight" ]
+}
+
+[sub_resource type="Animation" id=200]
+resource_name = "StayBottom"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayBottom" ]
+}
+
+[sub_resource type="Animation" id=201]
+resource_name = "StayBottomLeft"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayBottomLeft" ]
+}
+
+[sub_resource type="Animation" id=202]
+resource_name = "StayBottomRight"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayBottomRight" ]
+}
+
+[sub_resource type="Animation" id=203]
+resource_name = "StayLeft"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayLeft" ]
+}
+
+[sub_resource type="Animation" id=204]
+resource_name = "StayRight"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayRight" ]
+}
+
+[sub_resource type="Animation" id=205]
+resource_name = "StayTop"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayTop" ]
+}
+
+[sub_resource type="Animation" id=206]
+resource_name = "StayTopLeft"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayTopLeft" ]
+}
+
+[sub_resource type="Animation" id=207]
+resource_name = "StayTopRight"
+tracks/0/type = "value"
+tracks/0/path = NodePath("AnimatedSprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StayTopRight" ]
+}
 
 [node name="BaseUnit" type="Node2D"]
 script = ExtResource( 1 )
+SignContent = ""
+
+[node name="Healthbar" parent="." instance=ExtResource( 2 )]
+visible = false
+position = Vector2( 18, -51 )
+frame = 0
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0, -48 )
+playing = true
+centered = false
+
+[node name="QuestPopup" parent="." instance=ExtResource( 4 )]
+visible = false
+Content = ""
+
+[node name="SignPopup" parent="." instance=ExtResource( 3 )]
+visible = false
+Title = "Sign"
+
+[node name="HeaderMargin" parent="SignPopup/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 126.0
+margin_right = 181.0
+
+[node name="TitleBackground" parent="SignPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 55.0
+
+[node name="TitleMargin" parent="SignPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 55.0
+
+[node name="TitleLabel" parent="SignPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 45.0
+text = "Sign"
+
+[node name="SignLabel" type="Label" parent="SignPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 37.0
+margin_right = 281.0
+margin_bottom = 51.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+align = 1
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource( 182 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource( 183 )
+parameters/Attack/blend_position = Vector2( 0, -0.12 )
+parameters/Move/blend_position = Vector2( 0, -0.12 )
+parameters/Stay/blend_position = Vector2( 0, -0.12 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/AttackBottom = SubResource( 184 )
+anims/AttackBottomLeft = SubResource( 185 )
+anims/AttackBottomRight = SubResource( 186 )
+anims/AttackLeft = SubResource( 187 )
+anims/AttackRight = SubResource( 188 )
+anims/AttackTop = SubResource( 189 )
+anims/AttackTopLeft = SubResource( 190 )
+anims/AttackTopRight = SubResource( 191 )
+anims/MoveBottom = SubResource( 192 )
+anims/MoveBottomLeft = SubResource( 193 )
+anims/MoveBottomRight = SubResource( 194 )
+anims/MoveLeft = SubResource( 195 )
+anims/MoveRight = SubResource( 196 )
+anims/MoveTop = SubResource( 197 )
+anims/MoveTopLeft = SubResource( 198 )
+anims/MoveTopRight = SubResource( 199 )
+anims/StayBottom = SubResource( 200 )
+anims/StayBottomLeft = SubResource( 201 )
+anims/StayBottomRight = SubResource( 202 )
+anims/StayLeft = SubResource( 203 )
+anims/StayRight = SubResource( 204 )
+anims/StayTop = SubResource( 205 )
+anims/StayTopLeft = SubResource( 206 )
+anims/StayTopRight = SubResource( 207 )
+
+[editable path="QuestPopup"]
+[editable path="SignPopup"]

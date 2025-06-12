@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
@@ -16,17 +17,22 @@ public partial class QuestPopup
         this.FillMembers();
     }
 
-    public async Task<bool> ShowQuestPopup(string description, ValueTuple<string, uint>[] requirements, ValueTuple<string, uint>[] rewards)
+    public Task<bool> ShowQuestPopup(string description, List<QuestData> requirements, List<QuestData> rewards)
+    {
+        this.Content = description;
+        return ShowQuestPopup(requirements, rewards);
+    }
+
+    public async Task<bool> ShowQuestPopup(List<QuestData> requirements, List<QuestData> rewards)
     {
         var inventory = this.GetNode<BagInventoryPopup>(this.BagInventoryPath);
 
-        this.Content = description;
         this.requirementsList.RemoveChildren();
 
         var isEnough = true;
         foreach (var req in requirements)
         {
-            var definition = LootDefinition.LootByName[req.Item1];
+            var definition = LootDefinition.LootByName[req.Loot.GetState().GetNodeName(0)];
             this.requirementsList.AddChild(new TextureRect
             {
                 Texture = definition.Image
@@ -36,10 +42,10 @@ public partial class QuestPopup
 
             this.requirementsList.AddChild(new Label
             {
-                Text = $"x {existing} / {req.Item2}"
+                Text = $"x {existing} / {req.Count}"
             });
 
-            isEnough = isEnough && existing >= req.Item2;
+            isEnough = isEnough && existing >= req.Count;
         }
 
         this.AllowYes = isEnough;
@@ -58,10 +64,9 @@ public partial class QuestPopup
 
         var success = inventory.TryChangeCountsOrCancel(
             requirements
-                .Select(a => (a.Item1, -(int)a.Item2))
-                .Concat(rewards.Select(a => (a.Item1, (int)a.Item2))));
+                .Select(a => (a.Loot.GetState().GetNodeName(0), -(int)a.Count))
+                .Concat(rewards.Select(a => (a.Loot.GetState().GetNodeName(0), (int)a.Count))));
 
         return success;
     }
-
 }

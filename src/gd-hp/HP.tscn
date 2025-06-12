@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://gd-hp/HP.cs" type="Script" id=1]
+[ext_resource path="res://gd-hp/HP.png" type="Texture" id=2]
+
+[node name="HP" type="Sprite"]
+texture = ExtResource( 2 )
+hframes = 9
+frame = 8
+script = ExtResource( 1 )

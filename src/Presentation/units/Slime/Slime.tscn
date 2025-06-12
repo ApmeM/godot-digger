@@ -1,268 +1,8 @@
-[gd_scene load_steps=41 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Presentation/units/Slime/Slime.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/units/BaseUnit.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Presentation/units/Slime/Slime.cs" type="Script" id=3]
-
-[sub_resource type="AnimationNodeAnimation" id=77]
-animation = "MoveTopLeft"
-
-[sub_resource type="AnimationNodeAnimation" id=78]
-animation = "MoveTop"
-
-[sub_resource type="AnimationNodeAnimation" id=79]
-animation = "MoveTopRight"
-
-[sub_resource type="AnimationNodeAnimation" id=80]
-animation = "MoveRight"
-
-[sub_resource type="AnimationNodeAnimation" id=81]
-animation = "MoveBottomRight"
-
-[sub_resource type="AnimationNodeAnimation" id=82]
-animation = "MoveBottom"
-
-[sub_resource type="AnimationNodeAnimation" id=83]
-animation = "MoveBottomLeft"
-
-[sub_resource type="AnimationNodeAnimation" id=84]
-animation = "MoveLeft"
-
-[sub_resource type="AnimationNodeAnimation" id=85]
-animation = "MoveTopLeft"
-
-[sub_resource type="AnimationNodeAnimation" id=86]
-animation = "MoveTop"
-
-[sub_resource type="AnimationNodeBlendSpace2D" id=76]
-blend_point_0/node = SubResource( 77 )
-blend_point_0/pos = Vector2( -1, 1 )
-blend_point_1/node = SubResource( 78 )
-blend_point_1/pos = Vector2( 0, 1 )
-blend_point_2/node = SubResource( 79 )
-blend_point_2/pos = Vector2( 1, 1 )
-blend_point_3/node = SubResource( 80 )
-blend_point_3/pos = Vector2( 1, 0 )
-blend_point_4/node = SubResource( 81 )
-blend_point_4/pos = Vector2( 1, -1 )
-blend_point_5/node = SubResource( 82 )
-blend_point_5/pos = Vector2( 0, -1 )
-blend_point_6/node = SubResource( 83 )
-blend_point_6/pos = Vector2( -1, -1 )
-blend_point_7/node = SubResource( 84 )
-blend_point_7/pos = Vector2( -1, 0 )
-blend_point_8/node = SubResource( 85 )
-blend_point_8/pos = Vector2( -1, 1 )
-blend_point_9/node = SubResource( 86 )
-blend_point_9/pos = Vector2( 0, 1 )
-blend_mode = 1
-
-[sub_resource type="AnimationNodeStateMachine" id=87]
-states/Move/node = SubResource( 76 )
-states/Move/position = Vector2( 249, 156 )
-start_node = "Move"
-
-[sub_resource type="AnimationNodeStateMachinePlayback" id=88]
-
-[sub_resource type="Animation" id=89]
-resource_name = "MoveBottom"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveBottom" ]
-}
-
-[sub_resource type="Animation" id=90]
-resource_name = "MoveBottomLeft"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveBottomLeft" ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:flip_h")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ false ]
-}
-
-[sub_resource type="Animation" id=91]
-resource_name = "MoveBottomRight"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveBottomRight" ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:flip_h")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
-
-[sub_resource type="Animation" id=92]
-resource_name = "MoveLeft"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveLeft" ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:flip_h")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ false ]
-}
-
-[sub_resource type="Animation" id=93]
-resource_name = "MoveRight"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveRight" ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:flip_h")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
-
-[sub_resource type="Animation" id=94]
-resource_name = "MoveTop"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveTop" ]
-}
-
-[sub_resource type="Animation" id=95]
-resource_name = "MoveTopLeft"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveTopLeft" ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:flip_h")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ false ]
-}
-
-[sub_resource type="Animation" id=96]
-resource_name = "MoveTopRight"
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("AnimatedSprite:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ "MoveTopRight" ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("AnimatedSprite:flip_h")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
 
 [sub_resource type="AtlasTexture" id=98]
 flags = 4
@@ -380,33 +120,64 @@ animations = [ {
 "loop": true,
 "name": "MoveTopRight",
 "speed": 5.0
+}, {
+"frames": [ SubResource( 98 ), SubResource( 99 ), SubResource( 100 ), SubResource( 101 ), SubResource( 102 ), SubResource( 103 ), SubResource( 104 ) ],
+"loop": true,
+"name": "StayBottom",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 98 ), SubResource( 99 ), SubResource( 100 ), SubResource( 101 ), SubResource( 102 ), SubResource( 103 ), SubResource( 104 ) ],
+"loop": true,
+"name": "StayBottomLeft",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 98 ), SubResource( 99 ), SubResource( 100 ), SubResource( 101 ), SubResource( 102 ), SubResource( 103 ), SubResource( 104 ) ],
+"loop": true,
+"name": "StayBottomRight",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 98 ), SubResource( 99 ), SubResource( 100 ), SubResource( 101 ), SubResource( 102 ), SubResource( 103 ), SubResource( 104 ) ],
+"loop": true,
+"name": "StayLeft",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 105 ), SubResource( 106 ), SubResource( 107 ), SubResource( 108 ), SubResource( 109 ), SubResource( 110 ), SubResource( 111 ), SubResource( 112 ) ],
+"loop": true,
+"name": "StayRight",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 105 ), SubResource( 106 ), SubResource( 107 ), SubResource( 108 ), SubResource( 109 ), SubResource( 110 ), SubResource( 111 ), SubResource( 112 ) ],
+"loop": true,
+"name": "StayTop",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 105 ), SubResource( 106 ), SubResource( 107 ), SubResource( 108 ), SubResource( 109 ), SubResource( 110 ), SubResource( 111 ), SubResource( 112 ) ],
+"loop": true,
+"name": "StayTopLeft",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 105 ), SubResource( 106 ), SubResource( 107 ), SubResource( 108 ), SubResource( 109 ), SubResource( 110 ), SubResource( 111 ), SubResource( 112 ) ],
+"loop": true,
+"name": "StayTopRight",
+"speed": 5.0
 } ]
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=113]
 
 [node name="Slime" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
-Speed = 100.0
-MoveDelay = 1.0
+AttackPower = 1
+MoveSpeed = 100.0
+MoveFloors = [ 2 ]
+GrabLoot = true
 
-[node name="AnimationTree" type="AnimationTree" parent="." index="0"]
-tree_root = SubResource( 87 )
-anim_player = NodePath("../AnimationPlayer")
-active = true
-parameters/playback = SubResource( 88 )
-parameters/Move/blend_position = Vector2( -0.32931, -0.37069 )
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="1"]
-anims/MoveBottom = SubResource( 89 )
-anims/MoveBottomLeft = SubResource( 90 )
-anims/MoveBottomRight = SubResource( 91 )
-anims/MoveLeft = SubResource( 92 )
-anims/MoveRight = SubResource( 93 )
-anims/MoveTop = SubResource( 94 )
-anims/MoveTopLeft = SubResource( 95 )
-anims/MoveTopRight = SubResource( 96 )
-
-[node name="AnimatedSprite" type="AnimatedSprite" parent="." index="2"]
+[node name="AnimatedSprite" parent="." index="1"]
 position = Vector2( 0, -54 )
 frames = SubResource( 97 )
-animation = "MoveBottom"
-playing = true
-centered = false
+animation = "StayBottom"
+
+[node name="AnimationTree" parent="." index="4"]
+parameters/playback = SubResource( 113 )
+
+[editable path="QuestPopup"]
+[editable path="SignPopup"]
