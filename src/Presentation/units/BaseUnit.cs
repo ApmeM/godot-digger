@@ -311,7 +311,7 @@ public partial class BaseUnit
 
             var floorsSet = MoveFloors.ToHashSet();
 
-            this.moveNextStep = this.GetPathToLoot(floorsSet) ??
+            this.moveNextStep = this.GetPathToLoot(floorsSet, VisionDistance) ??
                         this.GetPathToOtherGroup(floorsSet, VisionDistance) ??
                         this.GetPathToRandomLocation(floorsSet);
             if (this.moveNextStep == null)
@@ -344,7 +344,7 @@ public partial class BaseUnit
         return moveResultPath[1].Item1;
     }
 
-    protected Vector2? GetPathToLoot(HashSet<Floor> floors)
+    protected Vector2? GetPathToLoot(HashSet<Floor> floors, int maxDistance)
     {
         if (!this.GrabLoot)
         {
@@ -358,10 +358,11 @@ public partial class BaseUnit
             .Cast<BaseLoot>()
             .Select(a => (level.WorldToMap(a.Position), floors))
             .Where(a => level.IsReachable(a.Item1, floors))
+            .Where(a => (a.Item1 - pos).LengthSquared() <= maxDistance * maxDistance)
             .ToHashSet();
 
         moveResultPath.Clear();
-        movePathfinder.Search((pos, floors), loots, 10, moveResultPath);
+        movePathfinder.Search((pos, floors), loots, (maxDistance * 2 + 1) * (maxDistance * 2 + 1), moveResultPath);
 
         if (moveResultPath == null || moveResultPath.Count < 2)
         {
