@@ -35,6 +35,9 @@ public partial class BaseUnit
     [Export]
     public List<Floor> MoveFloors;
 
+    [Export]
+    public int VisionDistance = 10;
+    
     private List<(Vector2, HashSet<Floor>)> moveResultPath = new List<(Vector2, HashSet<Floor>)>();
 
     private Vector2? moveNextStep;
@@ -203,9 +206,6 @@ public partial class BaseUnit
     }
 
     #endregion
-
-    [Export]
-    public int VisionDistance = 10;
 
     private static Random random = new Random();
 
