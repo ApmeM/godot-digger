@@ -171,6 +171,9 @@ MoveSpeed = 100.0
 MoveFloors = [ 2 ]
 GrabLoot = true
 
+[node name="Healthbar" parent="." index="0"]
+position = Vector2( 30, -41 )
+
 [node name="AnimatedSprite" parent="." index="1"]
 position = Vector2( 0, -54 )
 frames = SubResource( 97 )
