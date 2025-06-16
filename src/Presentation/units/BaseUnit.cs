@@ -20,7 +20,7 @@ public partial class BaseUnit
     public float AttackDelay;
 
     [Export]
-    public List<string> AggroAgainst = new List<string>();
+    public List<string> AggroAgainst;
 
     #endregion
 
@@ -207,6 +207,9 @@ public partial class BaseUnit
 
     #endregion
 
+    [Signal]
+    public delegate void Clicked();
+
     private static Random random = new Random();
 
     private float currentActionDelay;
@@ -243,7 +246,7 @@ public partial class BaseUnit
             return;
         }
 
-        if (this.AttackPower > 0)
+        if (this.AttackPower > 0 && this.AggroAgainst != null && this.AggroAgainst.Count > 0)
         {
             var opponent = this.AggroAgainst
                 .Except(this.GetGroups().Cast<string>())
@@ -374,6 +377,11 @@ public partial class BaseUnit
 
     protected Vector2? GetPathToOtherGroup(HashSet<Floor> floors, int maxDistance)
     {
+        if (this.AggroAgainst == null || this.AggroAgainst.Count == 0)
+        {
+            return null;
+        }
+
         var pos = level.WorldToMap(this.Position);
         var otherGroups = this.AggroAgainst
             .Except(this.GetGroups().Cast<string>())
@@ -407,13 +415,14 @@ public partial class BaseUnit
             {
                 this.GetTree().SetInputAsHandled();
                 this.UnitClicked();
+                this.EmitSignal(nameof(Clicked));
             }
         }
     }
 
     public virtual void UnitClicked()
     {
-        if (level.HeaderControl.Character.CanDig)
+        if (level.HeaderControl.Character.CanDig && this.MaxHP > 0)
         {
             DigClick();
         }
@@ -501,7 +510,7 @@ public partial class BaseUnit
 
             foreach (var unit in myGroups)
             {
-                unit.AggroAgainst = unit.AggroAgainst.Union(enemyGroups).ToList();
+                unit.AggroAgainst = (unit.AggroAgainst ?? new List<string>()).Union(enemyGroups).ToList();
                 foreach (var enemy in enemyGroups)
                 {
                     unit.AggroAgainst.Add(enemy);

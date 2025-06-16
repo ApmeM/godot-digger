@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level1.cs" type="Script" id=2]
@@ -22,6 +22,7 @@
 [ext_resource path="res://Presentation/loots/WolfSkin/WolfSkin.tscn" type="PackedScene" id=20]
 [ext_resource path="res://Presentation/loots/Gold/Gold.tscn" type="PackedScene" id=21]
 [ext_resource path="res://Presentation/units/Sign/Sign.tscn" type="PackedScene" id=22]
+[ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=23]
 
 [sub_resource type="Resource" id=1]
 script = ExtResource( 19 )
@@ -128,5 +129,15 @@ position = Vector2( 184, 730 )
 
 [node name="DraggableCamera" parent="." index="2"]
 position = Vector2( 51, 880 )
+
+[node name="StashInventory" parent="." index="5" instance=ExtResource( 23 )]
+visible = false
+margin_left = 101.0
+margin_top = 77.0
+margin_right = 461.0
+margin_bottom = 198.0
+Size = 14
+SizePerRow = 7
+Title = "Stash"
 
 [editable path="SelectPosition"]

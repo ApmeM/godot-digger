@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Presentation/units/Stash/Stash.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/units/BaseUnit.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Presentation/units/Stash/Stash.cs" type="Script" id=3]
-[ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=4]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -18,21 +17,11 @@ animations = [ {
 [node name="Stash" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
 
-[node name="StashInventory" parent="." index="0" instance=ExtResource( 4 )]
-visible = false
-margin_left = 101.0
-margin_top = 77.0
-margin_right = 461.0
-margin_bottom = 198.0
-Size = 14
-SizePerRow = 7
-Title = "Stash"
-
-[node name="AnimatedSprite" parent="." index="2"]
+[node name="AnimatedSprite" parent="." index="1"]
 frames = SubResource( 1 )
 animation = "StayBottom"
 
-[node name="AnimationTree" parent="." index="5"]
+[node name="AnimationTree" parent="." index="4"]
 parameters/playback = SubResource( 2 )
 
 [editable path="QuestPopup"]
