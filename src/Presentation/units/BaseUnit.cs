@@ -20,6 +20,9 @@ public partial class BaseUnit
     public float AttackDelay;
 
     [Export]
+    public float HitDelay;
+
+    [Export]
     public List<string> AggroAgainst;
 
     #endregion
@@ -37,7 +40,7 @@ public partial class BaseUnit
 
     [Export]
     public int VisionDistance = 10;
-    
+
     private List<(Vector2, HashSet<Floor>)> moveResultPath = new List<(Vector2, HashSet<Floor>)>();
 
     private Vector2? moveNextStep;
@@ -219,6 +222,22 @@ public partial class BaseUnit
         base._Ready();
         this.FillMembers();
 
+        var animations = this.animatedSprite.Frames.GetAnimationNames();
+        foreach (var animation in animations)
+        {
+            var framesCount = this.animatedSprite.Frames.GetFrameCount(animation);
+            var fps = this.animatedSprite.Frames.GetAnimationSpeed(animation);
+            var newAnim = (Animation)this.animationPlayer.GetAnimation(animation).Duplicate();
+            newAnim.Length = framesCount / fps;
+            this.animationPlayer.AddAnimation(animation, newAnim);
+        }
+        var newAttackDelay = this.animationPlayer.GetAnimation("AttackTop").Length;
+        if (newAttackDelay > this.AttackDelay)
+        {
+            GD.PrintErr($"{this.GetType()}: Calculated attack delay ({newAttackDelay}) is bigger then specified {this.AttackDelay}. This may lead to skipped animations. Reset to calcualted value.");
+            this.AttackDelay = newAttackDelay;
+        }
+
         this.AddToGroup(Groups.Unit);
         // HP order matters. Do not change it.
         this.MaxHP = this.maxHP;
@@ -227,6 +246,8 @@ public partial class BaseUnit
         this.QuestContent = this.questContent;
         this.SignContent = this.signContent;
     }
+
+    private BaseUnit opponent = null;
 
     public override void _Process(float delta)
     {
@@ -240,15 +261,19 @@ public partial class BaseUnit
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
 
         currentActionDelay -= delta;
-        if (currentActionDelay > 0)
+        if (currentActionDelay >= 0)
         {
-            stateMachine.Travel("Stay");
+            if (currentActionDelay <= this.HitDelay && this.HitDelay < currentActionDelay + delta && opponent != null)
+            {
+                opponent.GotHit(this, this.AttackPower);
+                opponent = null;
+            }
             return;
         }
 
         if (this.AttackPower > 0 && this.AggroAgainst != null && this.AggroAgainst.Count > 0)
         {
-            var opponent = this.AggroAgainst
+            opponent = this.AggroAgainst
                 .Except(this.GetGroups().Cast<string>())
                 .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
                 .Where(a => (a.Position - this.Position).LengthSquared() < this.AttackDistance * this.AttackDistance)
@@ -261,9 +286,7 @@ public partial class BaseUnit
                 this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
                 stateMachine.Travel("Attack");
 
-                opponent?.GotHit(this, this.AttackPower);
-
-                currentActionDelay = AttackDelay;
+                currentActionDelay = AttackDelay + 0.1f;
                 return;
             }
         }

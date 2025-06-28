@@ -20,8 +20,8 @@ format = 1
 
 [node name="DraggableCamera" parent="." instance=ExtResource( 11 )]
 position = Vector2( 241, 400 )
-minimumZoom = 1.0
-maximumZoom = 2.0
+minimumZoom = 0.5
+maximumZoom = 5.0
 
 [node name="FloatingTextManager" parent="." instance=ExtResource( 9 )]
 

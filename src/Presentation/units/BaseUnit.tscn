@@ -1,4 +1,4 @@
-[gd_scene load_steps=66 format=2]
+[gd_scene load_steps=64 format=2]
 
 [ext_resource path="res://Presentation/units/BaseUnit.cs" type="Script" id=1]
 [ext_resource path="res://gd-hp/HP.tscn" type="PackedScene" id=2]
@@ -144,36 +144,31 @@ blend_point_7/node = SubResource( 181 )
 blend_point_7/pos = Vector2( 1, 0 )
 blend_mode = 1
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=123]
-
 [sub_resource type="AnimationNodeStateMachineTransition" id=126]
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=127]
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=128]
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=154]
-switch_mode = 2
-
 [sub_resource type="AnimationNodeStateMachineTransition" id=155]
 switch_mode = 2
+auto_advance = true
 
 [sub_resource type="AnimationNodeStateMachine" id=182]
 states/Attack/node = SubResource( 122 )
-states/Attack/position = Vector2( 506, 164 )
+states/Attack/position = Vector2( 506, 156 )
 states/Move/node = SubResource( 76 )
 states/Move/position = Vector2( 250, 156 )
 states/Stay/node = SubResource( 125 )
 states/Stay/position = Vector2( 392, 249 )
-transitions = [ "Move", "Attack", SubResource( 123 ), "Move", "Stay", SubResource( 126 ), "Stay", "Move", SubResource( 127 ), "Stay", "Attack", SubResource( 128 ), "Attack", "Move", SubResource( 154 ), "Attack", "Stay", SubResource( 155 ) ]
+transitions = [ "Move", "Stay", SubResource( 126 ), "Stay", "Move", SubResource( 127 ), "Stay", "Attack", SubResource( 128 ), "Attack", "Stay", SubResource( 155 ) ]
 start_node = "Stay"
-graph_offset = Vector2( 0, 76.56 )
+graph_offset = Vector2( -23.2407, 76.56 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=183]
 
 [sub_resource type="Animation" id=184]
 resource_name = "AttackBottom"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -189,7 +184,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=185]
 resource_name = "AttackBottomLeft"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -205,7 +199,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=186]
 resource_name = "AttackBottomRight"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -221,7 +214,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=187]
 resource_name = "AttackLeft"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -237,7 +229,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=188]
 resource_name = "AttackRight"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -253,7 +244,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=189]
 resource_name = "AttackTop"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -269,7 +259,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=190]
 resource_name = "AttackTopLeft"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -285,7 +274,6 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id=191]
 resource_name = "AttackTopRight"
-length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -550,6 +538,7 @@ tracks/0/keys = {
 [node name="BaseUnit" type="Node2D"]
 script = ExtResource( 1 )
 SignContent = ""
+AttackDelay = 1
 
 [node name="Healthbar" parent="." instance=ExtResource( 2 )]
 visible = false
