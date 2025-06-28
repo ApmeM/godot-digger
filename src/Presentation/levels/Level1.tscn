@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=28 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level1.cs" type="Script" id=2]
@@ -24,6 +24,7 @@
 [ext_resource path="res://Presentation/units/Sign/Sign.tscn" type="PackedScene" id=22]
 [ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=23]
 [ext_resource path="res://Presentation/units/Ogre/Ogre.tscn" type="PackedScene" id=24]
+[ext_resource path="res://Presentation/units/Dragon/Dragon.tscn" type="PackedScene" id=25]
 
 [sub_resource type="Resource" id=1]
 script = ExtResource( 19 )
@@ -78,62 +79,59 @@ position = Vector2( 238, 834 )
 
 [node name="Grass" parent="Floor" index="11" instance=ExtResource( 5 )]
 position = Vector2( 99, 1057 )
-SignContent = null
 
 [node name="Wolf" parent="Floor" index="12" groups=["grp_2"] instance=ExtResource( 6 )]
 position = Vector2( 192, 907 )
-SignContent = null
-AggroAgainst = PoolStringArray( "grp_1" )
 
-[node name="WaspNest" parent="Floor" index="13" groups=["grp_1"] instance=ExtResource( 8 )]
+[node name="Dragon" parent="Floor" index="13" instance=ExtResource( 25 )]
+position = Vector2( 176, 863 )
+
+[node name="Camera2D" type="Camera2D" parent="Floor/Dragon" index="6"]
+current = true
+
+[node name="WaspNest" parent="Floor" index="14" groups=["grp_1"] instance=ExtResource( 8 )]
 position = Vector2( 68, 750 )
-SignContent = null
 SpawnUnit = ExtResource( 16 )
 
-[node name="Bag3" parent="Floor" index="14" instance=ExtResource( 11 )]
+[node name="Bag3" parent="Floor" index="15" instance=ExtResource( 11 )]
 position = Vector2( -143, 910 )
 
-[node name="WoodCutter" parent="Floor" index="15" instance=ExtResource( 12 )]
+[node name="WoodCutter" parent="Floor" index="16" instance=ExtResource( 12 )]
 position = Vector2( 257, 114 )
-SignContent = null
 MoveToLevel = "Forest"
 
-[node name="StairsDown" parent="Floor" index="16" instance=ExtResource( 13 )]
+[node name="StairsDown" parent="Floor" index="17" instance=ExtResource( 13 )]
 position = Vector2( 552, 286 )
-SignContent = null
 MoveToLevel = "Level2"
 
-[node name="Stash" parent="Floor" index="17" instance=ExtResource( 4 )]
+[node name="Stash" parent="Floor" index="18" instance=ExtResource( 4 )]
 position = Vector2( -123, 748 )
-SignContent = null
 
-[node name="Redhat" parent="Floor" index="18" instance=ExtResource( 14 )]
+[node name="Redhat" parent="Floor" index="19" instance=ExtResource( 14 )]
 position = Vector2( 168, 969 )
 QuestContent = "Hi Strong man"
 SignContent = "Thank you"
 QuestRequirements = [ SubResource( 1 ) ]
 QuestRewards = [ SubResource( 2 ) ]
 
-[node name="Grandma" parent="Floor" index="19" instance=ExtResource( 15 )]
+[node name="Grandma" parent="Floor" index="20" instance=ExtResource( 15 )]
 position = Vector2( -85, 646 )
-SignContent = null
 
-[node name="Wasp" parent="Floor" index="20" instance=ExtResource( 16 )]
+[node name="Wasp" parent="Floor" index="21" instance=ExtResource( 16 )]
 position = Vector2( 189, 789 )
-SignContent = null
 
-[node name="Fish" parent="Floor" index="21" instance=ExtResource( 17 )]
+[node name="Fish" parent="Floor" index="22" instance=ExtResource( 17 )]
 position = Vector2( 13, 1090 )
-SignContent = null
 
-[node name="PotionEmpty2" parent="Floor" index="22" instance=ExtResource( 10 )]
+[node name="PotionEmpty2" parent="Floor" index="23" instance=ExtResource( 10 )]
 position = Vector2( 215, 729 )
 
-[node name="PlantBrown" parent="Floor" index="23" instance=ExtResource( 18 )]
+[node name="PlantBrown" parent="Floor" index="24" instance=ExtResource( 18 )]
 position = Vector2( 184, 730 )
 
 [node name="DraggableCamera" parent="." index="2"]
 position = Vector2( 51, 880 )
+current = false
 
 [node name="StashInventory" parent="." index="5" instance=ExtResource( 23 )]
 visible = false
