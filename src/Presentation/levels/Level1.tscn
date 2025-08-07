@@ -129,11 +129,7 @@ position = Vector2( 215, 729 )
 [node name="PlantBrown" parent="Floor" index="24" instance=ExtResource( 18 )]
 position = Vector2( 184, 730 )
 
-[node name="DraggableCamera" parent="." index="2"]
-position = Vector2( 51, 880 )
-current = false
-
-[node name="StashInventory" parent="." index="5" instance=ExtResource( 23 )]
+[node name="StashInventory" parent="." index="4" instance=ExtResource( 23 )]
 visible = false
 margin_left = 101.0
 margin_top = 77.0

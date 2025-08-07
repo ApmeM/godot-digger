@@ -32,10 +32,10 @@ public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
         base._Ready();
         this.FillMembers();
 
-        this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
-        this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
-        this.draggableCamera.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
-        this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
+        // this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
+        // this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
+        // this.draggableCamera.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
+        // this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
@@ -88,8 +88,8 @@ public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
         return new LevelDump
         {
             Floor = this.floor.GetUsedCells().Cast<Vector2>().Select(a => (a, this.floor.GetCellv(a))).ToList(),
-            CameraZoom = this.draggableCamera.Zoom,
-            CameraPos = this.draggableCamera.Position
+            // CameraZoom = this.draggableCamera.Zoom,
+            // CameraPos = this.draggableCamera.Position
         };
     }
 
@@ -103,8 +103,8 @@ public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
         this.floor.Clear();
 
         levelDump.Floor?.ForEach(a => this.floor.SetCellv(a.Item1, a.Item2));
-        this.draggableCamera.Position = levelDump.CameraPos;
-        this.draggableCamera.Zoom = levelDump.CameraZoom;
+        // this.draggableCamera.Position = levelDump.CameraPos;
+        // this.draggableCamera.Zoom = levelDump.CameraZoom;
     }
 
     [Signal]
