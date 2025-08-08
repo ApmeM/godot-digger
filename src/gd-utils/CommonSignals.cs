@@ -5,6 +5,7 @@ namespace GodotDigger.Presentation.Utils
         public static string Pressed = "pressed";
         public static string Timeout = "timeout";
         public static string ScreenExited = "screen_exited";
+        public static string TreeExited = "tree_exited";
         public static string BodyEntered = "body_entered";
         public static string VisibilityChanged = "visibility_changed";
         public static string AnimationFinished = "animation_finished";

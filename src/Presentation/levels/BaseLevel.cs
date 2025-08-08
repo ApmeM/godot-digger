@@ -11,6 +11,9 @@ public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
 
+    [Signal]
+    public delegate void GameOver();
+
     public readonly Vector2[] moveDirections = new Vector2[] {
         Vector2.Down,
         Vector2.Down + Vector2.Left,

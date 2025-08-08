@@ -216,6 +216,7 @@ public partial class BaseUnit
     private static Random random = new Random();
 
     private float currentActionDelay;
+    private float currentHitDelay;
 
     public override void _Ready()
     {
@@ -260,13 +261,18 @@ public partial class BaseUnit
 
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
 
-        currentActionDelay -= delta;
-        if (currentActionDelay >= 0)
+        if (this.currentActionDelay >= 0)
         {
-            if (currentActionDelay <= this.HitDelay && this.HitDelay < currentActionDelay + delta && opponent != null)
+            this.currentActionDelay -= delta;
+            if (this.opponent != null && this.currentHitDelay >= 0)
             {
-                opponent.GotHit(this, this.AttackPower);
-                opponent = null;
+                // Attacking.
+                this.currentHitDelay -= delta;
+                if (this.currentHitDelay < 0)
+                {
+                    opponent.GotHit(this, this.AttackPower);
+                    opponent = null;
+                }
             }
             return;
         }
@@ -286,7 +292,8 @@ public partial class BaseUnit
                 this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
                 stateMachine.Travel("Attack");
 
-                currentActionDelay = AttackDelay + 0.1f;
+                this.currentActionDelay = this.AttackDelay + 0.1f;
+                this.currentHitDelay = this.HitDelay + 0.1f;
                 return;
             }
         }
@@ -298,6 +305,7 @@ public partial class BaseUnit
                 GD.PrintErr($"Should move but have no floors defined : {this.GetType()} {this.GetPath()}");
                 return;
             }
+
             if (moveNextStep != null)
             {
                 var dir = (moveNextStep.Value - this.Position).Normalized();

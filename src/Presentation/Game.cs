@@ -18,7 +18,7 @@ public partial class Game
         // For debug purposes all achievements can be reset
         // this.di.localAchievementRepository.ResetAchievements();
 
-        ChangeLevel("Level1");
+        ChangeLevel("Level2");
 
         this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
         this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
@@ -72,6 +72,11 @@ public partial class Game
         this.bagInventoryPopup.Show();
     }
 
+    public void GameOver()
+    {
+        this.GetTree().ChangeScene("res://Presentation/Main.tscn");    
+    }
+
     public void ChangeLevel(string nextLevel)
     {
         if (this.gamePosition.GetChildCount() > 0)
@@ -84,6 +89,7 @@ public partial class Game
         game.HeaderControl = this.header;
         game.BagInventoryPopup = this.bagInventoryPopup;
         game.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
+        game.Connect(nameof(BaseLevel.GameOver), this, nameof(GameOver));
         this.gamePosition.AddChild(game);
         CurrentSave.CurrentLevel = game.Name;
         LoadCurrentDump();
