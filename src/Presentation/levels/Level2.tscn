@@ -19,53 +19,95 @@ tile_data = PoolIntArray( -1376253, 2, 0, -1376252, 2, 0, -1310717, 2, 0, -13107
 
 [node name="Wall3" parent="Floor" index="0" instance=ExtResource( 6 )]
 position = Vector2( 2, 769 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall6" parent="Floor" index="1" instance=ExtResource( 6 )]
 position = Vector2( 437, 818 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall7" parent="Floor" index="2" instance=ExtResource( 6 )]
 position = Vector2( 437, 767 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall8" parent="Floor" index="3" instance=ExtResource( 6 )]
 position = Vector2( 50, 769 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall13" parent="Floor" index="4" instance=ExtResource( 6 )]
 position = Vector2( 296, 768 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall9" parent="Floor" index="5" instance=ExtResource( 6 )]
 position = Vector2( 343, 768 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall10" parent="Floor" index="6" instance=ExtResource( 6 )]
 position = Vector2( 99, 768 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall11" parent="Floor" index="7" instance=ExtResource( 6 )]
 position = Vector2( 394, 769 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall" parent="Floor" index="8" instance=ExtResource( 6 )]
 position = Vector2( 1, 817 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall14" parent="Floor" index="9" instance=ExtResource( 6 )]
 position = Vector2( 148, 767 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Door" parent="Floor" index="10" groups=["grp_player"] instance=ExtResource( 5 )]
 position = Vector2( 248, 767 )
+SignContent = null
 MaxHP = 10
 HP = 10
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Wall2" parent="Floor" index="11" instance=ExtResource( 6 )]
 position = Vector2( 199, 769 )
+SignContent = null
+AggroAgainst = null
+MoveFloors = null
 
-[node name="Dragon" parent="Floor" index="12" instance=ExtResource( 8 )]
-position = Vector2( 44, 801 )
+[node name="LeftTower" parent="Floor" index="12" instance=ExtResource( 8 )]
+position = Vector2( 91, 987 )
+SignContent = null
 MaxHP = 0
 HP = 0
 AttackPower = 1
+AggroAgainst = null
+MoveFloors = null
 
-[node name="Dragon2" parent="Floor" index="13" instance=ExtResource( 8 )]
-position = Vector2( 357, 792 )
+[node name="RightTower" parent="Floor" index="13" instance=ExtResource( 8 )]
+position = Vector2( 341, 1000 )
+SignContent = null
 MaxHP = 0
 HP = 0
 AttackPower = 1
+AggroAgainst = null
+MoveFloors = null
 
 [node name="Path2D" type="Path2D" parent="Floor" index="14"]
 position = Vector2( -16, -18 )
@@ -75,5 +117,14 @@ curve = SubResource( 1 )
 position = Vector2( 197, 0 )
 rotation = -1.55243
 loop = false
+
+[node name="CenterTower" parent="Floor" index="15" instance=ExtResource( 8 )]
+position = Vector2( 224, 996 )
+SignContent = null
+MaxHP = 0
+HP = 0
+AttackPower = 1
+AggroAgainst = null
+MoveFloors = null
 
 [editable path="SelectPosition"]

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Godot;
 using GodotDigger.Presentation.Utils;
@@ -16,16 +17,38 @@ public partial class Level2
         this.FillMembers();
 
         this.door.Connect(CommonSignals.TreeExited, this, nameof(DoorTreeExit));
-        this.dragon.Connect(nameof(BaseUnit.Clicked), this, nameof(LeftTowerClicked));
-        this.dragon2.Connect(nameof(BaseUnit.Clicked), this, nameof(RightTowerClicked));
+        this.leftTower.Connect(nameof(BaseUnit.Clicked), this, nameof(LeftTowerClicked));
+        this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(RightTowerClicked));
+        this.centerTower.Connect(nameof(BaseUnit.Clicked), this, nameof(CenterTowerClicked));
 
         BuildEnemies();
+
+        this.leftTower.AutomaticPathGenerator = null;
+        this.rightTower.AutomaticPathGenerator = null;
+        this.centerTower.AutomaticPathGenerator = null;
+
+        this.leftTower.StartMoveAction(new Vector2(44, 801));
+        this.rightTower.StartMoveAction(new Vector2(357, 801));
+        // centerTower will appear on later waves
+
+        this.leftTower.AttackDelay = 0.3f;
+        this.leftTower.HitDelay = 0.1f;
+        this.rightTower.AttackDelay = 0.3f;
+        this.rightTower.HitDelay = 0.1f;
+        this.centerTower.AttackDelay = 0.3f;
+        this.centerTower.HitDelay = 0.1f;
     }
 
     public void BuildEnemies()
     {
         var numberOfEnemies = 10 + level * 2;
         var enemies = new List<string> { nameof(Wolf), nameof(Wasp) };
+        if (level > 1)
+        {
+            enemies.Add(nameof(Slime));
+            this.centerTower.StartMoveAction(new Vector2(220, 801));
+        }
+
         var speed = 100 + level * 10;
 
         for (var i = 0; i < numberOfEnemies; i++)
@@ -59,14 +82,15 @@ public partial class Level2
         {
             return;
         }
+        var tower = this.rightTower;
 
         if (typeof(Wasp) == enemy.GetType())
         {
-            enemy.GotHit(null, this.dragon.AttackPower);
+            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
         }
-        else if (typeof(Wolf) == enemy.GetType())
+        else
         {
-            enemy.HP += (uint)this.dragon.AttackPower;
+            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
         }
     }
 
@@ -83,13 +107,40 @@ public partial class Level2
             return;
         }
 
-        if (typeof(Wasp) == enemy.GetType())
+        var tower = this.leftTower;
+
+        if (typeof(Wolf) == enemy.GetType())
         {
-            enemy.HP += (uint)this.dragon.AttackPower;
+            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
         }
-        else if (typeof(Wolf) == enemy.GetType())
+        else
         {
-            enemy.GotHit(null, this.dragon.AttackPower);
+            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
+        }
+    }
+    
+    private void CenterTowerClicked()
+    {
+        var enemy = this.GetTree()
+            .GetNodesInGroup("grp_enemy")
+            .Cast<BaseUnit>()
+            .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
+            .FirstOrDefault();
+
+        if (enemy == null)
+        {
+            return;
+        }
+
+        var tower = this.centerTower;
+
+        if (typeof(Slime) == enemy.GetType())
+        {
+            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
+        }
+        else
+        {
+            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
         }
     }
 

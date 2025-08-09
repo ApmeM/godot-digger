@@ -9,6 +9,7 @@ namespace GodotDigger.Presentation.Utils
         public static string BodyEntered = "body_entered";
         public static string VisibilityChanged = "visibility_changed";
         public static string AnimationFinished = "animation_finished";
+        public static string Finished = "finished";
         public static string InputEvent = "input_event";
         public static string Ready = "ready";
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BrainAI.Pathfinding;
 using Godot;
+using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseUnit.tscn")]
 [Tool]
@@ -17,7 +18,76 @@ public partial class BaseUnit
     public float AttackDistance;
 
     [Export]
-    public float AttackDelay;
+    public float AttackDelay
+    {
+        get
+        {
+            if (this.attackDelay < 0 && this.IsInsideTree())
+            {
+                this.attackDelay = RecalculateAttackDelay();
+            }
+
+            return attackDelay;
+        }
+        set
+        {
+            attackDelay = value;
+
+            if (this.IsInsideTree())
+            {
+                if (attackDelay < 0)
+                {
+                    this.attackDelay = RecalculateAttackDelay();
+                }
+                var animations = this.animatedSprite.Frames.GetAnimationNames();
+                foreach (var animation in animations)
+                {
+                    if (!animation.StartsWith("Attack"))
+                    {
+                        continue;
+                    }
+
+                    var framesCount = this.animatedSprite.Frames.GetFrameCount(animation);
+                    this.animatedSprite.Frames.SetAnimationSpeed(animation, framesCount / attackDelay);
+
+                    var newAnim = (Animation)this.animationPlayer.GetAnimation(animation).Duplicate();
+
+                    newAnim.Length = this.attackDelay;
+                    this.animationPlayer.AddAnimation(animation, newAnim);
+                }
+            }
+        }
+    }
+
+    private float RecalculateAttackDelay()
+    {
+        var animations = this.animatedSprite.Frames.GetAnimationNames();
+        var maxAnimationLength = float.MaxValue;
+
+        foreach (var animation in animations)
+        {
+            if (!animation.StartsWith("Attack"))
+            {
+                continue;
+            }
+
+            var framesCount = this.animatedSprite.Frames.GetFrameCount(animation);
+            var fps = this.animatedSprite.Frames.GetAnimationSpeed(animation);
+            var delay = framesCount / fps;
+            if (maxAnimationLength == float.MaxValue)
+            {
+                maxAnimationLength = delay;
+            }
+            else if (maxAnimationLength != delay)
+            {
+                GD.Print($"AttackAnimations have different lengths: {delay} and {maxAnimationLength}");
+                maxAnimationLength = Math.Max(maxAnimationLength, delay);
+            }
+        }
+        return maxAnimationLength;
+    }
+
+    private float attackDelay = -1;
 
     [Export]
     public float HitDelay;
@@ -41,9 +111,21 @@ public partial class BaseUnit
     [Export]
     public int VisionDistance = 10;
 
-    private List<(Vector2, HashSet<Floor>)> moveResultPath = new List<(Vector2, HashSet<Floor>)>();
+    public Func<BaseUnit, Vector2?> AutomaticPathGenerator = (unit) =>
+    {
+        if (unit.MoveFloors == null || unit.MoveFloors.Count == 0)
+        {
+            GD.PrintErr($"Automatic move enabled. Should move but have no floors defined : {unit.GetType()} {unit.GetPath()}");
+            return null;
+        }
 
-    private Vector2? moveNextStep;
+        var floorsSet = unit.MoveFloors.ToHashSet();
+        return unit.GetPathToLoot(floorsSet, unit.VisionDistance) ??
+                unit.GetPathToOtherGroup(floorsSet, unit.VisionDistance) ??
+                unit.GetPathToRandomLocation(floorsSet);
+    };
+
+    private List<(Vector2, HashSet<Floor>)> moveResultPath = new List<(Vector2, HashSet<Floor>)>();
 
     private IPathfinder<(Vector2, HashSet<Floor>)> internalMovePathfinder;
     private IPathfinder<(Vector2, HashSet<Floor>)> movePathfinder
@@ -216,28 +298,11 @@ public partial class BaseUnit
     private static Random random = new Random();
 
     private float currentActionDelay;
-    private float currentHitDelay;
 
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
-
-        var animations = this.animatedSprite.Frames.GetAnimationNames();
-        foreach (var animation in animations)
-        {
-            var framesCount = this.animatedSprite.Frames.GetFrameCount(animation);
-            var fps = this.animatedSprite.Frames.GetAnimationSpeed(animation);
-            var newAnim = (Animation)this.animationPlayer.GetAnimation(animation).Duplicate();
-            newAnim.Length = framesCount / fps;
-            this.animationPlayer.AddAnimation(animation, newAnim);
-        }
-        var newAttackDelay = this.animationPlayer.GetAnimation("AttackTop").Length;
-        if (newAttackDelay > this.AttackDelay)
-        {
-            GD.PrintErr($"{this.GetType()}: Calculated attack delay ({newAttackDelay}) is bigger then specified {this.AttackDelay}. This may lead to skipped animations. Reset to calcualted value.");
-            this.AttackDelay = newAttackDelay;
-        }
 
         this.AddToGroup(Groups.Unit);
         // HP order matters. Do not change it.
@@ -246,9 +311,8 @@ public partial class BaseUnit
         this.HP = this.hp;
         this.QuestContent = this.questContent;
         this.SignContent = this.signContent;
+        this.AttackDelay = this.attackDelay;
     }
-
-    private BaseUnit opponent = null;
 
     public override void _Process(float delta)
     {
@@ -259,27 +323,31 @@ public partial class BaseUnit
             return;
         }
 
-        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-
         if (this.currentActionDelay >= 0)
         {
             this.currentActionDelay -= delta;
-            if (this.opponent != null && this.currentHitDelay >= 0)
-            {
-                // Attacking.
-                this.currentHitDelay -= delta;
-                if (this.currentHitDelay < 0)
-                {
-                    opponent.GotHit(this, this.AttackPower);
-                    opponent = null;
-                }
-            }
             return;
+        }
+
+        if (this.GrabLoot)
+        {
+            var loot = this.GetTree()
+                .GetNodesInGroup(Groups.Loot)
+                .Cast<BaseLoot>()
+                .Where(a => level.WorldToMap(a.Position) == level.WorldToMap(this.Position))
+                .FirstOrDefault();
+
+            if (loot != null)
+            {
+                StartGrabLoot(loot);
+                return;
+            }
         }
 
         if (this.AttackPower > 0 && this.AggroAgainst != null && this.AggroAgainst.Count > 0)
         {
-            opponent = this.AggroAgainst
+            // AutoAttack nearest opponent.
+            var opponent = this.AggroAgainst
                 .Except(this.GetGroups().Cast<string>())
                 .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
                 .Where(a => (a.Position - this.Position).LengthSquared() < this.AttackDistance * this.AttackDistance)
@@ -287,95 +355,147 @@ public partial class BaseUnit
                 .FirstOrDefault();
             if (opponent != null)
             {
-                var dir = (opponent.Position - this.Position).Normalized();
-                this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
-                this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
-                stateMachine.Travel("Attack");
-
-                this.currentActionDelay = this.AttackDelay + 0.1f;
-                this.currentHitDelay = this.HitDelay + 0.1f;
+                StartAttackAction(opponent);
                 return;
             }
         }
 
         if (this.MoveSpeed > 0)
         {
-            if (this.MoveFloors == null || MoveFloors.Count == 0)
-            {
-                GD.PrintErr($"Should move but have no floors defined : {this.GetType()} {this.GetPath()}");
-                return;
-            }
-
+            var moveNextStep = AutomaticPathGenerator?.Invoke(this);
             if (moveNextStep != null)
             {
-                var dir = (moveNextStep.Value - this.Position).Normalized();
-                this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
-                this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
-                stateMachine.Travel("Move");
-
-                var speed = this.MoveSpeed * delta;
-                var direction = moveNextStep.Value - this.Position;
-                if (direction.LengthSquared() > speed * speed)
-                {
-                    this.Position += direction.Normalized() * speed;
-                    return;
-                }
-
-                this.Position = moveNextStep.Value;
-                moveNextStep = null;
-                currentActionDelay = this.MoveDelay;
-
-                if (this.GrabLoot)
-                {
-                    var loots = this.GetTree()
-                        .GetNodesInGroup(Groups.Loot)
-                        .Cast<BaseLoot>()
-                        .Where(a => level.WorldToMap(a.Position) == level.WorldToMap(this.Position))
-                        .ToList();
-
-                    foreach (var l in loots)
-                    {
-                        this.Loot.Add(Instantiator.LoadLoot(l.LootName));
-                        l.QueueFree();
-                    }
-                }
-
+                var moveNextPosition = level.MapToWorld(moveNextStep.Value);
+                this.StartMoveAction(moveNextPosition);
                 return;
             }
+        }
 
-            var floorsSet = MoveFloors.ToHashSet();
+        StartStayAction();
+    }
 
-            this.moveNextStep = this.GetPathToLoot(floorsSet, VisionDistance) ??
-                        this.GetPathToOtherGroup(floorsSet, VisionDistance) ??
-                        this.GetPathToRandomLocation(floorsSet);
-            if (this.moveNextStep == null)
-            {
-                moveNextStep = null;
-                currentActionDelay = MoveDelay;
-                return;
-            }
-            moveNextStep = level.MapToWorld(moveNextStep.Value);
+    public async void StartGrabLoot(BaseLoot l)
+    {
+        if (currentActionDelay > 0)
+        {
+            // Previous action not done. 
+            // Should not start new one.
+            return;
+        }
+
+        // TODO: Add animation to grab loot
+        // var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        // stateMachine.Travel("Grab");
+
+        this.Loot.Add(Instantiator.LoadLoot(l.LootName));
+        l.QueueFree();
+    }
+
+    public async void StartStayAction()
+    {
+        if (currentActionDelay > 0)
+        {
+            // Previous action not done. 
+            // Should not start new one.
+            return;
+        }
+
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        stateMachine.Travel("Stay");
+    }
+
+    public async void StartMoveAction(Vector2 destination)
+    {
+        if (currentActionDelay > 0)
+        {
+            // Previous action not done. 
+            // Should not start new one.
+            return;
+        }
+
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        var dir = (destination - this.Position).Normalized();
+        this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
+        this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
+        stateMachine.Travel("Move");
+
+        float distance = this.Position.DistanceTo(destination);
+        float duration = distance / MoveSpeed;
+
+        var tween = this.CreateTween();
+        tween.TweenProperty(this, "position", destination, duration)
+            .SetTrans(Tween.TransitionType.Linear)
+            .SetEase(Tween.EaseType.InOut);
+        this.currentActionDelay = duration;
+        try
+        {
+            await this.ToSignal(tween, CommonSignals.Finished);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Either attacker or defender no longer on a scene. 
+            // No need to calculate attcks.
+            return;
+        }
+        if (!Godot.Object.IsInstanceValid(this))
+        {
+            // Either attacker or defender no longer on a scene. 
+            // No need to calculate attcks.
+            return;
+        }
+    }
+
+    public async void StartAttackAction(BaseUnit opponent, Action onHit = null)
+    {
+        if (currentActionDelay > 0)
+        {
+            // Previous action not done. 
+            // Should not start new one.
+            return;
+        }
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        var dir = (opponent.Position - this.Position).Normalized();
+        this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
+        this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
+        stateMachine.Travel("Attack");
+
+        this.currentActionDelay = this.AttackDelay + 0.1f;
+        await this.ToSignal(this.GetTree().CreateTimer(this.HitDelay), CommonSignals.Timeout);
+        if (!Godot.Object.IsInstanceValid(this) || !Godot.Object.IsInstanceValid(opponent))
+        {
+            // Either attacker or defender no longer on a scene. 
+            // No need to calculate attcks.
+            return;
+        }
+        onHit = onHit ?? (() => opponent.GotHit(this, this.AttackPower));
+        onHit.Invoke();
+        await this.ToSignal(this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)), CommonSignals.Timeout);
+        if (!Godot.Object.IsInstanceValid(this))
+        {
+            // Either attacker or defender no longer on a scene. 
+            // No need to calculate attcks.
+            return;
         }
     }
 
     protected Vector2? GetPathToRandomLocation(HashSet<Floor> floors)
     {
-        var pos = level.WorldToMap(this.Position);
-        var dest = pos + level.moveDirections[random.Next(level.moveDirections.Length)];
+        var pos = this.level.WorldToMap(this.Position);
+        var dest = pos + this.level.moveDirections[random.Next(this.level.moveDirections.Length)];
         if (!level.IsReachable(dest, floors))
         {
             return null;
         }
 
-        moveResultPath.Clear();
-        movePathfinder.Search((pos, floors), (dest, floors), 10, moveResultPath);
+        this.moveResultPath.Clear();
+        this.movePathfinder.Search((pos, floors), (dest, floors), 10, moveResultPath);
 
-        if (moveResultPath == null || moveResultPath.Count < 2)
+        if (this.moveResultPath == null || this.moveResultPath.Count < 2)
         {
             return null;
         }
 
-        return moveResultPath[1].Item1;
+        return this.moveResultPath[1].Item1;
     }
 
     protected Vector2? GetPathToLoot(HashSet<Floor> floors, int maxDistance)
@@ -522,8 +642,8 @@ public partial class BaseUnit
 
     public void GotHit(BaseUnit from, int attackPower)
     {
-        var hitPower = (uint)Math.Min(attackPower, this.HP);
-        this.HP -= hitPower;
+        var hitPower = Math.Min(attackPower, this.HP);
+        this.HP = (uint)Math.Max(0, this.HP - hitPower);
         level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
 
         if (from != null)
@@ -551,15 +671,22 @@ public partial class BaseUnit
 
         if (this.SpawnUnit != null)
         {
-            var instance = this.SpawnUnit.Instance<BaseUnit>();
-            instance.Position = this.Position;
-            instance.LevelPath = this.LevelPath;
-            instance.AggroAgainst = this.AggroAgainst;
-            foreach (var group in this.GetGroups().Cast<string>().Where(a => a.StartsWith(Groups.AggrouGroupPrefix)))
+            if (LevelPath == null)
             {
-                instance.AddToGroup(group);
+                GD.PrintErr($"Should spawn unit on attack, but LevelPath is not set.");
             }
-            this.GetParent().AddChild(instance);
+            else
+            {
+                var instance = this.SpawnUnit.Instance<BaseUnit>();
+                instance.Position = this.Position;
+                instance.LevelPath = this.LevelPath;
+                instance.AggroAgainst = this.AggroAgainst;
+                foreach (var group in this.GetGroups().Cast<string>().Where(a => a.StartsWith(Groups.AggrouGroupPrefix)))
+                {
+                    instance.AddToGroup(group);
+                }
+                this.GetParent().AddChild(instance);
+            }
         }
 
         if (this.HP <= 0)
@@ -587,6 +714,11 @@ public partial class BaseUnit
 
     public void DropLoot()
     {
+        if (LevelPath == null)
+        {
+            GD.PrintErr($"Should drop loot, but LevelPath is not set.");
+            return;
+        }
         var loots = Loot;
 
         foreach (var loot in loots)
