@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("Level2.tscn")]
 public partial class Level2
@@ -81,6 +79,7 @@ public partial class Level2
             enemy.VisionDistance = 1000;
             enemy.AggroAgainst = new List<string> { "grp_player" };
             enemy.AttackPower = 1;
+            enemy.AttackDistance = 100;
             enemy.AddToGroup("grp_enemy");
             enemy.Loot = new List<PackedScene>();
             enemy.MaxHP = 5;
@@ -88,6 +87,7 @@ public partial class Level2
             enemy.MoveSpeed = speed;
             enemy.ZIndex = 1;
             enemy.Scale = new Vector2(1.5f, 1.5f);
+            enemy.HitDelay = enemy.AttackDelay / 2;
         }
     }
 

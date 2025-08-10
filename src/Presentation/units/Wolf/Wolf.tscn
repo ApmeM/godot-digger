@@ -374,6 +374,7 @@ animations = [ {
 
 [node name="Wolf" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
+AttackDelay = 0.4
 MaxHP = 30
 HP = 30
 AttackPower = 5
