@@ -6,7 +6,6 @@ using Godot;
 using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseUnit.tscn")]
-[Tool]
 public partial class BaseUnit
 {
     #region Attack
@@ -94,6 +93,9 @@ public partial class BaseUnit
 
     [Export]
     public List<string> AggroAgainst;
+
+    [Export]
+    public PackedScene Projectile;
 
     #endregion
 
@@ -474,8 +476,20 @@ public partial class BaseUnit
             // No need to calculate attcks.
             return;
         }
+
         onHit = onHit ?? (() => opponent.GotHit(this, this.AttackPower));
-        onHit.Invoke();
+
+        if (this.Projectile != null)
+        {
+            var instance = this.Projectile.Instance<BaseProjectile>();
+            this.GetParent().AddChild(instance);
+            instance.Shoot(this.Position, opponent, onHit);
+        }
+        else
+        {
+            onHit.Invoke();
+        }
+
         await this.ToSignal(this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)), CommonSignals.Timeout);
         if (!Godot.Object.IsInstanceValid(this))
         {
@@ -651,6 +665,11 @@ public partial class BaseUnit
 
     public void GotHit(BaseUnit from, int attackPower)
     {
+        if (!Godot.Object.IsInstanceValid(this))
+        {
+            return;
+        }
+
         var hitPower = Math.Min(attackPower, this.HP);
         this.HP = (uint)Math.Max(0, this.HP - hitPower);
         level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
