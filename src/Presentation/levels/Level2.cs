@@ -16,7 +16,7 @@ public partial class Level2
         base._Ready();
         this.FillMembers();
 
-        this.door.Connect(CommonSignals.TreeExited, this, nameof(DoorTreeExit));
+        this.door.Connect(nameof(BaseUnit.OnHit), this, nameof(DoorHit));
         this.leftTower.Connect(nameof(BaseUnit.Clicked), this, nameof(LeftTowerClicked));
         this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(RightTowerClicked));
         this.centerTower.Connect(nameof(BaseUnit.Clicked), this, nameof(CenterTowerClicked));
@@ -177,11 +177,27 @@ public partial class Level2
         }
     }
 
-    private void DoorTreeExit()
+    private void DoorHit(int hpLeft)
     {
-        if (Godot.Object.IsInstanceValid(this))
+        // TODO: Boom animation
+
+        var enemies = this.GetTree()
+            .GetNodesInGroup("grp_enemy")
+            .Cast<BaseUnit>()
+            .ToList();
+
+        foreach (var enemy in enemies)
+        {
+            enemy.GotHit(this.door, int.MaxValue);
+        }
+
+        if (hpLeft <= 0)
         {
             this.EmitSignal(nameof(GameOver));
+        }
+        else
+        {
+            level--;
         }
     }
 }

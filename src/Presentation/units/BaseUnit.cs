@@ -219,9 +219,11 @@ public partial class BaseUnit
 
     #region Defence
 
+    [Signal]
+    public delegate void OnHit(int hpLeft);
+
     [Export]
     public bool ShowDeath;
-
 
     private uint maxHP;
 
@@ -695,6 +697,8 @@ public partial class BaseUnit
                 this.GetParent().AddChild(instance);
             }
         }
+
+        this.EmitSignal(nameof(OnHit), this.HP);
 
         if (this.HP <= 0)
         {

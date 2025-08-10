@@ -71,8 +71,8 @@ SignContent = null
 position = Vector2( 265, 744 )
 z_index = 1
 SignContent = null
-MaxHP = 10
-HP = 10
+MaxHP = 3
+HP = 3
 AggroAgainst = null
 MoveFloors = null
 
