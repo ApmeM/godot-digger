@@ -27,10 +27,6 @@ public partial class Level2
         this.rightTower.AutomaticPathGenerator = null;
         this.centerTower.AutomaticPathGenerator = null;
 
-        this.leftTower.StartMoveAction(new Vector2(44, 801));
-        this.rightTower.StartMoveAction(new Vector2(357, 801));
-        // centerTower will appear on later waves
-
         this.leftTower.AttackDelay = 0.3f;
         this.leftTower.HitDelay = 0.1f;
         this.rightTower.AttackDelay = 0.3f;
@@ -42,14 +38,37 @@ public partial class Level2
     public void BuildEnemies()
     {
         var numberOfEnemies = 10 + level * 2;
-        var enemies = new List<string> { nameof(Wolf), nameof(Wasp) };
-        if (level > 1)
+        var enemies = new List<string>();
+        if (level == 0)
         {
-            enemies.Add(nameof(Slime));
-            this.centerTower.StartMoveAction(new Vector2(220, 801));
+            this.leftTower.StartMoveAction(new Vector2(240, 740));
+        }
+        if (level >= 0)
+        {
+            enemies.Add(nameof(Wolf));
         }
 
-        var speed = 100 + level * 10;
+        if (level == 1)
+        {
+            this.leftTower.CancelAction();
+            this.leftTower.StartMoveAction(new Vector2(50, 740));
+            this.rightTower.StartMoveAction(new Vector2(480 - 50, 740));
+        }
+        if (level >= 1)
+        {
+            enemies.Add(nameof(Wasp));
+        }
+
+        if (level == 2)
+        {
+            this.centerTower.StartMoveAction(new Vector2(240, 740));
+        }
+        if (level >= 2)
+        {
+            enemies.Add(nameof(Slime));
+        }
+
+        var speed = 150 + level * 15;
 
         for (var i = 0; i < numberOfEnemies; i++)
         {
@@ -59,7 +78,7 @@ public partial class Level2
             this.pathFollow2D.UnitOffset = 1f * i / numberOfEnemies;
             enemy.Position = this.pathFollow2D.Position;
             enemy.LevelPath = this.GetPath();
-            enemy.VisionDistance = 100;
+            enemy.VisionDistance = 1000;
             enemy.AggroAgainst = new List<string> { "grp_player" };
             enemy.AttackPower = 1;
             enemy.AddToGroup("grp_enemy");
@@ -67,6 +86,8 @@ public partial class Level2
             enemy.MaxHP = 5;
             enemy.HP = 1;
             enemy.MoveSpeed = speed;
+            enemy.ZIndex = 1;
+            enemy.Scale = new Vector2(1.5f, 1.5f);
         }
     }
 
@@ -118,7 +139,7 @@ public partial class Level2
             tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
         }
     }
-    
+
     private void CenterTowerClicked()
     {
         var enemy = this.GetTree()
@@ -158,6 +179,9 @@ public partial class Level2
 
     private void DoorTreeExit()
     {
-        this.EmitSignal(nameof(GameOver));
+        if (Godot.Object.IsInstanceValid(this))
+        {
+            this.EmitSignal(nameof(GameOver));
+        }
     }
 }

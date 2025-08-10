@@ -175,9 +175,10 @@ GrabLoot = true
 position = Vector2( 30, -41 )
 
 [node name="AnimatedSprite" parent="." index="1"]
-position = Vector2( 0, -54 )
+position = Vector2( 0, 0 )
 frames = SubResource( 97 )
 animation = "StayBottom"
+centered = true
 
 [node name="AnimationTree" parent="." index="4"]
 parameters/playback = SubResource( 113 )

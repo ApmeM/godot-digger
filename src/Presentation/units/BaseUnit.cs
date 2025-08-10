@@ -374,6 +374,11 @@ public partial class BaseUnit
         StartStayAction();
     }
 
+    public void CancelAction()
+    {
+        this.currentActionDelay = 0;
+    }
+
     public async void StartGrabLoot(BaseLoot l)
     {
         if (currentActionDelay > 0)
@@ -558,8 +563,10 @@ public partial class BaseUnit
         base._UnhandledInput(@event);
         if (@event is InputEventMouseButton mouse && mouse.IsPressed() && !mouse.IsEcho() && (ButtonList)mouse.ButtonIndex == ButtonList.Left)
         {
-            var size = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame).GetSize();
-            var rect = new Rect2(this.animatedSprite.Position, size);
+            var size = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame).GetSize() * animatedSprite.Scale;
+            var position = this.animatedSprite.Position + this.animatedSprite.Offset - (this.animatedSprite.Centered ? size / 2 : Vector2.Zero);
+
+            var rect = new Rect2(position, size);
             var mousePos = this.GetLocalMousePosition();
 
             if (rect.HasPoint(mousePos))

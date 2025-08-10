@@ -8,7 +8,7 @@
 
 [sub_resource type="Curve2D" id=1]
 _data = {
-"points": PoolVector2Array( 0, 0, 0, 0, 197, 0, 0, 0, 0, 0, 215, -980 )
+"points": PoolVector2Array( 0, 0, 0, 0, 197, 0, 0, 0, 0, 0, 215, -1000 )
 }
 
 [node name="Level2" instance=ExtResource( 1 )]
@@ -18,67 +18,58 @@ script = ExtResource( 2 )
 tile_data = PoolIntArray( -1376253, 2, 0, -1376252, 2, 0, -1310717, 2, 0, -1310716, 2, 0, -1245181, 2, 0, -1245180, 2, 0, -1179645, 2, 0, -1179644, 2, 0, -1114109, 2, 0, -1114108, 2, 0, -1048573, 2, 0, -1048572, 2, 0, -983037, 2, 0, -983036, 2, 0, -917501, 2, 0, -917500, 2, 0, -851965, 2, 0, -851964, 2, 0, -786429, 2, 0, -786428, 2, 0, -720893, 2, 0, -720892, 2, 0, -655357, 2, 0, -655356, 2, 0, -589821, 2, 0, -589820, 2, 0, -524285, 2, 0, -524284, 2, 0, -458749, 2, 0, -458748, 2, 0, -393213, 2, 0, -393212, 2, 0, -327677, 2, 0, -327676, 2, 0, -262141, 2, 0, -262140, 2, 0, -262128, 2, 0, -196605, 2, 0, -196604, 2, 0, -131069, 2, 0, -131068, 2, 0, -65533, 2, 0, -65532, 2, 0, 0, 5, 0, 1, 5, 0, 2, 5, 0, 3, 2, 0, 4, 2, 0, 5, 5, 0, 6, 5, 0, 7, 5, 0, 8, 5, 0, 9, 5, 0, 65536, 5, 0, 65537, 2, 0, 65538, 5, 0, 65539, 5, 0, 65540, 2, 0, 65541, 5, 0, 65542, 5, 0, 65543, 5, 0, 65544, 5, 0, 65545, 5, 0, 131072, 5, 0, 131073, 5, 0, 131074, 5, 0, 131075, 5, 0, 131076, 2, 0, 131077, 5, 0, 131078, 5, 0, 131079, 5, 0, 131080, 5, 0, 131081, 5, 0, 196608, 5, 0, 196609, 5, 0, 196610, 5, 0, 196611, 5, 0, 196612, 2, 0, 196613, 5, 0, 196614, 5, 0, 196615, 5, 0, 196616, 5, 0, 196617, 5, 0, 262144, 5, 0, 262145, 5, 0, 262146, 5, 0, 262147, 5, 0, 262148, 2, 0, 262149, 2, 0, 262150, 5, 0, 262151, 5, 0, 262152, 5, 0, 262153, 5, 0, 327680, 5, 0, 327681, 5, 0, 327682, 5, 0, 327683, 5, 0, 327684, 5, 0, 327685, 2, 0, 327686, 5, 0, 327687, 5, 0, 327688, 5, 0, 327689, 5, 0, 393216, 5, 0, 393217, 5, 0, 393218, 5, 0, 393219, 5, 0, 393220, 5, 0, 393221, 2, 0, 393222, 5, 0, 393223, 5, 0, 393224, 5, 0, 393225, 5, 0, 458752, 5, 0, 458753, 5, 0, 458754, 5, 0, 458755, 5, 0, 458756, 5, 0, 458757, 2, 0, 458758, 5, 0, 458759, 5, 0, 458760, 5, 0, 458761, 5, 0, 524288, 5, 0, 524289, 5, 0, 524290, 5, 0, 524291, 5, 0, 524292, 5, 0, 524293, 2, 0, 524294, 5, 0, 524295, 5, 0, 524296, 5, 0, 524297, 5, 0, 589824, 5, 0, 589825, 5, 0, 589826, 5, 0, 589827, 5, 0, 589828, 5, 0, 589829, 2, 0, 589830, 5, 0, 589831, 5, 0, 589832, 5, 0, 589833, 5, 0, 655360, 5, 0, 655361, 5, 0, 655362, 5, 0, 655363, 5, 0, 655364, 2, 0, 655365, 2, 0, 655366, 5, 0, 655367, 5, 0, 655368, 5, 0, 655369, 5, 0, 720896, 5, 0, 720897, 5, 0, 720898, 5, 0, 720899, 5, 0, 720900, 2, 0, 720901, 5, 0, 720902, 5, 0, 720903, 5, 0, 720904, 5, 0, 720905, 5, 0, 786432, 5, 0, 786433, 5, 0, 786434, 5, 0, 786435, 5, 0, 786436, 2, 0, 786437, 5, 0, 786438, 5, 0, 786439, 5, 0, 786440, 5, 0, 786441, 5, 0, 851968, 5, 0, 851969, 5, 0, 851970, 5, 0, 851971, 5, 0, 851972, 2, 0, 851973, 2, 0, 851974, 5, 0, 851975, 5, 0, 851976, 5, 0, 851977, 5, 0, 917504, 5, 0, 917505, 5, 0, 917506, 5, 0, 917507, 5, 0, 917508, 5, 0, 917509, 2, 0, 917510, 5, 0, 917511, 5, 0, 917512, 5, 0, 917513, 5, 0, 983040, 3, 0, 983041, 3, 0, 983042, 3, 0, 983043, 3, 0, 983044, 3, 0, 983045, 2, 0, 983046, 3, 0, 983047, 3, 0, 983048, 3, 0, 983049, 3, 0, 1048576, 3, 0, 1048577, 3, 0, 1048578, 3, 0, 1048579, 3, 0, 1048580, 3, 0, 1048581, 3, 0, 1048582, 3, 0, 1048583, 3, 0, 1048584, 3, 0, 1048585, 3, 0 )
 
 [node name="Wall3" parent="Floor" index="0" instance=ExtResource( 6 )]
-position = Vector2( 2, 769 )
+position = Vector2( 24, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall6" parent="Floor" index="1" instance=ExtResource( 6 )]
-position = Vector2( 437, 818 )
+position = Vector2( 458, 791 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall7" parent="Floor" index="2" instance=ExtResource( 6 )]
-position = Vector2( 437, 767 )
+position = Vector2( 457, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall8" parent="Floor" index="3" instance=ExtResource( 6 )]
-position = Vector2( 50, 769 )
+position = Vector2( 72, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall13" parent="Floor" index="4" instance=ExtResource( 6 )]
-position = Vector2( 296, 768 )
+position = Vector2( 313, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall9" parent="Floor" index="5" instance=ExtResource( 6 )]
-position = Vector2( 343, 768 )
+position = Vector2( 363, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall10" parent="Floor" index="6" instance=ExtResource( 6 )]
-position = Vector2( 99, 768 )
+position = Vector2( 120, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall11" parent="Floor" index="7" instance=ExtResource( 6 )]
-position = Vector2( 394, 769 )
+position = Vector2( 411, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall" parent="Floor" index="8" instance=ExtResource( 6 )]
-position = Vector2( 1, 817 )
+position = Vector2( 24, 791 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall14" parent="Floor" index="9" instance=ExtResource( 6 )]
-position = Vector2( 148, 767 )
+position = Vector2( 168, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="Door" parent="Floor" index="10" groups=["grp_player"] instance=ExtResource( 5 )]
-position = Vector2( 248, 767 )
+position = Vector2( 265, 744 )
+z_index = 1
 SignContent = null
 MaxHP = 10
 HP = 10
@@ -86,45 +77,43 @@ AggroAgainst = null
 MoveFloors = null
 
 [node name="Wall2" parent="Floor" index="11" instance=ExtResource( 6 )]
-position = Vector2( 199, 769 )
+position = Vector2( 217, 744 )
+z_index = 1
 SignContent = null
-AggroAgainst = null
-MoveFloors = null
 
 [node name="LeftTower" parent="Floor" index="12" instance=ExtResource( 8 )]
-position = Vector2( 91, 987 )
+position = Vector2( 101, 998 )
+z_index = 2
 SignContent = null
 MaxHP = 0
 HP = 0
 AttackPower = 1
-AggroAgainst = null
-MoveFloors = null
+MoveSpeed = 300.0
 
 [node name="RightTower" parent="Floor" index="13" instance=ExtResource( 8 )]
-position = Vector2( 341, 1000 )
+position = Vector2( 339, 995 )
+z_index = 2
 SignContent = null
 MaxHP = 0
 HP = 0
 AttackPower = 1
-AggroAgainst = null
-MoveFloors = null
+MoveSpeed = 300.0
 
-[node name="Path2D" type="Path2D" parent="Floor" index="14"]
-position = Vector2( -16, -18 )
+[node name="CenterTower" parent="Floor" index="14" instance=ExtResource( 8 )]
+position = Vector2( 224, 996 )
+z_index = 2
+SignContent = null
+MaxHP = 0
+HP = 0
+AttackPower = 1
+MoveSpeed = 300.0
+
+[node name="Path2D" type="Path2D" parent="Floor" index="15"]
 curve = SubResource( 1 )
 
 [node name="PathFollow2D" type="PathFollow2D" parent="Floor/Path2D" index="0"]
 position = Vector2( 197, 0 )
-rotation = -1.55243
+rotation = -1.55279
 loop = false
-
-[node name="CenterTower" parent="Floor" index="15" instance=ExtResource( 8 )]
-position = Vector2( 224, 996 )
-SignContent = null
-MaxHP = 0
-HP = 0
-AttackPower = 1
-AggroAgainst = null
-MoveFloors = null
 
 [editable path="SelectPosition"]

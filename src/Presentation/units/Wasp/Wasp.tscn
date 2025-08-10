@@ -612,11 +612,11 @@ animations = [ {
 
 [node name="Wasp" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
+AttackDelay = 0.4
 MaxHP = 20
 HP = 20
 AttackPower = 1
 AttackDistance = 10.0
-AttackDelay = 0.4
 MoveSpeed = 100.0
 MoveFloors = PoolIntArray( 2 )
 
@@ -624,9 +624,10 @@ MoveFloors = PoolIntArray( 2 )
 position = Vector2( 26, -45 )
 
 [node name="AnimatedSprite" parent="." index="1"]
-position = Vector2( 0, -49 )
+position = Vector2( 0, 0 )
 frames = SubResource( 52 )
 animation = "StayBottom"
+centered = true
 
 [node name="AnimationTree" parent="." index="4"]
 parameters/playback = SubResource( 256 )

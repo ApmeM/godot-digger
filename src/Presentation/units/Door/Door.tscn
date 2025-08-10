@@ -18,8 +18,10 @@ animations = [ {
 script = ExtResource( 3 )
 
 [node name="AnimatedSprite" parent="." index="1"]
+position = Vector2( 0, 0 )
 frames = SubResource( 1 )
 animation = "StayBottom"
+centered = true
 
 [node name="AnimationTree" parent="." index="4"]
 parameters/playback = SubResource( 2 )

@@ -74,7 +74,10 @@ public partial class Game
 
     public void GameOver()
     {
-        this.GetTree().ChangeScene("res://Presentation/Main.tscn");    
+        if (this.IsInsideTree())
+        {
+            this.GetTree().ChangeScene("res://Presentation/Main.tscn");
+        }
     }
 
     public void ChangeLevel(string nextLevel)
