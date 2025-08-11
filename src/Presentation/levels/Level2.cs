@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Godot;
 
 [SceneReference("Level2.tscn")]
@@ -80,7 +81,6 @@ public partial class Level2
             enemy.AggroAgainst = new List<string> { "grp_player" };
             enemy.AttackPower = 1;
             enemy.AttackDistance = 100;
-            enemy.AddToGroup("grp_enemy");
             enemy.Loot = new List<PackedScene>();
             enemy.MaxHP = 5;
             enemy.HP = 1;
@@ -88,62 +88,30 @@ public partial class Level2
             enemy.ZIndex = 1;
             enemy.Scale = new Vector2(1.5f, 1.5f);
             enemy.HitDelay = enemy.AttackDelay / 2;
+            enemy.AddToGroup(Groups.Enemy);
+            enemy.AddToGroup(Groups.AttackingEnemy);
         }
     }
 
     private void RightTowerClicked()
     {
-        var enemy = this.GetTree()
-            .GetNodesInGroup("grp_enemy")
-            .Cast<BaseUnit>()
-            .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
-            .FirstOrDefault();
-
-        if (enemy == null)
-        {
-            return;
-        }
-        var tower = this.rightTower;
-
-        if (typeof(Wasp) == enemy.GetType())
-        {
-            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
-        }
-        else
-        {
-            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
-        }
+        TowerClicked(this.rightTower, typeof(Wasp));
     }
 
     private void LeftTowerClicked()
     {
-        var enemy = this.GetTree()
-            .GetNodesInGroup("grp_enemy")
-            .Cast<BaseUnit>()
-            .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
-            .FirstOrDefault();
-
-        if (enemy == null)
-        {
-            return;
-        }
-
-        var tower = this.leftTower;
-
-        if (typeof(Wolf) == enemy.GetType())
-        {
-            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
-        }
-        else
-        {
-            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
-        }
+        TowerClicked(this.leftTower, typeof(Wolf));
     }
 
     private void CenterTowerClicked()
     {
+        TowerClicked(this.centerTower, typeof(Slime));
+    }
+
+    private void TowerClicked(BaseUnit tower, Type against)
+    {
         var enemy = this.GetTree()
-            .GetNodesInGroup("grp_enemy")
+            .GetNodesInGroup(Groups.AttackingEnemy)
             .Cast<BaseUnit>()
             .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
             .FirstOrDefault();
@@ -153,22 +121,35 @@ public partial class Level2
             return;
         }
 
-        var tower = this.centerTower;
-
-        if (typeof(Slime) == enemy.GetType())
+        if (against == enemy.GetType())
         {
+            tower.CancelAction();
             tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
+            if (enemy.HP <= tower.AttackPower)
+            {
+                enemy.RemoveFromGroup(Groups.AttackingEnemy);
+            }
         }
         else
         {
-            tower.StartAttackAction(enemy, () => enemy.GotHit(tower, -tower.AttackPower));
+            enemy.HP += (uint)tower.AttackPower;
+            tower.CancelAction();
+            tower.StartAttackAction(enemy, () =>
+            {
+                if (!Godot.Object.IsInstanceValid(enemy))
+                {
+                    return;
+                }
+                enemy.HP -= (uint)tower.AttackPower;
+                enemy.GotHit(tower, -tower.AttackPower);
+            });
         }
     }
 
     public override void _Process(float delta)
     {
         base._Process(delta);
-        var enemy = this.GetTree().GetFirstNodeInGroup("grp_enemy");
+        var enemy = this.GetTree().GetFirstNodeInGroup(Groups.Enemy);
         if (enemy == null)
         {
             // Next level.
@@ -182,7 +163,7 @@ public partial class Level2
         // TODO: Boom animation
 
         var enemies = this.GetTree()
-            .GetNodesInGroup("grp_enemy")
+            .GetNodesInGroup(Groups.Enemy)
             .Cast<BaseUnit>()
             .ToList();
 
