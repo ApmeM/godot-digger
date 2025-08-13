@@ -136,7 +136,7 @@ public partial class Level2
             tower.CancelAction();
             tower.StartAttackAction(enemy, () =>
             {
-                if (!Godot.Object.IsInstanceValid(enemy))
+                if (!Godot.Object.IsInstanceValid(enemy) || !Godot.Object.IsInstanceValid(tower))
                 {
                     return;
                 }
