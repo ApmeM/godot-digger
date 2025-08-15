@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseLoot.tscn")]
 public partial class BaseLoot

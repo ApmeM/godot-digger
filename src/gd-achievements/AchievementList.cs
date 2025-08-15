@@ -1,6 +1,4 @@
 using Godot;
-using GodotDigger.Achievements;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("AchievementList.tscn")]
 public partial class AchievementList

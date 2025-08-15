@@ -1,5 +1,4 @@
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("TimerLabel.tscn")]
 public partial class TimerLabel

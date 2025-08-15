@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("Header.tscn")]
 [Tool]

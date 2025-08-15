@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 
 [SceneReference("Main.tscn")]

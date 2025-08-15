@@ -6,7 +6,7 @@ using BrainAI.Pathfinding;
 using Godot;
 
 [SceneReference("BaseLevel.tscn")]
-public partial class BaseLevel : IWeightedGraph<(Vector2, HashSet<Floor>)>
+public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floor>>>
 {
     [Signal]
     public delegate void ChangeLevel(string nextLevel);

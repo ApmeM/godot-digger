@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("Shop.tscn")]
 public partial class Shop

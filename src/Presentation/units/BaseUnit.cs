@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BrainAI.Pathfinding;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("BaseUnit.tscn")]
 public partial class BaseUnit

@@ -1,5 +1,4 @@
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("CustomConfirmPopup.tscn")]
 [Tool]

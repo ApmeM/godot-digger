@@ -1,5 +1,4 @@
 using Godot;
-using GodotDigger.Achievements;
 
 [SceneReference("AchievementNotifications.tscn")]
 public partial class AchievementNotifications

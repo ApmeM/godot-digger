@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using GodotDigger.Presentation.Utils;
 
 [SceneReference("InventorySlot.tscn")]
 [Tool]
