@@ -7,6 +7,7 @@ public partial class Gold
     {
         this.Price = 1;
         this.MaxCount = 1000;
+        this.ItemType = ItemType.Money;
     }
 
     public override void _Ready()

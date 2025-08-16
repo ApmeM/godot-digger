@@ -44,6 +44,9 @@ public partial class BagInventoryPopup
 
         this.bagSlot.AcceptedTypes.Add((int)ItemType.Bag);
         this.bagSlot.Config = Config;
+
+        this.moneySlot.AcceptedTypes.Add((int)ItemType.Money);
+        this.moneySlot.Config = Config;
     }
 
 
@@ -122,7 +125,16 @@ public partial class BagInventoryPopup
 
     public int TryChangeCount(string lootId, int count)
     {
-        return this.bagInventory.TryChangeCount(LootDefinition.LootByName[lootId].Id, count);
+        var loot = LootDefinition.LootByName[lootId];
+        if (loot.ItemType == ItemType.Money)
+        {
+            if (moneySlot.TryChangeCount(loot.Id, count) == 0)
+            {
+                return 0;
+            }
+        }
+
+        return this.bagInventory.TryChangeCount(loot.Id, count);
     }
 
     public int GetItemCount(string lootId)

@@ -11,4 +11,5 @@ public enum ItemType
     Boots = 9,
     Potion = 10,
     Bag = 11,
+    Money = 12,
 }
