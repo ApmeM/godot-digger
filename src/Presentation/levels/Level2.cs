@@ -146,7 +146,7 @@ public partial class Level2
             enemy.AggroAgainst = new List<string> { "grp_player" };
             enemy.AttackPower = 1;
             enemy.AttackDistance = 100;
-            enemy.Loot = new List<PackedScene>();
+            enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
             enemy.MaxHP = 5;
             enemy.HP = 1;
             enemy.MoveSpeed = speed;
@@ -159,14 +159,30 @@ public partial class Level2
         }
     }
 
-    private void LootDropped(BaseLoot newLoot)
+    private async void LootDropped(BaseLoot newLoot)
     {
-        var toPosition = newLoot.Position + new Vector2(r.Next(20) - 10, -r.Next(10) - 10).Normalized() * 50;
+        var toPosition = new Vector2(0, 0);
         var tween = newLoot.CreateTween();
-        tween.TweenProperty(newLoot, "position", toPosition, 0.3f)
+        tween.TweenProperty(newLoot, "position", toPosition, 0.5f)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-
+        try
+        {
+            await this.ToSignal(tween, CommonSignals.Finished);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Either attacker or defender no longer on a scene. 
+            // No need to calculate attcks.
+            return;
+        }
+        if (!Godot.Object.IsInstanceValid(this))
+        {
+            // Either attacker or defender no longer on a scene. 
+            // No need to calculate attcks.
+            return;
+        }
+        newLoot.LootClicked();
     }
 
     private void RightTowerClicked()

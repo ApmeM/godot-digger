@@ -42,7 +42,7 @@ public partial class BaseLoot
         this.texture.Connect(CommonSignals.Pressed, this, nameof(LootClicked));
     }
 
-    private void LootClicked()
+    public void LootClicked()
     {
         if (level.BagInventoryPopup.TryChangeCount(this.LootName, 1) == 0)
         {
