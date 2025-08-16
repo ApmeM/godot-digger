@@ -132,14 +132,22 @@ custom_fonts/font = SubResource( 2 )
 text = "Level 1"
 align = 1
 
-[node name="Button" type="Button" parent="." index="5"]
-margin_left = 215.0
-margin_top = 842.0
-margin_right = 280.0
-margin_bottom = 862.0
-text = "ToBattle"
+[node name="UpgradeDoor" type="Button" parent="." index="5"]
+margin_left = 232.0
+margin_top = 783.0
+margin_right = 297.0
+margin_bottom = 803.0
+text = "Upgrade
+Door"
 
-[node name="Camera2D" type="Camera2D" parent="." index="6"]
+[node name="ToBattle" type="Button" parent="." index="6"]
+margin_left = 232.0
+margin_top = 888.0
+margin_right = 297.0
+margin_bottom = 908.0
+text = "To Battle"
+
+[node name="Camera2D" type="Camera2D" parent="." index="7"]
 position = Vector2( 240, 1000 )
 current = true
 

@@ -139,7 +139,13 @@ public partial class BagInventoryPopup
 
     public int GetItemCount(string lootId)
     {
-        return this.bagInventory.GetItemCount(LootDefinition.LootByName[lootId].Id);
+        var loot = LootDefinition.LootByName[lootId];
+        if (loot.ItemType == ItemType.Money)
+        {
+            return moneySlot.GetItem().Item2;
+        }
+        
+        return this.bagInventory.GetItemCount(loot.Id);
     }
 
     public void ApplyEquipment(Character character)

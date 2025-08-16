@@ -86,6 +86,7 @@ margin_left = 52.0
 margin_right = 100.0
 margin_bottom = 48.0
 ItemTypePlaceholderTexture = ExtResource( 7 )
+CanDragData = false
 
 [node name="BagInventory" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer/BagContainer" index="1" instance=ExtResource( 3 )]
 margin_left = 0.0

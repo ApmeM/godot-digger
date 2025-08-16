@@ -25,7 +25,8 @@ public partial class Level2
         this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(RightTowerClicked));
         this.centerTower.Connect(nameof(BaseUnit.Clicked), this, nameof(CenterTowerClicked));
 
-        this.button.Connect(CommonSignals.Pressed, this, nameof(StartWave));
+        this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
+        this.upgradeDoor.Connect(CommonSignals.Pressed, this, nameof(UpgradeDoor));
 
         this.leftTower.AutomaticPathGenerator = null;
         this.rightTower.AutomaticPathGenerator = null;
@@ -41,6 +42,17 @@ public partial class Level2
         this.rightTower.HitDelay = 0.1f;
         this.centerTower.AttackDelay = 0.3f;
         this.centerTower.HitDelay = 0.1f;
+    }
+
+    private void UpgradeDoor()
+    {
+        var count = this.BagInventoryPopup.GetItemCount(nameof(Gold));
+        if (count > this.door.MaxHP * this.door.MaxHP)
+        {
+            this.BagInventoryPopup.TryChangeCount(nameof(Gold), -(int)(this.door.MaxHP * this.door.MaxHP));
+            this.door.MaxHP++;
+            this.door.HP = this.door.MaxHP;
+        }
     }
 
     private async void StartWave()
