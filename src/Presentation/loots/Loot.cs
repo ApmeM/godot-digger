@@ -42,7 +42,7 @@ public class LootDefinition
         var id = 0;
         while (!string.IsNullOrWhiteSpace(dirname = dir.GetNext()))
         {
-            if (!dir.FileExists($"res://Presentation/loots/{dirname}/{dirname}.png"))
+            if (!dir.FileExists($"res://Presentation/loots/{dirname}/{dirname}.png.import"))
             {
                 continue;
             }

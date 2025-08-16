@@ -142,6 +142,9 @@ public partial class BaseUnit
 
     #region Loot
 
+    [Signal]
+    public delegate void LootDropped(BaseLoot loot);
+
     [Export]
     public List<PackedScene> Loot = new List<PackedScene>();
 
@@ -756,6 +759,7 @@ public partial class BaseUnit
             newLoot.LevelPath = this.LevelPath;
             newLoot.Position = this.Position;
             this.GetParent().AddChild(newLoot);
+            this.EmitSignal(nameof(LootDropped), newLoot);
         }
     }
 }

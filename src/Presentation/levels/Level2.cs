@@ -1,14 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Godot;
 
 [SceneReference("Level2.tscn")]
 public partial class Level2
 {
     private Random r = new Random();
-    private int level;
+    private int level = 0;
+
+    private Vector2 leftTowerInitialPosition;
+    private Vector2 rightTowerInitialPosition;
+    private Vector2 centerTowerInitialPosition;
+
+    private bool isWaveStarted = false;
 
     public override void _Ready()
     {
@@ -20,11 +25,15 @@ public partial class Level2
         this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(RightTowerClicked));
         this.centerTower.Connect(nameof(BaseUnit.Clicked), this, nameof(CenterTowerClicked));
 
-        BuildEnemies();
+        this.button.Connect(CommonSignals.Pressed, this, nameof(StartWave));
 
         this.leftTower.AutomaticPathGenerator = null;
         this.rightTower.AutomaticPathGenerator = null;
         this.centerTower.AutomaticPathGenerator = null;
+
+        this.leftTowerInitialPosition = this.leftTower.Position;
+        this.rightTowerInitialPosition = this.rightTower.Position;
+        this.centerTowerInitialPosition = this.centerTower.Position;
 
         this.leftTower.AttackDelay = 0.3f;
         this.leftTower.HitDelay = 0.1f;
@@ -34,33 +43,89 @@ public partial class Level2
         this.centerTower.HitDelay = 0.1f;
     }
 
+    private async void StartWave()
+    {
+        timerLabel.ShowMessage($"Level {level + 1}.", 5);
+
+        this.leftTower.CancelAction();
+        this.rightTower.CancelAction();
+        this.centerTower.CancelAction();
+        switch (level)
+        {
+            case 0:
+                this.leftTower.StartMoveAction(new Vector2(240, 740));
+                this.rightTower.StartMoveAction(this.rightTowerInitialPosition);
+                this.centerTower.StartMoveAction(this.centerTowerInitialPosition);
+                break;
+            case 1:
+                this.leftTower.StartMoveAction(new Vector2(50, 740));
+                this.rightTower.StartMoveAction(new Vector2(480 - 50, 740));
+                this.centerTower.StartMoveAction(this.centerTowerInitialPosition);
+                break;
+            default:
+                this.leftTower.StartMoveAction(new Vector2(50, 740));
+                this.rightTower.StartMoveAction(new Vector2(480 - 50, 740));
+                this.centerTower.StartMoveAction(new Vector2(240, 740));
+                break;
+        }
+
+        var tween = this.CreateTween();
+        tween.TweenProperty(this.camera2D, "position", new Vector2(240, 400), 2)
+            .SetTrans(Tween.TransitionType.Linear)
+            .SetEase(Tween.EaseType.InOut);
+        await this.ToSignal(tween, CommonSignals.Finished);
+
+        BuildEnemies();
+        isWaveStarted = true;
+    }
+
+    private async void StopWave()
+    {
+        isWaveStarted = false;
+        if (this.door.HP <= 1)
+        {
+            timerLabel.ShowMessage($"Game Over.", 5);
+        }
+        else
+        {
+            timerLabel.ShowMessage($"Level clear.", 5);
+        }
+        this.door.HP = this.door.MaxHP;
+
+        var enemies = this.GetTree()
+            .GetNodesInGroup(Groups.Enemy)
+            .Cast<BaseUnit>()
+            .ToList();
+        foreach (var enemy in enemies)
+        {
+            enemy.QueueFree();
+        }
+
+        this.leftTower.CancelAction();
+        this.rightTower.CancelAction();
+        this.centerTower.CancelAction();
+        this.leftTower.StartMoveAction(this.leftTowerInitialPosition);
+        this.rightTower.StartMoveAction(this.rightTowerInitialPosition);
+        this.centerTower.StartMoveAction(this.centerTowerInitialPosition);
+
+        var tween = this.CreateTween();
+        tween.TweenProperty(this.camera2D, "position", new Vector2(240, 1000), 2)
+            .SetTrans(Tween.TransitionType.Linear)
+            .SetEase(Tween.EaseType.InOut);
+        await this.ToSignal(tween, CommonSignals.Finished);
+    }
+
     public void BuildEnemies()
     {
         var numberOfEnemies = 10 + level * 2;
         var enemies = new List<string>();
-        if (level == 0)
-        {
-            this.leftTower.StartMoveAction(new Vector2(240, 740));
-        }
         if (level >= 0)
         {
             enemies.Add(nameof(Wolf));
         }
-
-        if (level == 1)
-        {
-            this.leftTower.CancelAction();
-            this.leftTower.StartMoveAction(new Vector2(50, 740));
-            this.rightTower.StartMoveAction(new Vector2(480 - 50, 740));
-        }
         if (level >= 1)
         {
             enemies.Add(nameof(Wasp));
-        }
-
-        if (level == 2)
-        {
-            this.centerTower.StartMoveAction(new Vector2(240, 740));
         }
         if (level >= 2)
         {
@@ -90,7 +155,18 @@ public partial class Level2
             enemy.HitDelay = enemy.AttackDelay / 2;
             enemy.AddToGroup(Groups.Enemy);
             enemy.AddToGroup(Groups.AttackingEnemy);
+            enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
         }
+    }
+
+    private void LootDropped(BaseLoot newLoot)
+    {
+        var toPosition = newLoot.Position + new Vector2(r.Next(20) - 10, -r.Next(10) - 10).Normalized() * 50;
+        var tween = newLoot.CreateTween();
+        tween.TweenProperty(newLoot, "position", toPosition, 0.3f)
+            .SetTrans(Tween.TransitionType.Linear)
+            .SetEase(Tween.EaseType.InOut);
+
     }
 
     private void RightTowerClicked()
@@ -110,6 +186,11 @@ public partial class Level2
 
     private void TowerClicked(BaseUnit tower, Type against)
     {
+        if (!isWaveStarted)
+        {
+            return;
+        }
+
         var enemy = this.GetTree()
             .GetNodesInGroup(Groups.AttackingEnemy)
             .Cast<BaseUnit>()
@@ -149,12 +230,14 @@ public partial class Level2
     public override void _Process(float delta)
     {
         base._Process(delta);
-        var enemy = this.GetTree().GetFirstNodeInGroup(Groups.Enemy);
-        if (enemy == null)
+        if (isWaveStarted)
         {
-            // Next level.
-            this.level++;
-            this.BuildEnemies();
+            var enemy = this.GetTree().GetFirstNodeInGroup(Groups.Enemy);
+            if (enemy == null)
+            {
+                StopWave();
+                level++;
+            }
         }
     }
 
@@ -165,20 +248,27 @@ public partial class Level2
         var enemies = this.GetTree()
             .GetNodesInGroup(Groups.Enemy)
             .Cast<BaseUnit>()
+            .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
             .ToList();
 
+        var i = 0;
         foreach (var enemy in enemies)
         {
-            enemy.GotHit(this.door, int.MaxValue);
+            if (i < 5)
+            {
+                enemy.RemoveFromGroup(Groups.AttackingEnemy);
+                enemy.GotHit(this.door, int.MaxValue);
+            }
+            else
+            {
+                enemy.MoveSpeed /= 2;
+            }
+            i++;
         }
 
-        if (hpLeft <= 0)
+        if (hpLeft <= 1)
         {
-            this.EmitSignal(nameof(GameOver));
-        }
-        else
-        {
-            level--;
+            this.StopWave();
         }
     }
 }
