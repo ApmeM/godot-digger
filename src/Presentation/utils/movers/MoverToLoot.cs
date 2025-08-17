@@ -4,7 +4,7 @@ using Godot;
 
 public class MoverToLoot : BaseFloorMover
 {
-    public MoverToLoot(BaseLevel level) : base(level)
+    public MoverToLoot(BaseUnit unit, BaseLevel level) : base(unit, level)
     {
     }
 

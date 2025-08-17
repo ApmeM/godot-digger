@@ -4,7 +4,7 @@ using Godot;
 
 public class MoverToEnemyGroup : BaseFloorMover
 {
-    public MoverToEnemyGroup(BaseLevel level) : base(level)
+    public MoverToEnemyGroup(BaseUnit unit, BaseLevel level) : base(unit, level)
     {
     }
 

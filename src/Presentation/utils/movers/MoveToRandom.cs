@@ -6,7 +6,7 @@ public class MoveToRandom : BaseFloorMover
 {
     private Random random = new Random();
 
-    public MoveToRandom(BaseLevel level) : base(level)
+    public MoveToRandom(BaseUnit unit, BaseLevel level) : base(unit, level)
     {
     }
 

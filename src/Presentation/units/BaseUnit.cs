@@ -343,15 +343,9 @@ public partial class BaseUnit
             }
         }
 
-        if (this.MoveSpeed > 0)
+        if (AutomaticPathGenerator?.MoveUnit() == true)
         {
-            var moveNextStep = AutomaticPathGenerator?.MoveUnit(this);
-            if (moveNextStep != null)
-            {
-                var moveNextPosition = level.MapToWorld(moveNextStep.Value);
-                this.StartMoveAction(moveNextPosition);
-                return;
-            }
+            return;
         }
 
         StartStayAction();

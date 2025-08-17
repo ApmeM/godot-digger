@@ -1,25 +1,23 @@
-using Godot;
-
 public class MoverToFirstFound : BaseMover
 {
     private readonly BaseMover[] movers;
 
-    public MoverToFirstFound(params BaseMover[] movers)
+    public MoverToFirstFound(BaseUnit unit, BaseLevel level, params BaseMover[] movers) : base(unit, level)
     {
         this.movers = movers;
     }
 
-    public override Vector2? MoveUnit(BaseUnit unit)
+    public override bool MoveUnit()
     {
         foreach (var mover in movers)
         {
-            var res = mover.MoveUnit(unit);
-            if (res != null)
+            var res = mover.MoveUnit();
+            if (res)
             {
-                return res;
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 }

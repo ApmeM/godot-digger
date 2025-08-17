@@ -5,15 +5,9 @@ using Godot;
 
 public abstract class BaseFloorMover : BaseMover
 {
-    public BaseFloorMover(BaseLevel level)
-    {
-        this.level = level;
-    }
-
     private List<(Vector2, HashSet<Floor>)> moveResultPath = new List<(Vector2, HashSet<Floor>)>();
 
     private IPathfinder<(Vector2, HashSet<Floor>)> internalMovePathfinder;
-    protected readonly BaseLevel level;
 
     private IPathfinder<(Vector2, HashSet<Floor>)> movePathfinder
     {
@@ -24,12 +18,16 @@ public abstract class BaseFloorMover : BaseMover
         }
     }
 
-    public override Vector2? MoveUnit(BaseUnit unit)
+    protected BaseFloorMover(BaseUnit unit, BaseLevel level) : base(unit, level)
+    {
+    }
+
+    public override bool MoveUnit()
     {
         if (unit.MoveFloors == null || unit.MoveFloors.Count == 0)
         {
             GD.PrintErr($"Automatic move enabled. Should move but have no floors defined : {unit.GetType()} {unit.GetPath()}");
-            return null;
+            return false;
         }
 
         var maxDistance = unit.VisionDistance;
@@ -37,7 +35,7 @@ public abstract class BaseFloorMover : BaseMover
         var targets = this.GetTargets(unit, floors, maxDistance);
         if (targets == null)
         {
-            return null;
+            return false;
         }
 
         var pos = level.WorldToMap(unit.Position);
@@ -46,10 +44,14 @@ public abstract class BaseFloorMover : BaseMover
 
         if (moveResultPath == null || moveResultPath.Count < 2)
         {
-            return null;
+            return false;
         }
 
-        return moveResultPath[1].Item1;
+        var moveNextStep = moveResultPath[1].Item1;
+        var moveNextPosition = level.MapToWorld(moveNextStep);
+        unit.StartMoveAction(moveNextPosition);
+
+        return true;
     }
 
     public abstract HashSet<(Vector2, HashSet<Floor>)> GetTargets(BaseUnit unit, HashSet<Floor> floors, int maxDistance);
