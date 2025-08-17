@@ -81,7 +81,6 @@ SignContent = null
 MaxHP = 3
 HP = 3
 AggroAgainst = null
-MoveFloors = null
 
 [node name="Wall2" parent="Floor" index="11" instance=ExtResource( 6 )]
 position = Vector2( 217, 744 )

@@ -107,36 +107,15 @@ public partial class BaseUnit
     public float MoveDelay;
 
     [Export]
-    public List<Floor> MoveFloors;
+    public List<Floor> MoveFloors { get => moveFloors; set  { moveFloors = value; moveFloorsSet = value.ToHashSet(); } }
+    private List<Floor> moveFloors;
+    private HashSet<Floor> moveFloorsSet = new HashSet<Floor>();
+    public HashSet<Floor> MoveFloorsSet{ get => moveFloorsSet; }
 
     [Export]
     public int VisionDistance = 10;
 
-    public Func<BaseUnit, Vector2?> AutomaticPathGenerator = (unit) =>
-    {
-        if (unit.MoveFloors == null || unit.MoveFloors.Count == 0)
-        {
-            GD.PrintErr($"Automatic move enabled. Should move but have no floors defined : {unit.GetType()} {unit.GetPath()}");
-            return null;
-        }
-
-        var floorsSet = unit.MoveFloors.ToHashSet();
-        return unit.GetPathToLoot(floorsSet, unit.VisionDistance) ??
-                unit.GetPathToOtherGroup(floorsSet, unit.VisionDistance) ??
-                unit.GetPathToRandomLocation(floorsSet);
-    };
-
-    private List<(Vector2, HashSet<Floor>)> moveResultPath = new List<(Vector2, HashSet<Floor>)>();
-
-    private IPathfinder<(Vector2, HashSet<Floor>)> internalMovePathfinder;
-    private IPathfinder<(Vector2, HashSet<Floor>)> movePathfinder
-    {
-        get
-        {
-            internalMovePathfinder = internalMovePathfinder ?? new WeightedPathfinder<(Vector2, HashSet<Floor>)>(level);
-            return internalMovePathfinder;
-        }
-    }
+    public BaseMover AutomaticPathGenerator; // In Constructor
 
     #endregion
 
@@ -301,8 +280,6 @@ public partial class BaseUnit
     [Signal]
     public delegate void Clicked();
 
-    private static Random random = new Random();
-
     private float currentActionDelay;
 
     public override void _Ready()
@@ -368,7 +345,7 @@ public partial class BaseUnit
 
         if (this.MoveSpeed > 0)
         {
-            var moveNextStep = AutomaticPathGenerator?.Invoke(this);
+            var moveNextStep = AutomaticPathGenerator?.MoveUnit(this);
             if (moveNextStep != null)
             {
                 var moveNextPosition = level.MapToWorld(moveNextStep.Value);
@@ -501,80 +478,6 @@ public partial class BaseUnit
         }
     }
 
-    protected Vector2? GetPathToRandomLocation(HashSet<Floor> floors)
-    {
-        var pos = this.level.WorldToMap(this.Position);
-        var dest = pos + this.level.moveDirections[random.Next(this.level.moveDirections.Length)];
-        if (!level.IsReachable(dest, floors))
-        {
-            return null;
-        }
-
-        this.moveResultPath.Clear();
-        this.movePathfinder.Search((pos, floors), (dest, floors), 10, moveResultPath);
-
-        if (this.moveResultPath == null || this.moveResultPath.Count < 2)
-        {
-            return null;
-        }
-
-        return this.moveResultPath[1].Item1;
-    }
-
-    protected Vector2? GetPathToLoot(HashSet<Floor> floors, int maxDistance)
-    {
-        if (!this.GrabLoot)
-        {
-            return null;
-        }
-
-        var pos = level.WorldToMap(this.Position);
-
-        var loots = this.GetTree()
-            .GetNodesInGroup(Groups.Loot)
-            .Cast<BaseLoot>()
-            .Select(a => (level.WorldToMap(a.Position), floors))
-            .Where(a => level.IsReachable(a.Item1, floors))
-            .Where(a => (a.Item1 - pos).LengthSquared() <= maxDistance * maxDistance)
-            .ToHashSet();
-
-        moveResultPath.Clear();
-        movePathfinder.Search((pos, floors), loots, (maxDistance * 2 + 1) * (maxDistance * 2 + 1), moveResultPath);
-
-        if (moveResultPath == null || moveResultPath.Count < 2)
-        {
-            return null;
-        }
-
-        return moveResultPath[1].Item1;
-    }
-
-    protected Vector2? GetPathToOtherGroup(HashSet<Floor> floors, int maxDistance)
-    {
-        if (this.AggroAgainst == null || this.AggroAgainst.Count == 0)
-        {
-            return null;
-        }
-
-        var pos = level.WorldToMap(this.Position);
-        var otherGroups = this.AggroAgainst
-            .Except(this.GetGroups().Cast<string>())
-            .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-            .Select(a => (level.WorldToMap(a.Position), floors))
-            .Where(a => level.IsReachable(a.Item1, floors))
-            .Where(a => (a.Item1 - pos).LengthSquared() <= maxDistance * maxDistance)
-            .ToHashSet();
-
-        moveResultPath.Clear();
-        movePathfinder.Search((pos, floors), otherGroups, (maxDistance * 2 + 1) * (maxDistance * 2 + 1), moveResultPath);
-
-        if (moveResultPath == null || moveResultPath.Count < 2)
-        {
-            return null;
-        }
-
-        return moveResultPath[1].Item1;
-    }
 
     public override void _UnhandledInput(InputEvent @event)
     {

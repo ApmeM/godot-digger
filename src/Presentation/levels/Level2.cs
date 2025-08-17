@@ -168,6 +168,11 @@ public partial class Level2
             enemy.AddToGroup(Groups.Enemy);
             enemy.AddToGroup(Groups.AttackingEnemy);
             enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
+
+            enemy.AutomaticPathGenerator = new MoverToFirstFound(
+                    new MoverToLoot(this),
+                    new MoverToEnemyGroup(this),
+                    new MoveToRandom(this));
         }
     }
 
