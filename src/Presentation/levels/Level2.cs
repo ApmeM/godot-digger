@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 
 [SceneReference("Level2.tscn")]
@@ -12,8 +13,6 @@ public partial class Level2
     private Vector2 leftTowerInitialPosition;
     private Vector2 rightTowerInitialPosition;
     private Vector2 centerTowerInitialPosition;
-
-    private bool isWaveStarted = false;
 
     public override void _Ready()
     {
@@ -87,13 +86,39 @@ public partial class Level2
             .SetEase(Tween.EaseType.InOut);
         await this.ToSignal(tween, CommonSignals.Finished);
 
-        BuildEnemies();
-        isWaveStarted = true;
+        var numberOfEnemies = 10 + level * 2;
+        var enemies = new List<string>();
+        if (level >= 0)
+        {
+            enemies.Add(nameof(Wolf));
+        }
+        if (level >= 1)
+        {
+            enemies.Add(nameof(Wasp));
+        }
+        if (level >= 2)
+        {
+            enemies.Add(nameof(Slime));
+        }
+
+        var speed = 150 + level * 15;
+        var path = enemyPath.Curve.GetBakedPoints().Reverse().ToArray();
+
+        for (var i = 0; i < numberOfEnemies - 1; i++)
+        {
+            var enemy = BuildEnemy(enemies, path, speed);
+            await this.ToSignal(this.GetTree().CreateTimer(0.3f), CommonSignals.Timeout);
+        }
+
+        var lastEnemy = BuildEnemy(enemies, path, speed);
+        await ToSignal(lastEnemy, nameof(BaseUnit.LootDropped));
+
+        this.StopWave();
+        level++;
     }
 
     private async void StopWave()
     {
-        isWaveStarted = false;
         if (this.door.HP <= 1)
         {
             timerLabel.ShowMessage($"Game Over.", 5);
@@ -127,50 +152,29 @@ public partial class Level2
         await this.ToSignal(tween, CommonSignals.Finished);
     }
 
-    public void BuildEnemies()
+    private BaseUnit BuildEnemy(List<string> enemies, Vector2[] path, int speed)
     {
-        var numberOfEnemies = 10 + level * 2;
-        var enemies = new List<string>();
-        if (level >= 0)
-        {
-            enemies.Add(nameof(Wolf));
-        }
-        if (level >= 1)
-        {
-            enemies.Add(nameof(Wasp));
-        }
-        if (level >= 2)
-        {
-            enemies.Add(nameof(Slime));
-        }
-
-        var speed = 150 + level * 15;
-
-        for (var i = 0; i < numberOfEnemies; i++)
-        {
-            var enemyName = enemies[r.Next(enemies.Count)];
-            var enemy = Instantiator.CreateUnit(enemyName);
-            this.floor.AddChild(enemy);
-            this.pathFollow2D.UnitOffset = 1f * i / numberOfEnemies;
-            enemy.Position = this.pathFollow2D.Position;
-            enemy.LevelPath = this.GetPath();
-            enemy.VisionDistance = 1000;
-            enemy.AggroAgainst = new List<string> { "grp_player" };
-            enemy.AttackPower = 1;
-            enemy.AttackDistance = 100;
-            enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
-            enemy.MaxHP = 5;
-            enemy.HP = 1;
-            enemy.MoveSpeed = speed;
-            enemy.ZIndex = 1;
-            enemy.Scale = new Vector2(1.5f, 1.5f);
-            enemy.HitDelay = enemy.AttackDelay / 2;
-            enemy.AddToGroup(Groups.Enemy);
-            enemy.AddToGroup(Groups.AttackingEnemy);
-            enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
-
-            enemy.AutomaticPathGenerator = new MoverToFirstFound(enemy, this, new MoverToEnemyGroup(enemy, this));
-        }
+        var enemyName = enemies[r.Next(enemies.Count)];
+        var enemy = Instantiator.CreateUnit(enemyName);
+        this.floor.AddChild(enemy);
+        enemy.Position = path[0];
+        enemy.LevelPath = this.GetPath();
+        enemy.VisionDistance = 1000;
+        enemy.AggroAgainst = new List<string> { "grp_player" };
+        enemy.AttackPower = 1;
+        enemy.AttackDistance = 100;
+        enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
+        enemy.MaxHP = 1;
+        enemy.HP = 1;
+        enemy.MoveSpeed = speed;
+        enemy.ZIndex = 1;
+        enemy.Scale = new Vector2(1.5f, 1.5f);
+        enemy.HitDelay = enemy.AttackDelay / 2;
+        enemy.AddToGroup(Groups.Enemy);
+        enemy.AddToGroup(Groups.AttackingEnemy);
+        enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
+        enemy.AutomaticPathGenerator = new MoverToFirstFound(enemy, this, new MoverToConstant(enemy, this, path));
+        return enemy;
     }
 
     private async void LootDropped(BaseLoot newLoot)
@@ -216,11 +220,6 @@ public partial class Level2
 
     private void TowerClicked(BaseUnit tower, Type against)
     {
-        if (!isWaveStarted)
-        {
-            return;
-        }
-
         var enemy = this.GetTree()
             .GetNodesInGroup(Groups.AttackingEnemy)
             .Cast<BaseUnit>()
@@ -232,9 +231,10 @@ public partial class Level2
             return;
         }
 
+        tower.CancelAction();
+
         if (against == enemy.GetType())
         {
-            tower.CancelAction();
             tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
             if (enemy.HP <= tower.AttackPower)
             {
@@ -243,32 +243,13 @@ public partial class Level2
         }
         else
         {
-            enemy.HP += (uint)tower.AttackPower;
-            tower.CancelAction();
-            tower.StartAttackAction(enemy, () =>
-            {
-                if (!Godot.Object.IsInstanceValid(enemy) || !Godot.Object.IsInstanceValid(tower))
-                {
-                    return;
-                }
-                enemy.HP -= (uint)tower.AttackPower;
-                enemy.GotHit(tower, -tower.AttackPower);
-            });
+            tower.StartAttackAction(enemy, () => { });
         }
     }
 
     public override void _Process(float delta)
     {
         base._Process(delta);
-        if (isWaveStarted)
-        {
-            var enemy = this.GetTree().GetFirstNodeInGroup(Groups.Enemy);
-            if (enemy == null)
-            {
-                StopWave();
-                level++;
-            }
-        }
     }
 
     private void DoorHit(int hpLeft)
