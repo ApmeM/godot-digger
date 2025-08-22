@@ -27,10 +27,6 @@ public partial class Level2
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
         this.upgradeDoor.Connect(CommonSignals.Pressed, this, nameof(UpgradeDoor));
 
-        this.leftTower.AutomaticPathGenerator = null;
-        this.rightTower.AutomaticPathGenerator = null;
-        this.centerTower.AutomaticPathGenerator = null;
-
         this.leftTowerInitialPosition = this.leftTower.Position;
         this.rightTowerInitialPosition = this.rightTower.Position;
         this.centerTowerInitialPosition = this.centerTower.Position;
@@ -173,7 +169,7 @@ public partial class Level2
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
         enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
-        enemy.AutomaticPathGenerator = new MoverToFirstFound(enemy, this, new MoverToConstant(enemy, this, path));
+        enemy.AutomaticActionGenerator = new MoverToFirstFound(enemy, this, new MoverToConstant(enemy, this, path), new AttackMove(enemy, this));
         return enemy;
     }
 

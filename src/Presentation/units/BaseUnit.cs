@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BrainAI.Pathfinding;
 using Godot;
 
 [SceneReference("BaseUnit.tscn")]
@@ -115,7 +114,7 @@ public partial class BaseUnit
     [Export]
     public int VisionDistance = 10;
 
-    public BaseMover AutomaticPathGenerator; // In Constructor
+    public BaseMover AutomaticActionGenerator;
 
     #endregion
 
@@ -301,49 +300,13 @@ public partial class BaseUnit
     {
         base._Process(delta);
 
-        if (this.LevelPath == null)
-        {
-            return;
-        }
-
         if (this.currentActionDelay >= 0)
         {
             this.currentActionDelay -= delta;
             return;
         }
 
-        if (this.GrabLoot)
-        {
-            var loot = this.GetTree()
-                .GetNodesInGroup(Groups.Loot)
-                .Cast<BaseLoot>()
-                .Where(a => level.WorldToMap(a.Position) == level.WorldToMap(this.Position))
-                .FirstOrDefault();
-
-            if (loot != null)
-            {
-                StartGrabLoot(loot);
-                return;
-            }
-        }
-
-        if (this.AttackPower > 0 && this.AggroAgainst != null && this.AggroAgainst.Count > 0)
-        {
-            // AutoAttack nearest opponent.
-            var opponent = this.AggroAgainst
-                .Except(this.GetGroups().Cast<string>())
-                .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-                .Where(a => (a.Position - this.Position).LengthSquared() < this.AttackDistance * this.AttackDistance)
-                .OrderBy(a => (a.Position - this.Position).LengthSquared())
-                .FirstOrDefault();
-            if (opponent != null)
-            {
-                StartAttackAction(opponent);
-                return;
-            }
-        }
-
-        if (AutomaticPathGenerator?.MoveUnit() == true)
+        if (AutomaticActionGenerator?.MoveUnit() == true)
         {
             return;
         }

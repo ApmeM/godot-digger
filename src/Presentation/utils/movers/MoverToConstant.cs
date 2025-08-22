@@ -12,7 +12,7 @@ public class MoverToConstant : BaseMover
     public override bool MoveUnit()
     {
         currentIndex++;
-        if (this.currentIndex == this.follow.Length)
+        if (this.currentIndex >= this.follow.Length)
         {
             return false;
         }
