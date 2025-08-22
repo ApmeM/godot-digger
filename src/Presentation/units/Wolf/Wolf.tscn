@@ -375,16 +375,16 @@ animations = [ {
 [node name="Wolf" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
 AttackDelay = 0.4
+MoveFloors = PoolIntArray( 2 )
 MaxHP = 30
 HP = 30
 AttackPower = 5
 AttackDistance = 100.0
 MoveSpeed = 100.0
-MoveFloors = PoolIntArray( 2 )
 Loot = [ ExtResource( 6 ) ]
 
 [node name="Healthbar" parent="." index="0"]
-position = Vector2( 28, -41 )
+position = Vector2( 0, -10 )
 
 [node name="AnimatedSprite" parent="." index="1"]
 position = Vector2( 0, 0 )

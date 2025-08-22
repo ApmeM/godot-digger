@@ -160,7 +160,7 @@ public partial class Level2
         enemy.AttackPower = 1;
         enemy.AttackDistance = 100;
         enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
-        enemy.MaxHP = 1;
+        enemy.MaxHP = 3;
         enemy.HP = 1;
         enemy.MoveSpeed = speed;
         enemy.ZIndex = 1;
@@ -239,6 +239,7 @@ public partial class Level2
         }
         else
         {
+            enemy.HP+= (uint)tower.AttackPower; 
             tower.StartAttackAction(enemy, () => { });
         }
     }

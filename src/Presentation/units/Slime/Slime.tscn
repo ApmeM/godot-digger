@@ -166,13 +166,13 @@ animations = [ {
 
 [node name="Slime" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
+MoveFloors = [ 2 ]
 AttackPower = 1
 MoveSpeed = 100.0
-MoveFloors = [ 2 ]
 GrabLoot = true
 
 [node name="Healthbar" parent="." index="0"]
-position = Vector2( 30, -41 )
+position = Vector2( 0, -10 )
 
 [node name="AnimatedSprite" parent="." index="1"]
 position = Vector2( 0, 0 )

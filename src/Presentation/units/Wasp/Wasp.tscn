@@ -613,15 +613,16 @@ animations = [ {
 [node name="Wasp" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
 AttackDelay = 0.4
+MoveFloors = PoolIntArray( 2 )
 MaxHP = 20
 HP = 20
 AttackPower = 1
 AttackDistance = 10.0
 MoveSpeed = 100.0
-MoveFloors = PoolIntArray( 2 )
 
 [node name="Healthbar" parent="." index="0"]
-position = Vector2( 26, -45 )
+visible = true
+position = Vector2( 0, -20 )
 
 [node name="AnimatedSprite" parent="." index="1"]
 position = Vector2( 0, 0 )
