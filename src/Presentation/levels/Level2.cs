@@ -134,6 +134,8 @@ public partial class Level2
             enemy.QueueFree();
         }
 
+        this.HeaderControl.ClearBuffs();
+
         this.leftTower.CancelAction();
         this.rightTower.CancelAction();
         this.centerTower.CancelAction();
@@ -267,12 +269,10 @@ public partial class Level2
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
                 enemy.GotHit(this.door, int.MaxValue);
             }
-            else
-            {
-                enemy.MoveSpeed /= 2;
-            }
             i++;
         }
+
+        this.HeaderControl.AddBuff(nameof(SlowDown));
 
         if (hpLeft <= 1)
         {

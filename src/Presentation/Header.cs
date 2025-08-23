@@ -159,6 +159,13 @@ public partial class Header
         this.EmitSignal(nameof(BuffsChanged));
     }
 
+    public void ClearBuffs()
+    {
+        this.buffContainer.FreeChildren();
+        this.EmitSignal(nameof(BuffsChanged));
+    }
+
+
     public void ApplyBuffs(Character character)
     {
         foreach (BaseBuff buff in this.buffContainer.GetChildren())

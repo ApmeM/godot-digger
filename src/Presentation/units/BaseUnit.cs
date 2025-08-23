@@ -365,7 +365,7 @@ public partial class BaseUnit
         stateMachine.Travel("Move");
 
         float distance = this.Position.DistanceTo(destination);
-        float duration = distance / MoveSpeed;
+        float duration = distance / MoveSpeed / level.HeaderControl.Character.EnemySlowdownCoeff;
 
         var tween = this.CreateTween();
         tween.TweenProperty(this, "position", destination, duration)
