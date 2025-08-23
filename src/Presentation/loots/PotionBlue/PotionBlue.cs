@@ -10,7 +10,7 @@ public partial class PotionBlue
         MaxCount = 1;
         UseAction = (level) =>
         {
-            level.HeaderControl.AddBuff(Buff.StaminaRegen);
+            level.HeaderControl.AddBuff(nameof(StaminaRegen));
             return Task.FromResult(true);
         };
     }

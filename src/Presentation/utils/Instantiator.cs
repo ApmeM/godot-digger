@@ -2,7 +2,7 @@ using Godot;
 
 public class Instantiator
 {
-    public static PackedScene LoadBuff(Buff buff)
+    public static PackedScene LoadBuff(string buff)
     {
         var path = $"res://Presentation/buffs/{buff}/{buff}.tscn";
         var scene = ResourceLoader.Load<PackedScene>(path);
@@ -22,7 +22,7 @@ public class Instantiator
         var scene = ResourceLoader.Load<PackedScene>(path);
         return scene;
     }
-    public static BaseBuff CreateBuff(Buff buff)
+    public static BaseBuff CreateBuff(string buff)
     {
         return LoadBuff(buff).Instance<BaseBuff>();
     }

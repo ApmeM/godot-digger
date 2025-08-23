@@ -130,12 +130,12 @@ public partial class Header
         this.EmitSignal(nameof(InventoryButtonClicked));
     }
 
-    public BaseBuff AddBuff(Buff buff)
+    public BaseBuff AddBuff(string buff)
     {
         return this.AddBuff(buff, 0);
     }
 
-    public BaseBuff AddBuff(Buff buff, double progress)
+    public BaseBuff AddBuff(string buff, double progress)
     {
         var buffInstance = Instantiator.CreateBuff(buff);
         buffInstance.Connect(nameof(BaseBuff.BuffRemoved), this, nameof(BuffRemoved), new Godot.Collections.Array { buffInstance });
@@ -232,7 +232,7 @@ public partial class Header
             this.hpLastUpdate = header.HPLastUpdate;
             this.CurrentStamina = header.CurrentStaina;
             this.staminaLastUpdate = header.StaminaLastupdate;
-            header.Buffs.ForEach(a => this.AddBuff((Buff)Enum.Parse(typeof(Buff), a.Name)));
+            header.Buffs.ForEach(a => this.AddBuff(a.Name));
         }
         else
         {

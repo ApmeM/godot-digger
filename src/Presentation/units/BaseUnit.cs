@@ -585,7 +585,7 @@ public partial class BaseUnit
         {
             if (ShowDeath)
             {
-                level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(Buff.Dead), this.Position);
+                level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(nameof(Dead)), this.Position);
             }
             this.DropLoot();
             this.QueueFree();
@@ -600,7 +600,7 @@ public partial class BaseUnit
 
         if (level.HeaderControl.CurrentHp <= 0)
         {
-            level.HeaderControl.AddBuff(Buff.Dead);
+            level.HeaderControl.AddBuff(nameof(Dead));
         }
     }
 
