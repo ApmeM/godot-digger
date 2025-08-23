@@ -106,10 +106,10 @@ public partial class BaseUnit
     public float MoveDelay;
 
     [Export]
-    public List<Floor> MoveFloors { get => moveFloors; set  { moveFloors = value; moveFloorsSet = value.ToHashSet(); } }
+    public List<Floor> MoveFloors { get => moveFloors; set { moveFloors = value; moveFloorsSet = value.ToHashSet(); } }
     private List<Floor> moveFloors;
     private HashSet<Floor> moveFloorsSet = new HashSet<Floor>();
-    public HashSet<Floor> MoveFloorsSet{ get => moveFloorsSet; }
+    public HashSet<Floor> MoveFloorsSet { get => moveFloorsSet; }
 
     [Export]
     public int VisionDistance = 10;
@@ -435,7 +435,6 @@ public partial class BaseUnit
         }
     }
 
-
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
@@ -450,36 +449,26 @@ public partial class BaseUnit
             if (rect.HasPoint(mousePos))
             {
                 this.GetTree().SetInputAsHandled();
-                this.UnitClicked();
                 this.EmitSignal(nameof(Clicked));
             }
         }
     }
 
-    public virtual void UnitClicked()
+    public virtual void AutomaticUnitClickedAction()
     {
-        if (level.HeaderControl.Character.CanDig && this.MaxHP > 0)
-        {
-            DigClick();
-        }
-
-        if (!string.IsNullOrWhiteSpace(this.MoveToLevel))
-        {
-            MoveToLevelClick();
-        }
-
-        if (!string.IsNullOrWhiteSpace(this.QuestContent))
-        {
-            QuestClick();
-        }
-        else if (!string.IsNullOrWhiteSpace(this.SignContent))
-        {
-            SignClick();
-        }
+        DigClick();
+        MoveToLevelClick();
+        QuestClick();
+        SignClick();
     }
 
-    private async void QuestClick()
+    public async void QuestClick()
     {
+        if (string.IsNullOrWhiteSpace(this.QuestContent))
+        {
+            return;
+        }
+
         this.questPopup.BagInventoryPath = level.BagInventoryPopup.GetPath();
 
         var result = await questPopup.ShowQuestPopup(
@@ -494,18 +483,29 @@ public partial class BaseUnit
         }
     }
 
-    private void SignClick()
+    public void SignClick()
     {
-        this.signPopup.Show();
+        if (!string.IsNullOrWhiteSpace(this.SignContent))
+        {
+            this.signPopup.Show();
+        }
     }
 
-    private void MoveToLevelClick()
+    public void MoveToLevelClick()
     {
-        level.EmitSignal(nameof(BaseLevel.ChangeLevel), MoveToLevel);
+        if (!string.IsNullOrWhiteSpace(this.MoveToLevel))
+        {
+            level.EmitSignal(nameof(BaseLevel.ChangeLevel), MoveToLevel);
+        }
     }
 
     public void DigClick()
     {
+        if (!level.HeaderControl.Character.CanDig || this.MaxHP == 0)
+        {
+            return;
+        }
+
         var worldPos = this.Position;
 
         if (level.HeaderControl.CurrentStamina == 0)
