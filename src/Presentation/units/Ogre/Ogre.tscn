@@ -811,14 +811,15 @@ animations = [ {
 
 [node name="Ogre" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
+AttackDelay = 1.4
+MoveFloors = null
 MaxHP = 500
 HP = 500
 AttackPower = 10
 AttackDistance = 100.0
-AttackDelay = 1.4
 HitDelay = 0.6
+AggroAgainst = null
 MoveSpeed = 100.0
-MoveFloors = PoolIntArray( 2 )
 
 [node name="Healthbar" parent="." index="0"]
 position = Vector2( 28, -41 )

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level2.cs" type="Script" id=2]
@@ -6,12 +6,13 @@
 [ext_resource path="res://gd-timerLabel/TimerLabel.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Presentation/units/Door/Door.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Presentation/units/Wall/Wall.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Presentation/units/Mage/Mage.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Presentation/units/Dragon/Dragon.tscn" type="PackedScene" id=8]
 
 [sub_resource type="Curve2D" id=1]
 bake_interval = 24.0
 _data = {
-"points": PoolVector2Array( 0, 0, 0, 0, 270, 708, 0, 0, 0, 0, 217, 654, 0, 0, 0, 0, 218, 514, 0, 0, 0, 0, 256, 478, 0, 0, 0, 0, 258, 240, 0, 0, 0, 0, 217, 195, 0, 0, 0, 0, 195, -29 )
+"points": PoolVector2Array( 0, 0, 0, 0, 242, 664, 0, 0, 0, 0, 217, 654, 0, 0, 0, 0, 218, 514, 0, 0, 0, 0, 256, 478, 0, 0, 0, 0, 258, 240, 0, 0, 0, 0, 217, 195, 0, 0, 0, 0, 195, -29 )
 }
 
 [sub_resource type="DynamicFont" id=2]
@@ -75,7 +76,7 @@ position = Vector2( 168, 744 )
 z_index = 1
 SignContent = null
 
-[node name="Door" parent="Floor" index="10" groups=["grp_player"] instance=ExtResource( 5 )]
+[node name="Door" parent="Floor" index="10" instance=ExtResource( 5 )]
 position = Vector2( 265, 744 )
 z_index = 1
 MoveFloors = null
@@ -121,9 +122,18 @@ z_index = 10
 curve = SubResource( 1 )
 
 [node name="EnemyPathFollow" type="PathFollow2D" parent="Floor/EnemyPath" index="0"]
-position = Vector2( 270, 708 )
-rotation = -2.37228
+position = Vector2( 243, 665 )
+rotation = -2.34684
 loop = false
+
+[node name="Mage" parent="Floor" index="16" groups=["grp_player"] instance=ExtResource( 7 )]
+position = Vector2( 255, 686 )
+AttackDelay = 0.5
+MoveFloors = null
+AttackPower = 0
+AttackDistance = 0.0
+HitDelay = 0.2
+AggroAgainst = null
 
 [node name="TimerLabel" parent="." index="4" instance=ExtResource( 4 )]
 margin_top = 287.0

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Godot;
 
 [SceneReference("Level2.tscn")]
@@ -19,13 +18,13 @@ public partial class Level2
         base._Ready();
         this.FillMembers();
 
-        this.door.Connect(nameof(BaseUnit.OnHit), this, nameof(DoorHit));
+        this.mage.Connect(nameof(BaseUnit.OnHit), this, nameof(MageHit));
         this.leftTower.Connect(nameof(BaseUnit.Clicked), this, nameof(LeftTowerClicked));
         this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(RightTowerClicked));
         this.centerTower.Connect(nameof(BaseUnit.Clicked), this, nameof(CenterTowerClicked));
 
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
-        this.upgradeDoor.Connect(CommonSignals.Pressed, this, nameof(UpgradeDoor));
+        this.upgradeDoor.Connect(CommonSignals.Pressed, this, nameof(UpgradeMage));
 
         this.leftTowerInitialPosition = this.leftTower.Position;
         this.rightTowerInitialPosition = this.rightTower.Position;
@@ -39,14 +38,14 @@ public partial class Level2
         this.centerTower.HitDelay = 0.1f;
     }
 
-    private void UpgradeDoor()
+    private void UpgradeMage()
     {
         var count = this.BagInventoryPopup.GetItemCount(nameof(Gold));
-        if (count > this.door.MaxHP * this.door.MaxHP)
+        if (count > this.mage.MaxHP * this.mage.MaxHP)
         {
-            this.BagInventoryPopup.TryChangeCount(nameof(Gold), -(int)(this.door.MaxHP * this.door.MaxHP));
-            this.door.MaxHP++;
-            this.door.HP = this.door.MaxHP;
+            this.BagInventoryPopup.TryChangeCount(nameof(Gold), -(int)(this.mage.MaxHP * this.mage.MaxHP));
+            this.mage.MaxHP++;
+            this.mage.HP = this.mage.MaxHP;
         }
     }
 
@@ -115,7 +114,7 @@ public partial class Level2
 
     private async void StopWave()
     {
-        if (this.door.HP <= 1)
+        if (this.mage.HP <= 1)
         {
             timerLabel.ShowMessage($"Game Over.", 5);
         }
@@ -123,7 +122,7 @@ public partial class Level2
         {
             timerLabel.ShowMessage($"Level clear.", 5);
         }
-        this.door.HP = this.door.MaxHP;
+        this.mage.HP = this.mage.MaxHP;
 
         var enemies = this.GetTree()
             .GetNodesInGroup(Groups.Enemy)
@@ -221,7 +220,7 @@ public partial class Level2
         var enemy = this.GetTree()
             .GetNodesInGroup(Groups.AttackingEnemy)
             .Cast<BaseUnit>()
-            .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
+            .OrderBy(a => (a.Position - this.mage.Position).LengthSquared())
             .FirstOrDefault();
 
         if (enemy == null)
@@ -251,14 +250,14 @@ public partial class Level2
         base._Process(delta);
     }
 
-    private void DoorHit(int hpLeft)
+    private void MageHit(int hpLeft)
     {
         // TODO: Boom animation
 
         var enemies = this.GetTree()
             .GetNodesInGroup(Groups.Enemy)
             .Cast<BaseUnit>()
-            .OrderBy(a => (a.Position - this.door.Position).LengthSquared())
+            .OrderBy(a => (a.Position - this.mage.Position).LengthSquared())
             .ToList();
 
         var i = 0;
@@ -267,7 +266,8 @@ public partial class Level2
             if (i < 5)
             {
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
-                enemy.GotHit(this.door, int.MaxValue);
+                this.mage.CancelAction();
+                this.mage.StartAttackAction(enemy, () => enemy.GotHit(this.mage, int.MaxValue) );
             }
             i++;
         }
