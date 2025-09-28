@@ -75,6 +75,9 @@ public partial class Level2
                 break;
         }
 
+        this.mage.CancelAction();
+        this.mage.StartMoveAction(new Vector2(255, 686));
+
         var tween = this.CreateTween();
         tween.TweenProperty(this.camera2D, "position", new Vector2(240, 400), 2)
             .SetTrans(Tween.TransitionType.Linear)
@@ -121,6 +124,9 @@ public partial class Level2
         else
         {
             timerLabel.ShowMessage($"Level clear.", 5);
+
+            this.mage.CancelAction();
+            this.mage.StartMoveAction(new Vector2(297, 1004));
         }
         this.mage.HP = this.mage.MaxHP;
 
@@ -165,7 +171,6 @@ public partial class Level2
         enemy.HP = 1;
         enemy.MoveSpeed = speed;
         enemy.ZIndex = 1;
-        enemy.Scale = new Vector2(1.5f, 1.5f);
         enemy.HitDelay = enemy.AttackDelay / 2;
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);

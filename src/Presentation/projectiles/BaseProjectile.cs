@@ -31,8 +31,8 @@ public partial class BaseProjectile
 
         this.Position = to();
         // TODO: Animate BOOM
-        onHit?.Invoke();
         this.QueueFree();
+        onHit?.Invoke();
     }
 
     public void Shoot(Vector2 from, BaseUnit toUnit, Action onHit)

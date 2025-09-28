@@ -420,6 +420,7 @@ public partial class BaseUnit
             var instance = this.Projectile.Instance<BaseProjectile>();
             this.GetParent().AddChild(instance);
             instance.Shoot(this.Position, opponent, onHit);
+            instance.ZIndex = this.ZIndex;
         }
         else
         {

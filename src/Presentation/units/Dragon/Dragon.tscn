@@ -893,6 +893,7 @@ animations = [ {
 [node name="Dragon" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
 AttackDelay = 1.4
+MoveFloors = null
 MaxHP = 30
 HP = 30
 AttackPower = 5
@@ -901,14 +902,12 @@ HitDelay = 0.8
 AggroAgainst = null
 Projectile = ExtResource( 4 )
 MoveSpeed = 100.0
-MoveFloors = null
 
 [node name="Healthbar" parent="." index="0"]
 position = Vector2( 28, -41 )
 
 [node name="AnimatedSprite" parent="." index="1"]
 position = Vector2( 0, 0 )
-scale = Vector2( 2, 2 )
 frames = SubResource( 201 )
 animation = "StayBottom"
 centered = true
