@@ -1,4 +1,6 @@
-public class MoverToFirstFound : BaseMover
+using BrainAI.AI;
+
+public class MoverToFirstFound : BaseMover, IAITurn
 {
     private readonly BaseMover[] movers;
 
@@ -19,5 +21,10 @@ public class MoverToFirstFound : BaseMover
         }
 
         return false;
+    }
+
+    public void Tick()
+    {
+        this.MoveUnit();
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BrainAI.AI;
 using Godot;
 
 [SceneReference("BaseUnit.tscn")]
@@ -114,7 +115,7 @@ public partial class BaseUnit
     [Export]
     public int VisionDistance = 10;
 
-    public BaseMover AutomaticActionGenerator;
+    public IAITurn AutomaticActionGenerator;
 
     #endregion
 
@@ -306,10 +307,7 @@ public partial class BaseUnit
             return;
         }
 
-        if (AutomaticActionGenerator?.MoveUnit() == true)
-        {
-            return;
-        }
+        AutomaticActionGenerator?.Tick();
 
         StartStayAction();
     }
