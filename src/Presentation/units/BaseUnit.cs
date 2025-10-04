@@ -206,8 +206,8 @@ public partial class BaseUnit
     [Signal]
     public delegate void OnHit(int hpLeft);
 
-    [Export]
-    public bool ShowDeath;
+    [Signal]
+    public delegate void OnDead();
 
     private uint maxHP;
 
@@ -306,8 +306,8 @@ public partial class BaseUnit
     public async Task StartGrabLoot(BaseLoot l)
     {
         // TODO: Add animation to grab loot
-        // var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        // stateMachine.Travel("Grab");
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        stateMachine.Travel("Grab");
 
         this.Loot.Add(Instantiator.LoadLoot(l.LootName));
         l.QueueFree();
@@ -317,6 +317,34 @@ public partial class BaseUnit
     {
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
         stateMachine.Travel("Stay");
+    }
+
+    private async Task StartDyingAction()
+    {
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        stateMachine.Travel("Die");
+
+        await this.StartDropLootAction();
+        this.EmitSignal(nameof(OnDead));
+    }
+
+    public async Task StartDropLootAction()
+    {
+        if (LevelPath == null)
+        {
+            GD.PrintErr($"Should drop loot, but LevelPath is not set.");
+            return;
+        }
+        var loots = Loot;
+
+        foreach (var loot in loots)
+        {
+            var newLoot = loot.Instance<BaseLoot>();
+            newLoot.LevelPath = this.LevelPath;
+            newLoot.Position = this.Position;
+            this.GetParent().AddChild(newLoot);
+            this.EmitSignal(nameof(LootDropped), newLoot);
+        }
     }
 
     public async Task StartMoveAction(Vector2 destination)
@@ -334,7 +362,7 @@ public partial class BaseUnit
         tween.TweenProperty(this, "position", destination, duration)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-            await tween.ToMySignal(CommonSignals.Finished);
+        await tween.ToMySignal(CommonSignals.Finished);
     }
 
     public async Task StartAttackAction(BaseUnit opponent, Action onHit = null)
@@ -345,7 +373,7 @@ public partial class BaseUnit
         this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
         stateMachine.Travel("Attack");
 
-            await this.GetTree().CreateTimer(this.HitDelay).ToMySignal(CommonSignals.Timeout);
+        await this.GetTree().CreateTimer(this.HitDelay).ToMySignal(CommonSignals.Timeout);
 
         if (!Godot.Object.IsInstanceValid(this) || !Godot.Object.IsInstanceValid(opponent))
         {
@@ -367,7 +395,7 @@ public partial class BaseUnit
         {
             onHit.Invoke();
         }
-        
+
         await this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)).ToMySignal(CommonSignals.Timeout);
 
         if (!Godot.Object.IsInstanceValid(this))
@@ -526,12 +554,7 @@ public partial class BaseUnit
 
         if (this.HP <= 0)
         {
-            if (ShowDeath)
-            {
-                level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(nameof(Dead)), this.Position);
-            }
-            this.DropLoot();
-            this.QueueFree();
+            StartDyingAction();
         }
     }
 
@@ -544,25 +567,6 @@ public partial class BaseUnit
         if (level.HeaderControl.CurrentHp <= 0)
         {
             level.HeaderControl.AddBuff(nameof(Dead));
-        }
-    }
-
-    public void DropLoot()
-    {
-        if (LevelPath == null)
-        {
-            GD.PrintErr($"Should drop loot, but LevelPath is not set.");
-            return;
-        }
-        var loots = Loot;
-
-        foreach (var loot in loots)
-        {
-            var newLoot = loot.Instance<BaseLoot>();
-            newLoot.LevelPath = this.LevelPath;
-            newLoot.Position = this.Position;
-            this.GetParent().AddChild(newLoot);
-            this.EmitSignal(nameof(LootDropped), newLoot);
         }
     }
 }

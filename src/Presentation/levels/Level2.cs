@@ -254,10 +254,12 @@ public partial class Level2
             .Cast<BaseUnit>()
             .OrderBy(a => (a.Position - this.mage.Position).LengthSquared())
             .Take(5)
-            .Select(enemy =>
+            .Select(async enemy =>
             {
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
-                return this.mage.StartAttackAction(enemy, () => enemy.GotHit(this.mage, int.MaxValue));
+                _ = this.mage.StartAttackAction(enemy, () => enemy.GotHit(this.mage, int.MaxValue));
+                await enemy.ToMySignal(nameof(BaseUnit.OnDead));
+                enemy.QueueFree();
             })
             .ToArray();
 
