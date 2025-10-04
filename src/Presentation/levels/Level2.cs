@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 
 [SceneReference("Level2.tscn")]
@@ -53,36 +54,33 @@ public partial class Level2
     {
         timerLabel.ShowMessage($"Level {level + 1}.", 5);
 
-        this.leftTower.CancelAction();
-        this.rightTower.CancelAction();
-        this.centerTower.CancelAction();
         switch (level)
         {
             case 0:
-                this.leftTower.StartMoveAction(new Vector2(240, 740));
-                this.rightTower.StartMoveAction(this.rightTowerInitialPosition);
-                this.centerTower.StartMoveAction(this.centerTowerInitialPosition);
+
+                this.MoveUnit(this.leftTower, new Vector2(240, 740));
+                this.MoveUnit(this.rightTower, this.rightTowerInitialPosition);
+                this.MoveUnit(this.centerTower, this.centerTowerInitialPosition);
                 break;
             case 1:
-                this.leftTower.StartMoveAction(new Vector2(50, 740));
-                this.rightTower.StartMoveAction(new Vector2(480 - 50, 740));
-                this.centerTower.StartMoveAction(this.centerTowerInitialPosition);
+                this.MoveUnit(this.leftTower, new Vector2(50, 740));
+                this.MoveUnit(this.rightTower, new Vector2(480 - 50, 740));
+                this.MoveUnit(this.centerTower, this.centerTowerInitialPosition);
                 break;
             default:
-                this.leftTower.StartMoveAction(new Vector2(50, 740));
-                this.rightTower.StartMoveAction(new Vector2(480 - 50, 740));
-                this.centerTower.StartMoveAction(new Vector2(240, 740));
+                this.MoveUnit(this.leftTower, new Vector2(50, 740));
+                this.MoveUnit(this.rightTower, new Vector2(480 - 50, 740));
+                this.MoveUnit(this.centerTower, new Vector2(240, 740));
                 break;
         }
 
-        this.mage.CancelAction();
-        this.mage.StartMoveAction(new Vector2(255, 686));
+        this.MoveUnit(this.mage, new Vector2(255, 686));
 
         var tween = this.CreateTween();
         tween.TweenProperty(this.camera2D, "position", new Vector2(240, 400), 2)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-        await this.ToSignal(tween, CommonSignals.Finished);
+        await tween.ToMySignal(CommonSignals.Finished);
 
         var numberOfEnemies = 10 + level * 2;
         var enemies = new List<string>();
@@ -105,11 +103,11 @@ public partial class Level2
         for (var i = 0; i < numberOfEnemies - 1; i++)
         {
             var enemy = BuildEnemy(enemies, path, speed);
-            await this.ToSignal(this.GetTree().CreateTimer(0.3f), CommonSignals.Timeout);
+            await this.GetTree().CreateTimer(0.3f).ToMySignal(CommonSignals.Timeout);
         }
 
         var lastEnemy = BuildEnemy(enemies, path, speed);
-        await ToSignal(lastEnemy, nameof(BaseUnit.LootDropped));
+        await lastEnemy.ToMySignal(nameof(BaseUnit.LootDropped));
 
         this.StopWave();
         level++;
@@ -125,8 +123,7 @@ public partial class Level2
         {
             timerLabel.ShowMessage($"Level clear.", 5);
 
-            this.mage.CancelAction();
-            this.mage.StartMoveAction(new Vector2(297, 1004));
+            this.MoveUnit(this.mage, new Vector2(297, 1004));
         }
         this.mage.HP = this.mage.MaxHP;
 
@@ -141,18 +138,21 @@ public partial class Level2
 
         this.HeaderControl.ClearBuffs();
 
-        this.leftTower.CancelAction();
-        this.rightTower.CancelAction();
-        this.centerTower.CancelAction();
-        this.leftTower.StartMoveAction(this.leftTowerInitialPosition);
-        this.rightTower.StartMoveAction(this.rightTowerInitialPosition);
-        this.centerTower.StartMoveAction(this.centerTowerInitialPosition);
+        this.MoveUnit(this.leftTower, this.leftTowerInitialPosition);
+        this.MoveUnit(this.rightTower, this.rightTowerInitialPosition);
+        this.MoveUnit(this.centerTower, this.centerTowerInitialPosition);
 
         var tween = this.CreateTween();
         tween.TweenProperty(this.camera2D, "position", new Vector2(240, 1000), 2)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-        await this.ToSignal(tween, CommonSignals.Finished);
+        await tween.ToMySignal(CommonSignals.Finished);
+    }
+
+    private async void MoveUnit(BaseUnit tower, Vector2 direction)
+    {
+        await tower.StartMoveAction(direction);
+        await tower.StartStayAction();
     }
 
     private BaseUnit BuildEnemy(List<string> enemies, Vector2[] path, int speed)
@@ -175,7 +175,7 @@ public partial class Level2
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
         enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
-        enemy.AutomaticActionGenerator = new MoverToFirstFound(enemy, this, new MoverToConstant(enemy, this, path), new AttackMove(enemy, this));
+        enemy.AutomaticActionGenerator = new MoverToFirstFound(enemy, this, new MoverToConstant(enemy, this, path), new AttackMove(enemy, this), new StandStil(enemy, this));
         return enemy;
     }
 
@@ -186,16 +186,8 @@ public partial class Level2
         tween.TweenProperty(newLoot, "position", toPosition, 0.5f)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-        try
-        {
-            await this.ToSignal(tween, CommonSignals.Finished);
-        }
-        catch (ObjectDisposedException)
-        {
-            // Either attacker or defender no longer on a scene. 
-            // No need to calculate attcks.
-            return;
-        }
+        await tween.ToMySignal(CommonSignals.Finished);
+
         if (!Godot.Object.IsInstanceValid(this))
         {
             // Either attacker or defender no longer on a scene. 
@@ -233,8 +225,6 @@ public partial class Level2
             return;
         }
 
-        tower.CancelAction();
-
         if (against == enemy.GetType())
         {
             tower.StartAttackAction(enemy, () => enemy.GotHit(tower, tower.AttackPower));
@@ -245,7 +235,7 @@ public partial class Level2
         }
         else
         {
-            enemy.HP+= (uint)tower.AttackPower; 
+            enemy.HP += (uint)tower.AttackPower;
             tower.StartAttackAction(enemy, () => { });
         }
     }
@@ -255,29 +245,25 @@ public partial class Level2
         base._Process(delta);
     }
 
-    private void MageHit(int hpLeft)
+    private async void MageHit(int hpLeft)
     {
         // TODO: Boom animation
 
-        var enemies = this.GetTree()
+        var mageShoots = this.GetTree()
             .GetNodesInGroup(Groups.Enemy)
             .Cast<BaseUnit>()
             .OrderBy(a => (a.Position - this.mage.Position).LengthSquared())
-            .ToList();
-
-        var i = 0;
-        foreach (var enemy in enemies)
-        {
-            if (i < 5)
+            .Take(5)
+            .Select(enemy =>
             {
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
-                this.mage.CancelAction();
-                this.mage.StartAttackAction(enemy, () => enemy.GotHit(this.mage, int.MaxValue) );
-            }
-            i++;
-        }
+                return this.mage.StartAttackAction(enemy, () => enemy.GotHit(this.mage, int.MaxValue));
+            })
+            .ToArray();
 
         this.HeaderControl.AddBuff(nameof(SlowDown));
+
+        await Task.WhenAll(mageShoots);
 
         if (hpLeft <= 1)
         {

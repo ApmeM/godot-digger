@@ -24,7 +24,7 @@ public partial class Shop
             this.shopSellButton.Visible = true;
             this.BagInventoryPopup.CloseOnClickButton = false;
             this.BagInventoryPopup.Show();
-            await this.ToSignal(this.BagInventoryPopup, nameof(CustomPopup.PopupClosed));
+            await this.BagInventoryPopup.ToMySignal(nameof(CustomPopup.PopupClosed));
             this.shopInventory.Visible = false;
             this.shopSellButton.Visible = false;
             this.BagInventoryPopup.CloseOnClickButton = true;

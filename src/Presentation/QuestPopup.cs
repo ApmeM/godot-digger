@@ -49,7 +49,7 @@ public partial class QuestPopup
 
         this.AllowYes = isEnough;
         this.Show();
-        var decision = (bool)(await ToSignal(this, nameof(CustomConfirmPopup.ChoiceMade))).GetValue(0);
+        var decision = await this.ToMySignal<bool>(nameof(CustomConfirmPopup.ChoiceMade));
 
         if (!isEnough)
         {

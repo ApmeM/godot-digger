@@ -288,8 +288,7 @@ public partial class GodotPlayGameService : IAchievementRepository
     public async Task<Achievement> GetAchievement(string key)
     {
         this.achievementsLoad(false);
-        var result = await this.ToSignal(Plugin, "achievementsLoaded");
-        var json = result[0]?.ToString();
+        var json = await Plugin.ToMySignal<string>("achievementsLoaded");
         return JsonConvert.DeserializeObject<List<AchievementFromPlay>>(json)
             .Where(a => a.AchievementId == key)
             .Select(ToAchievement)
@@ -299,8 +298,7 @@ public partial class GodotPlayGameService : IAchievementRepository
     public async Task<IEnumerable<Achievement>> GetForList()
     {
         this.achievementsLoad(false);
-        var result = await this.ToSignal(Plugin, "achievementsLoaded");
-        var json = result[0]?.ToString();
+        var json = await Plugin.ToMySignal<string>("achievementsLoaded");
         return JsonConvert.DeserializeObject<List<AchievementFromPlay>>(json).Select(ToAchievement);
     }
 

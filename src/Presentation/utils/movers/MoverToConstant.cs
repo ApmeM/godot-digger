@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Godot;
 
 public class MoverToConstant : BaseMover
@@ -9,7 +10,7 @@ public class MoverToConstant : BaseMover
         this.follow = follow;
     }
 
-    public override bool MoveUnit()
+    public override async Task<bool> MoveUnit()
     {
         currentIndex++;
         if (this.currentIndex >= this.follow.Length)
@@ -17,7 +18,7 @@ public class MoverToConstant : BaseMover
             return false;
         }
         
-        unit.StartMoveAction(this.follow[currentIndex]);
+        await unit.StartMoveAction(this.follow[currentIndex]);
         return true;
     }
 }

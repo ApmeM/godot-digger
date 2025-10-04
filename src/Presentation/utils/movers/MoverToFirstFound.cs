@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using BrainAI.AI;
 
 public class MoverToFirstFound : BaseMover, IAITurn
@@ -9,11 +10,11 @@ public class MoverToFirstFound : BaseMover, IAITurn
         this.movers = movers;
     }
 
-    public override bool MoveUnit()
+    public override async Task<bool> MoveUnit()
     {
         foreach (var mover in movers)
         {
-            var res = mover.MoveUnit();
+            var res = await mover.MoveUnit();
             if (res)
             {
                 return true;
@@ -23,8 +24,17 @@ public class MoverToFirstFound : BaseMover, IAITurn
         return false;
     }
 
-    public void Tick()
+
+    private bool taskInProgress = false;
+    public async void Tick()
     {
-        this.MoveUnit();
+        if (taskInProgress)
+        {
+            return;
+        }
+
+        taskInProgress = true;
+        await this.MoveUnit();
+        taskInProgress = false;
     }
 }

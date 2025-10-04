@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 public abstract class BaseMover
 {
     protected readonly BaseUnit unit;
@@ -9,15 +11,15 @@ public abstract class BaseMover
         this.level = level;
     }
 
-    public bool TryMoveUnit()
+    public Task<bool> TryMoveUnit()
     {
         if (!Godot.Object.IsInstanceValid(unit) || !Godot.Object.IsInstanceValid(level))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         return MoveUnit();
     }
 
-    public abstract bool MoveUnit();
+    public abstract Task<bool> MoveUnit();
 }

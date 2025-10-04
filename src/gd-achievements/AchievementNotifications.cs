@@ -67,11 +67,11 @@ public partial class AchievementNotifications
 
         this.tween.InterpolateProperty(notification, new NodePath("rect_position:x"), -500, 0, this.MoveTime);
         this.tween.Start();
-        await ToSignal(GetTree().CreateTimer(this.MoveTime), "timeout");
-        await ToSignal(GetTree().CreateTimer(ShowTime), "timeout");
+        await GetTree().CreateTimer(this.MoveTime).ToMySignal(CommonSignals.Timeout);
+        await GetTree().CreateTimer(ShowTime).ToMySignal(CommonSignals.Timeout);
         this.tween.InterpolateProperty(notification, new NodePath("rect_position:x"), 0, -500, this.MoveTime);
         this.tween.Start();
-        await ToSignal(GetTree().CreateTimer(this.MoveTime), "timeout");
+        await GetTree().CreateTimer(this.MoveTime).ToMySignal(CommonSignals.Timeout);
 
         notification.QueueFree();
     }

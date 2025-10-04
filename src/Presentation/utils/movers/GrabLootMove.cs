@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 
 public class GrabLootMove : BaseMover
 {
@@ -6,22 +7,25 @@ public class GrabLootMove : BaseMover
     {
     }
 
-    public override bool MoveUnit()
+    public override async Task<bool> MoveUnit()
     {
-        if (unit.GrabLoot)
+        if (!unit.GrabLoot)
         {
-            var loot = unit.GetTree()
-                .GetNodesInGroup(Groups.Loot)
-                .Cast<BaseLoot>()
-                .Where(a => level.WorldToMap(a.Position) == level.WorldToMap(unit.Position))
-                .FirstOrDefault();
-
-            if (loot != null)
-            {
-                unit.StartGrabLoot(loot);
-                return true;
-            }
+            return false;
         }
-        return false;
+
+        var loot = unit.GetTree()
+            .GetNodesInGroup(Groups.Loot)
+            .Cast<BaseLoot>()
+            .Where(a => level.WorldToMap(a.Position) == level.WorldToMap(unit.Position))
+            .FirstOrDefault();
+
+        if (loot == null)
+        {
+            return false;
+        }
+
+        await unit.StartGrabLoot(loot);
+        return true;
     }
 }

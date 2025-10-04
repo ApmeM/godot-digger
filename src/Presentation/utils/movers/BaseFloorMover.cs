@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
 
@@ -22,7 +23,7 @@ public abstract class BaseFloorMover : BaseMover
     {
     }
 
-    public override bool MoveUnit()
+    public override async Task<bool> MoveUnit()
     {
         if (unit.MoveFloors == null || unit.MoveFloors.Count == 0)
         {
@@ -49,7 +50,7 @@ public abstract class BaseFloorMover : BaseMover
 
         var moveNextStep = moveResultPath[1].Item1;
         var moveNextPosition = level.MapToWorld(moveNextStep);
-        unit.StartMoveAction(moveNextPosition);
+        await unit.StartMoveAction(moveNextPosition);
 
         return true;
     }

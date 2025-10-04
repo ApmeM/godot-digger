@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BrainAI.AI;
 using Godot;
 
@@ -280,8 +281,6 @@ public partial class BaseUnit
     [Signal]
     public delegate void Clicked();
 
-    private float currentActionDelay;
-
     public override void _Ready()
     {
         base._Ready();
@@ -301,31 +300,11 @@ public partial class BaseUnit
     {
         base._Process(delta);
 
-        if (this.currentActionDelay >= 0)
-        {
-            this.currentActionDelay -= delta;
-            return;
-        }
-
         AutomaticActionGenerator?.Tick();
-
-        StartStayAction();
     }
 
-    public void CancelAction()
+    public async Task StartGrabLoot(BaseLoot l)
     {
-        this.currentActionDelay = 0;
-    }
-
-    public async void StartGrabLoot(BaseLoot l)
-    {
-        if (currentActionDelay > 0)
-        {
-            // Previous action not done. 
-            // Should not start new one.
-            return;
-        }
-
         // TODO: Add animation to grab loot
         // var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
         // stateMachine.Travel("Grab");
@@ -334,28 +313,14 @@ public partial class BaseUnit
         l.QueueFree();
     }
 
-    public async void StartStayAction()
+    public async Task StartStayAction()
     {
-        if (currentActionDelay > 0)
-        {
-            // Previous action not done. 
-            // Should not start new one.
-            return;
-        }
-
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
         stateMachine.Travel("Stay");
     }
 
-    public async void StartMoveAction(Vector2 destination)
+    public async Task StartMoveAction(Vector2 destination)
     {
-        if (currentActionDelay > 0)
-        {
-            // Previous action not done. 
-            // Should not start new one.
-            return;
-        }
-
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
         var dir = (destination - this.Position).Normalized();
         this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
@@ -369,41 +334,19 @@ public partial class BaseUnit
         tween.TweenProperty(this, "position", destination, duration)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-        this.currentActionDelay = duration;
-        try
-        {
-            await this.ToSignal(tween, CommonSignals.Finished);
-        }
-        catch (ObjectDisposedException)
-        {
-            // Either attacker or defender no longer on a scene. 
-            // No need to calculate attcks.
-            return;
-        }
-        if (!Godot.Object.IsInstanceValid(this))
-        {
-            // Either attacker or defender no longer on a scene. 
-            // No need to calculate attcks.
-            return;
-        }
+            await tween.ToMySignal(CommonSignals.Finished);
     }
 
-    public async void StartAttackAction(BaseUnit opponent, Action onHit = null)
+    public async Task StartAttackAction(BaseUnit opponent, Action onHit = null)
     {
-        if (currentActionDelay > 0)
-        {
-            // Previous action not done. 
-            // Should not start new one.
-            return;
-        }
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
         var dir = (opponent.Position - this.Position).Normalized();
         this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
         this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
         stateMachine.Travel("Attack");
 
-        this.currentActionDelay = this.AttackDelay + 0.1f;
-        await this.ToSignal(this.GetTree().CreateTimer(this.HitDelay), CommonSignals.Timeout);
+            await this.GetTree().CreateTimer(this.HitDelay).ToMySignal(CommonSignals.Timeout);
+
         if (!Godot.Object.IsInstanceValid(this) || !Godot.Object.IsInstanceValid(opponent))
         {
             // Either attacker or defender no longer on a scene. 
@@ -424,8 +367,9 @@ public partial class BaseUnit
         {
             onHit.Invoke();
         }
+        
+        await this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)).ToMySignal(CommonSignals.Timeout);
 
-        await this.ToSignal(this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)), CommonSignals.Timeout);
         if (!Godot.Object.IsInstanceValid(this))
         {
             // Either attacker or defender no longer on a scene. 

@@ -145,9 +145,9 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
     {
         this.BagInventoryPopup.Close();
         this.selectPosition.Show();
-        var res = await this.ToSignal(this, nameof(CellClicked));
+        var res = await this.ToMySignal<Vector2?, bool>(nameof(CellClicked));
         this.selectPosition.Hide();
         this.BagInventoryPopup.Show();
-        return (bool)res[1] ? (Vector2?)res[0] : null;
+        return res.Item2 ? res.Item1 : null;
     }
 }
