@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BrainAI.AI;
+using BrainAI.AI.UtilityAI;
 using Godot;
 
 [SceneReference("BaseUnit.tscn")]
-public partial class BaseUnit
+public partial class BaseUnit : IIntentContainer<BaseUnit>
 {
     #region Attack
 
@@ -102,21 +103,10 @@ public partial class BaseUnit
     #region Move
 
     [Export]
+    public string PathFollow2DPath;
+
+    [Export]
     public float MoveSpeed;
-
-    [Export]
-    public float MoveDelay;
-
-    [Export]
-    public List<Floor> MoveFloors { get => moveFloors; set { moveFloors = value; moveFloorsSet = value.ToHashSet(); } }
-    private List<Floor> moveFloors;
-    private HashSet<Floor> moveFloorsSet = new HashSet<Floor>();
-    public HashSet<Floor> MoveFloorsSet { get => moveFloorsSet; }
-
-    [Export]
-    public int VisionDistance = 10;
-
-    public IAITurn AutomaticActionGenerator;
 
     #endregion
 
@@ -133,68 +123,7 @@ public partial class BaseUnit
 
     #endregion
 
-    #region Chat
-
-    [Export]
-    public List<QuestData> QuestRequirements = new List<QuestData>();
-
-    [Export]
-    public List<QuestData> QuestRewards = new List<QuestData>();
-
-    private string questContent;
-
-    [Export]
-    public string QuestContent
-    {
-        get
-        {
-            if (IsInsideTree())
-            {
-                return this.questPopup.Content;
-            }
-
-            return questContent;
-        }
-        set
-        {
-            this.questContent = value;
-            if (IsInsideTree())
-            {
-                this.questPopup.Content = value;
-            }
-        }
-    }
-
-    private string signContent;
-
-    [Export]
-    public string SignContent
-    {
-        get
-        {
-            if (IsInsideTree())
-            {
-                return this.signLabel.Text;
-            }
-
-            return signContent;
-        }
-        set
-        {
-            this.signContent = value;
-            if (IsInsideTree())
-            {
-                this.signLabel.Text = value;
-            }
-        }
-    }
-
-    #endregion
-
     #region CustomActions
-
-    [Export]
-    public string MoveToLevel { get; set; }
 
     [Export]
     public PackedScene SpawnUnit;
@@ -204,7 +133,7 @@ public partial class BaseUnit
     #region Defence
 
     [Signal]
-    public delegate void OnHit(int hpLeft);
+    public delegate void OnHit();
 
     [Export]
     public bool ShowDeath;
@@ -267,7 +196,7 @@ public partial class BaseUnit
     public NodePath LevelPath;
 
     private BaseLevel internalLevel;
-    protected BaseLevel level
+    public BaseLevel level
     {
         get
         {
@@ -277,6 +206,11 @@ public partial class BaseUnit
     }
 
     #endregion
+
+    public IAITurn AutomaticActionGenerator;
+    public IContext AutomaticActionGeneratorContext;
+
+    public IIntent<BaseUnit> Intent { get; set; }
 
     [Signal]
     public delegate void Clicked();
@@ -291,41 +225,56 @@ public partial class BaseUnit
         this.MaxHP = this.maxHP;
         // HP order matters. Do not change it.
         this.HP = this.hp;
-        this.QuestContent = this.questContent;
-        this.SignContent = this.signContent;
         this.AttackDelay = this.attackDelay;
     }
 
     public override void _Process(float delta)
     {
         base._Process(delta);
-
+        AutomaticActionGeneratorContext?.Update(delta);
         AutomaticActionGenerator?.Tick();
     }
 
-    public async Task StartGrabLoot(BaseLoot l)
+    public void StartGrabLootAnimation()
     {
-        // TODO: Add animation to grab loot
-        // var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        // stateMachine.Travel("Grab");
-
-        this.Loot.Add(Instantiator.LoadLoot(l.LootName));
-        l.QueueFree();
+        StartAnimation("Grab");
+        // BaseLoot l
+        // this.Loot.Add(Instantiator.LoadLoot(l.LootName));
+        // l.QueueFree();
     }
 
-    public async Task StartStayAction()
+    private void StartAnimation(string animation)
     {
         var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        stateMachine.Travel("Stay");
+        stateMachine.Travel(animation);
+    }
+
+    public void StartMoveAnimation()
+    {
+        StartAnimation("Move");
+    }
+
+    public void StartStayAnimation()
+    {
+        StartAnimation("Stay");
+    }
+
+    public void StartAttackAnimation()
+    {
+        StartAnimation("Attack");
+    }
+
+    public void UpdateAniationDirection(Vector2 dir)
+    {
+        this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
+        this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
+        this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
     }
 
     public async Task StartMoveAction(Vector2 destination)
     {
-        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        var dir = (destination - this.Position).Normalized();
-        this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
-        this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
-        stateMachine.Travel("Move");
+        StartMoveAnimation();
+        UpdateAniationDirection((destination - this.Position).Normalized());
 
         float distance = this.Position.DistanceTo(destination);
         float duration = distance / MoveSpeed / level.HeaderControl.Character.EnemySlowdownCoeff;
@@ -334,18 +283,15 @@ public partial class BaseUnit
         tween.TweenProperty(this, "position", destination, duration)
             .SetTrans(Tween.TransitionType.Linear)
             .SetEase(Tween.EaseType.InOut);
-            await tween.ToMySignal(CommonSignals.Finished);
+        await tween.ToMySignal(CommonSignals.Finished);
     }
 
     public async Task StartAttackAction(BaseUnit opponent, Action onHit = null)
     {
-        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        var dir = (opponent.Position - this.Position).Normalized();
-        this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
-        this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
-        stateMachine.Travel("Attack");
+        StartAttackAnimation();
+        UpdateAniationDirection((opponent.Position - this.Position).Normalized());
 
-            await this.GetTree().CreateTimer(this.HitDelay).ToMySignal(CommonSignals.Timeout);
+        await this.GetTree().CreateTimer(this.HitDelay).ToMySignal(CommonSignals.Timeout);
 
         if (!Godot.Object.IsInstanceValid(this) || !Godot.Object.IsInstanceValid(opponent))
         {
@@ -367,7 +313,7 @@ public partial class BaseUnit
         {
             onHit.Invoke();
         }
-        
+
         await this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)).ToMySignal(CommonSignals.Timeout);
 
         if (!Godot.Object.IsInstanceValid(this))
@@ -397,77 +343,6 @@ public partial class BaseUnit
         }
     }
 
-    public virtual void AutomaticUnitClickedAction()
-    {
-        DigClick();
-        MoveToLevelClick();
-        QuestClick();
-        SignClick();
-    }
-
-    public async void QuestClick()
-    {
-        if (string.IsNullOrWhiteSpace(this.QuestContent))
-        {
-            return;
-        }
-
-        this.questPopup.BagInventoryPath = level.BagInventoryPopup.GetPath();
-
-        var result = await questPopup.ShowQuestPopup(
-            QuestContent,
-            QuestRequirements,
-            QuestRewards
-        );
-
-        if (result && !string.IsNullOrWhiteSpace(this.SignContent))
-        {
-            SignClick();
-        }
-    }
-
-    public void SignClick()
-    {
-        if (!string.IsNullOrWhiteSpace(this.SignContent))
-        {
-            this.signPopup.Show();
-        }
-    }
-
-    public void MoveToLevelClick()
-    {
-        if (!string.IsNullOrWhiteSpace(this.MoveToLevel))
-        {
-            level.EmitSignal(nameof(BaseLevel.ChangeLevel), MoveToLevel);
-        }
-    }
-
-    public void DigClick()
-    {
-        if (!level.HeaderControl.Character.CanDig || this.MaxHP == 0)
-        {
-            return;
-        }
-
-        var worldPos = this.Position;
-
-        if (level.HeaderControl.CurrentStamina == 0)
-        {
-            level.FloatingTextManagerControl.ShowValue("Too tired", worldPos, new Color(0.60f, 0.85f, 0.91f));
-            return;
-        }
-
-        level.HeaderControl.CurrentStamina--;
-        level.FloatingTextManagerControl.ShowValue((-1).ToString(), worldPos, new Color(0.60f, 0.85f, 0.91f));
-
-        this.GotHit(null, (int)level.HeaderControl.Character.DigPower);
-
-        if (this.AttackPower > 0 && this.HP > 0)
-        {
-            DefendClick();
-        }
-    }
-
     public void GotHit(BaseUnit from, int attackPower)
     {
         if (!Godot.Object.IsInstanceValid(this))
@@ -479,7 +354,7 @@ public partial class BaseUnit
         this.HP = (uint)Math.Max(0, this.HP - hitPower);
         level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
 
-        if (from != null)
+        if (from != null && Godot.Object.IsInstanceValid(from))
         {
             var enemyGroups = from.GetGroups()
                 .Cast<string>()
@@ -522,7 +397,7 @@ public partial class BaseUnit
             }
         }
 
-        this.EmitSignal(nameof(OnHit), this.HP);
+        this.EmitSignal(nameof(OnHit));
 
         if (this.HP <= 0)
         {
@@ -532,18 +407,6 @@ public partial class BaseUnit
             }
             this.DropLoot();
             this.QueueFree();
-        }
-    }
-
-    private void DefendClick()
-    {
-        var hitPower = (uint)Math.Min(this.AttackPower, level.HeaderControl.CurrentHp);
-        level.HeaderControl.CurrentHp -= hitPower;
-        level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
-
-        if (level.HeaderControl.CurrentHp <= 0)
-        {
-            level.HeaderControl.AddBuff(nameof(Dead));
         }
     }
 

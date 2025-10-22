@@ -13,7 +13,7 @@
 [sub_resource type="Curve2D" id=1]
 bake_interval = 24.0
 _data = {
-"points": PoolVector2Array( 0, 0, 0, 0, 230, 660, 0, 0, 0, 0, 217, 654, 0, 0, 0, 0, 218, 514, 0, 0, 0, 0, 256, 478, 0, 0, 0, 0, 258, 240, 0, 0, 0, 0, 217, 195, 0, 0, 0, 0, 195, -29 )
+"points": PoolVector2Array( 0, 0, 0, 0, 195, -29, 0, 0, 0, 0, 217, 195, 0, 0, 0, 0, 258, 240, 0, 0, 0, 0, 256, 478, 0, 0, 0, 0, 218, 514, 0, 0, 0, 0, 217, 654, 0, 0, 0, 0, 230, 660 )
 }
 
 [sub_resource type="DynamicFont" id=2]
@@ -30,57 +30,45 @@ tile_data = PoolIntArray( 0, 5, 0, 1, 5, 0, 2, 5, 0, 3, 2, 0, 4, 2, 0, 5, 5, 0, 
 [node name="Wall3" parent="Floor" index="0" instance=ExtResource( 6 )]
 position = Vector2( 24, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall6" parent="Floor" index="1" instance=ExtResource( 6 )]
 position = Vector2( 458, 791 )
 z_index = 1
-SignContent = null
 
 [node name="Wall7" parent="Floor" index="2" instance=ExtResource( 6 )]
 position = Vector2( 457, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall8" parent="Floor" index="3" instance=ExtResource( 6 )]
 position = Vector2( 72, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall13" parent="Floor" index="4" instance=ExtResource( 6 )]
 position = Vector2( 313, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall9" parent="Floor" index="5" instance=ExtResource( 6 )]
 position = Vector2( 363, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall10" parent="Floor" index="6" instance=ExtResource( 6 )]
 position = Vector2( 120, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall11" parent="Floor" index="7" instance=ExtResource( 6 )]
 position = Vector2( 411, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Wall" parent="Floor" index="8" instance=ExtResource( 6 )]
 position = Vector2( 24, 791 )
 z_index = 1
-SignContent = null
 
 [node name="Wall14" parent="Floor" index="9" instance=ExtResource( 6 )]
 position = Vector2( 168, 744 )
 z_index = 1
-SignContent = null
 
 [node name="Door" parent="Floor" index="10" instance=ExtResource( 5 )]
 position = Vector2( 265, 744 )
-MoveFloors = null
-SignContent = null
 MaxHP = 3
 HP = 3
 AggroAgainst = null
@@ -88,33 +76,35 @@ AggroAgainst = null
 [node name="Wall2" parent="Floor" index="11" instance=ExtResource( 6 )]
 position = Vector2( 217, 744 )
 z_index = 1
-SignContent = null
 
 [node name="LeftTower" parent="Floor" index="12" instance=ExtResource( 8 )]
 position = Vector2( 73, 939 )
 z_index = 2
-SignContent = null
+AttackDelay = 1.0
 MaxHP = 0
 HP = 0
 AttackPower = 1
+HitDelay = 0.5
 MoveSpeed = 300.0
 
 [node name="RightTower" parent="Floor" index="13" instance=ExtResource( 8 )]
 position = Vector2( 445, 1094 )
 z_index = 2
-SignContent = null
+AttackDelay = 1.0
 MaxHP = 0
 HP = 0
 AttackPower = 1
+HitDelay = 0.5
 MoveSpeed = 300.0
 
 [node name="CenterTower" parent="Floor" index="14" instance=ExtResource( 8 )]
 position = Vector2( 122, 1185 )
 z_index = 2
-SignContent = null
+AttackDelay = 1.0
 MaxHP = 0
 HP = 0
 AttackPower = 1
+HitDelay = 0.5
 MoveSpeed = 300.0
 
 [node name="EnemyPath" type="Path2D" parent="Floor" index="15"]
@@ -123,7 +113,8 @@ curve = SubResource( 1 )
 
 [node name="EnemyPathFollow" type="PathFollow2D" parent="Floor/EnemyPath" index="0"]
 position = Vector2( 230, 660 )
-rotation = -2.19511
+rotation = 0.792366
+offset = 721.059
 loop = false
 
 [node name="Mage" parent="Floor" index="16" groups=["grp_player"] instance=ExtResource( 7 )]
@@ -134,8 +125,13 @@ MaxHP = 3
 HP = 3
 AttackPower = 0
 AttackDistance = 0.0
-HitDelay = 0.2
+HitDelay = 0.1
 Projectile = ExtResource( 9 )
+MoveSpeed = 150.0
+
+[node name="Camera2D" type="Camera2D" parent="Floor/Mage" index="4"]
+position = Vector2( -57, -4 )
+current = true
 
 [node name="TimerLabel" parent="." index="4" instance=ExtResource( 4 )]
 margin_top = 287.0
@@ -160,9 +156,5 @@ margin_top = 888.0
 margin_right = 297.0
 margin_bottom = 908.0
 text = "To Battle"
-
-[node name="Camera2D" type="Camera2D" parent="." index="7"]
-position = Vector2( 240, 1000 )
-current = true
 
 [editable path="SelectPosition"]
