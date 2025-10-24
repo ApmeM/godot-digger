@@ -536,9 +536,6 @@ tracks/0/keys = {
 [node name="BaseUnit" type="Node2D"]
 script = ExtResource( 1 )
 AttackDelay = 1.0
-MoveFloors = PoolIntArray(  )
-AggroAgainst = PoolStringArray(  )
-SignContent = ""
 LevelPath = NodePath("")
 
 [node name="Healthbar" parent="." instance=ExtResource( 2 )]

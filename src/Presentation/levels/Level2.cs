@@ -68,12 +68,12 @@ public class FollowPathIntent : IIntent<BaseUnit>
     public bool Execute(BaseUnit context)
     {
         var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
-        this.MoveOffset += context.MoveSpeed * moveContext.Delta;
+        this.MoveOffset += context.MoveSpeed * moveContext.Delta * context.level.HeaderControl.Character.EnemySlowdownCoeff;
         var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
         pathPosition.Offset = this.MoveOffset;
         var oldPosition = context.Position;
         context.Position = pathPosition.Position;
-        context.UpdateAniationDirection(context.Position - oldPosition);
+        context.UpdateAnimationDirection(context.Position - oldPosition);
         return pathPosition.UnitOffset == 1;
     }
 
@@ -93,7 +93,7 @@ public class MoveToPointIntent : IIntent<BaseUnit>
     public void Enter(BaseUnit context)
     {
         context.StartMoveAnimation();
-        context.UpdateAniationDirection(this.TargetPoint - context.Position);
+        context.UpdateAnimationDirection(this.TargetPoint - context.Position);
     }
 
     public bool Execute(BaseUnit context)
@@ -123,7 +123,7 @@ public class AttackOpponentIntent : IIntent<BaseUnit>
     private Action onHit;
     private float AttackStep;
 
-    public AttackOpponentIntent(BaseUnit opponent, Action onHit = null)
+    public AttackOpponentIntent(BaseUnit opponent, Action onHit)
     {
         this.opponent = opponent;
         this.onHit = onHit;
@@ -132,8 +132,10 @@ public class AttackOpponentIntent : IIntent<BaseUnit>
     public void Enter(BaseUnit context)
     {
         context.StartAttackAnimation();
+        context.UpdateAnimationDirection(this.opponent.Position - context.Position);
         this.AttackStep = 0;
     }
+
     public bool Execute(BaseUnit context)
     {
         var commonContext = context.AutomaticActionGeneratorContext;
@@ -152,8 +154,6 @@ public class AttackOpponentIntent : IIntent<BaseUnit>
 
         if (isHit)
         {
-            this.onHit = this.onHit ?? (() => opponent.GotHit(context, context.AttackPower));
-
             if (context.Projectile != null)
             {
                 var instance = context.Projectile.Instance<BaseProjectile>();
@@ -194,8 +194,6 @@ public partial class Level2
     {
         base._Ready();
         this.FillMembers();
-
-        this.mage.Connect(nameof(BaseUnit.OnHit), this, nameof(MageHit));
 
         this.leftTower.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.leftTower });
         this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.rightTower });
@@ -243,6 +241,8 @@ public partial class Level2
     {
         waveInProgress = true;
 
+        waveInProgress = true;
+
         timerLabel.ShowMessage($"Level {level + 1}.", 5);
 
         switch (level)
@@ -251,8 +251,14 @@ public partial class Level2
                 this.leftTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
                 this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
                 this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
+                this.leftTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
+                this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
+                this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
                 break;
             case 1:
+                this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
+                this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
+                this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
                 this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
                 this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
                 this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
@@ -261,9 +267,13 @@ public partial class Level2
                 this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
                 this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
                 this.centerTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
+                this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
+                this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
+                this.centerTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
                 break;
         }
 
+        this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
         this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
 
         var numberOfEnemies = 10 + level * 20;
@@ -271,13 +281,16 @@ public partial class Level2
         if (level >= 0)
         {
             enemyTypes.Add(nameof(Wolf));
+            enemyTypes.Add(nameof(Wolf));
         }
         if (level >= 1)
         {
             enemyTypes.Add(nameof(Wasp));
+            enemyTypes.Add(nameof(Wasp));
         }
         if (level >= 2)
         {
+            enemyTypes.Add(nameof(Slime));
             enemyTypes.Add(nameof(Slime));
         }
 
@@ -288,8 +301,12 @@ public partial class Level2
         // Intent phase
         reasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
         // Decision phase
-        reasoner.Add(new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)), new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage)));
-        reasoner.Add(new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)), new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent()));
+        reasoner.Add(
+            new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
+            new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit())));
+        reasoner.Add(
+            new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
+            new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent()));
 
         var enemies = Enumerable
             .Range(0, numberOfEnemies)
@@ -337,7 +354,6 @@ public partial class Level2
         }
 
         this.mage.Intent = new MoveToPointIntent(new Vector2(297, 1004));
-
         this.mage.HP = this.mage.MaxHP;
 
         var enemies = this.GetTree()
@@ -354,6 +370,9 @@ public partial class Level2
         this.leftTower.Intent = new MoveToPointIntent(this.leftTowerInitialPosition);
         this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
         this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
+        this.leftTower.Intent = new MoveToPointIntent(this.leftTowerInitialPosition);
+        this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
+        this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
     }
 
     private BaseUnit BuildEnemy(List<string> enemies, Vector2 position, Reasoner<BaseUnit> action, int speed)
@@ -363,7 +382,6 @@ public partial class Level2
         enemy.Position = position;
         enemy.LevelPath = this.GetPath();
         enemy.PathFollow2DPath = this.enemyPathFollow.GetPath();
-        enemy.AggroAgainst = new List<string> { "grp_player" };
         enemy.AttackPower = 1;
         enemy.AttackDistance = 100;
         enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
@@ -375,21 +393,31 @@ public partial class Level2
         enemy.HitDelay = enemy.AttackDelay / 2;
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
-        enemy.Connect(nameof(BaseUnit.LootDropped), this, nameof(LootDropped));
         enemy.AutomaticActionGeneratorContext = new EnemyContext();
         enemy.AutomaticActionGenerator = new UtilityAI<BaseUnit>(enemy, action);
         return enemy;
     }
 
-    private async void LootDropped(BaseLoot newLoot)
+    public async void DropLoot(BaseUnit unit)
     {
-        var toPosition = new Vector2(0, 0);
-        var tween = newLoot.CreateTween();
-        tween.TweenProperty(newLoot, "position", toPosition, 0.5f)
-            .SetTrans(Tween.TransitionType.Linear)
-            .SetEase(Tween.EaseType.InOut);
-        await tween.ToMySignal(CommonSignals.Finished);
-        newLoot.LootClicked();
+        var loots = unit.Loot;
+
+        foreach (var loot in loots)
+        {
+            var newLoot = loot.Instance<BaseLoot>();
+            newLoot.LevelPath = this.GetPath();
+            newLoot.Position = unit.Position;
+            this.GetParent().AddChild(newLoot);
+
+            var toPosition = new Vector2(0, 0);
+            var tween = newLoot.CreateTween();
+            tween.TweenProperty(newLoot, "position", toPosition, 0.5f)
+                .SetTrans(Tween.TransitionType.Linear)
+                .SetEase(Tween.EaseType.InOut);
+            await tween.ToMySignal(CommonSignals.Finished);
+
+            newLoot.LootClicked();
+        }
     }
 
     private void TowerClicked(BaseUnit tower)
@@ -430,7 +458,7 @@ public partial class Level2
 
         if (against == enemy.GetType())
         {
-            tower.Intent = new AttackOpponentIntent(enemy);
+            tower.Intent = new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, tower.AttackPower));
             if (enemy.HP <= tower.AttackPower)
             {
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
@@ -452,9 +480,26 @@ public partial class Level2
         }
     }
 
+    private void EnemyHit(BaseUnit enemy, int attackPower)
+    {
+        if (!Godot.Object.IsInstanceValid(enemy))
+        {
+            return;
+        }
+
+        enemy.HP -= (uint)Math.Min(attackPower, enemy.HP);
+        if (enemy.HP <= 0)
+        {
+            this.DropLoot(enemy);
+            enemy.QueueFree();
+        }
+    }
+
     private void MageHit()
     {
         // TODO: Boom animation
+
+        this.mage.HP--;
 
         var mageShoots = this.GetTree()
             .GetNodesInGroup(Groups.Enemy)
@@ -463,9 +508,11 @@ public partial class Level2
             .Take(5)
             .Select(enemy =>
             {
-                return new AttackOpponentIntent(enemy, () => enemy.GotHit(this.mage, int.MaxValue));
+                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, int.MaxValue));
             })
             .ToArray();
+
+        this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
 
         this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
 

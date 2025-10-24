@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BrainAI.AI;
 using BrainAI.AI.UtilityAI;
 using Godot;
@@ -93,9 +91,6 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     public float HitDelay;
 
     [Export]
-    public List<string> AggroAgainst;
-
-    [Export]
     public PackedScene Projectile;
 
     #endregion
@@ -112,9 +107,6 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #region Loot
 
-    [Signal]
-    public delegate void LootDropped(BaseLoot loot);
-
     [Export]
     public List<PackedScene> Loot = new List<PackedScene>();
 
@@ -123,17 +115,7 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #endregion
 
-    #region CustomActions
-
-    [Export]
-    public PackedScene SpawnUnit;
-
-    #endregion
-
     #region Defence
-
-    [Signal]
-    public delegate void OnHit();
 
     [Export]
     public bool ShowDeath;
@@ -235,18 +217,18 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
         AutomaticActionGenerator?.Tick();
     }
 
+    private void StartAnimation(string animation)
+    {
+        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
+        stateMachine.Travel(animation);
+    }
+
     public void StartGrabLootAnimation()
     {
         StartAnimation("Grab");
         // BaseLoot l
         // this.Loot.Add(Instantiator.LoadLoot(l.LootName));
         // l.QueueFree();
-    }
-
-    private void StartAnimation(string animation)
-    {
-        var stateMachine = (AnimationNodeStateMachinePlayback)animationTree.Get("parameters/playback");
-        stateMachine.Travel(animation);
     }
 
     public void StartMoveAnimation()
@@ -264,64 +246,11 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
         StartAnimation("Attack");
     }
 
-    public void UpdateAniationDirection(Vector2 dir)
+    public void UpdateAnimationDirection(Vector2 dir)
     {
         this.animationTree.Set("parameters/Attack/blend_position", new Vector2(dir.x, -dir.y));
         this.animationTree.Set("parameters/Move/blend_position", new Vector2(dir.x, -dir.y));
         this.animationTree.Set("parameters/Stay/blend_position", new Vector2(dir.x, -dir.y));
-    }
-
-    public async Task StartMoveAction(Vector2 destination)
-    {
-        StartMoveAnimation();
-        UpdateAniationDirection((destination - this.Position).Normalized());
-
-        float distance = this.Position.DistanceTo(destination);
-        float duration = distance / MoveSpeed / level.HeaderControl.Character.EnemySlowdownCoeff;
-
-        var tween = this.CreateTween();
-        tween.TweenProperty(this, "position", destination, duration)
-            .SetTrans(Tween.TransitionType.Linear)
-            .SetEase(Tween.EaseType.InOut);
-        await tween.ToMySignal(CommonSignals.Finished);
-    }
-
-    public async Task StartAttackAction(BaseUnit opponent, Action onHit = null)
-    {
-        StartAttackAnimation();
-        UpdateAniationDirection((opponent.Position - this.Position).Normalized());
-
-        await this.GetTree().CreateTimer(this.HitDelay).ToMySignal(CommonSignals.Timeout);
-
-        if (!Godot.Object.IsInstanceValid(this) || !Godot.Object.IsInstanceValid(opponent))
-        {
-            // Either attacker or defender no longer on a scene. 
-            // No need to calculate attcks.
-            return;
-        }
-
-        onHit = onHit ?? (() => opponent.GotHit(this, this.AttackPower));
-
-        if (this.Projectile != null)
-        {
-            var instance = this.Projectile.Instance<BaseProjectile>();
-            this.GetParent().AddChild(instance);
-            instance.Shoot(this.Position, opponent, onHit);
-            instance.ZIndex = this.ZIndex;
-        }
-        else
-        {
-            onHit.Invoke();
-        }
-
-        await this.GetTree().CreateTimer(Math.Max(0, this.AttackDelay - this.HitDelay)).ToMySignal(CommonSignals.Timeout);
-
-        if (!Godot.Object.IsInstanceValid(this))
-        {
-            // Either attacker or defender no longer on a scene. 
-            // No need to calculate attcks.
-            return;
-        }
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -340,92 +269,6 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
                 this.GetTree().SetInputAsHandled();
                 this.EmitSignal(nameof(Clicked));
             }
-        }
-    }
-
-    public void GotHit(BaseUnit from, int attackPower)
-    {
-        if (!Godot.Object.IsInstanceValid(this))
-        {
-            return;
-        }
-
-        var hitPower = Math.Min(attackPower, this.HP);
-        this.HP = (uint)Math.Max(0, this.HP - hitPower);
-        level.FloatingTextManagerControl.ShowValue((-hitPower).ToString(), this.Position, new Color(1, 0, 0));
-
-        if (from != null && Godot.Object.IsInstanceValid(from))
-        {
-            var enemyGroups = from.GetGroups()
-                .Cast<string>()
-                .Where(a => a.StartsWith(Groups.AggrouGroupPrefix))
-                .ToArray();
-
-            var myGroups = this.GetGroups()
-                .Cast<string>()
-                .Where(a => a.StartsWith(Groups.AggrouGroupPrefix))
-                .SelectMany(a => this.GetTree().GetNodesInGroup(a).Cast<BaseUnit>())
-                .ToHashSet();
-
-            foreach (var unit in myGroups)
-            {
-                unit.AggroAgainst = (unit.AggroAgainst ?? new List<string>()).Union(enemyGroups).ToList();
-                foreach (var enemy in enemyGroups)
-                {
-                    unit.AggroAgainst.Add(enemy);
-                }
-            }
-        }
-
-        if (this.SpawnUnit != null)
-        {
-            if (LevelPath == null)
-            {
-                GD.PrintErr($"Should spawn unit on attack, but LevelPath is not set.");
-            }
-            else
-            {
-                var instance = this.SpawnUnit.Instance<BaseUnit>();
-                instance.Position = this.Position;
-                instance.LevelPath = this.LevelPath;
-                instance.AggroAgainst = this.AggroAgainst;
-                foreach (var group in this.GetGroups().Cast<string>().Where(a => a.StartsWith(Groups.AggrouGroupPrefix)))
-                {
-                    instance.AddToGroup(group);
-                }
-                this.GetParent().AddChild(instance);
-            }
-        }
-
-        this.EmitSignal(nameof(OnHit));
-
-        if (this.HP <= 0)
-        {
-            if (ShowDeath)
-            {
-                level.FloatingTextManagerControl.ShowValue(Instantiator.CreateBuff(nameof(Dead)), this.Position);
-            }
-            this.DropLoot();
-            this.QueueFree();
-        }
-    }
-
-    public void DropLoot()
-    {
-        if (LevelPath == null)
-        {
-            GD.PrintErr($"Should drop loot, but LevelPath is not set.");
-            return;
-        }
-        var loots = Loot;
-
-        foreach (var loot in loots)
-        {
-            var newLoot = loot.Instance<BaseLoot>();
-            newLoot.LevelPath = this.LevelPath;
-            newLoot.Position = this.Position;
-            this.GetParent().AddChild(newLoot);
-            this.EmitSignal(nameof(LootDropped), newLoot);
         }
     }
 }

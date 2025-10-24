@@ -1,8 +1,8 @@
 [gd_scene load_steps=159 format=2]
 
-[ext_resource path="res://Presentation/units/Dragon/Dragon.png" type="Texture" id=1]
+[ext_resource path="res://Presentation/units/DragonBlue/DragonBlue.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/units/BaseUnit.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Presentation/units/Dragon/Dragon.cs" type="Script" id=3]
+[ext_resource path="res://Presentation/units/DragonBlue/DragonBlue.cs" type="Script" id=3]
 [ext_resource path="res://Presentation/projectiles/Fireball/Fireball.tscn" type="PackedScene" id=4]
 
 [sub_resource type="AtlasTexture" id=97]

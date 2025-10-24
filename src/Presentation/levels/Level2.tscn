@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level2.cs" type="Script" id=2]
@@ -7,8 +7,10 @@
 [ext_resource path="res://Presentation/units/Door/Door.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Presentation/units/Wall/Wall.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Presentation/units/Mage/Mage.tscn" type="PackedScene" id=7]
-[ext_resource path="res://Presentation/units/Dragon/Dragon.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Presentation/units/DragonBlue/DragonBlue.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Presentation/projectiles/Fireball/Fireball.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Presentation/units/DragonRed/DragonRed.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Presentation/units/DragonGold/DragonGold.tscn" type="PackedScene" id=11]
 
 [sub_resource type="Curve2D" id=1]
 bake_interval = 24.0
@@ -71,13 +73,16 @@ z_index = 1
 position = Vector2( 265, 744 )
 MaxHP = 3
 HP = 3
-AggroAgainst = null
 
 [node name="Wall2" parent="Floor" index="11" instance=ExtResource( 6 )]
 position = Vector2( 217, 744 )
 z_index = 1
 
-[node name="LeftTower" parent="Floor" index="12" instance=ExtResource( 8 )]
+[node name="RightTower" parent="Floor" index="12" instance=ExtResource( 10 )]
+position = Vector2( 383, 1057 )
+z_index = 2
+
+[node name="LeftTower" parent="Floor" index="13" instance=ExtResource( 8 )]
 position = Vector2( 73, 939 )
 z_index = 2
 AttackDelay = 1.0
@@ -87,25 +92,8 @@ AttackPower = 1
 HitDelay = 0.5
 MoveSpeed = 300.0
 
-[node name="RightTower" parent="Floor" index="13" instance=ExtResource( 8 )]
-position = Vector2( 445, 1094 )
-z_index = 2
-AttackDelay = 1.0
-MaxHP = 0
-HP = 0
-AttackPower = 1
-HitDelay = 0.5
-MoveSpeed = 300.0
-
-[node name="CenterTower" parent="Floor" index="14" instance=ExtResource( 8 )]
-position = Vector2( 122, 1185 )
-z_index = 2
-AttackDelay = 1.0
-MaxHP = 0
-HP = 0
-AttackPower = 1
-HitDelay = 0.5
-MoveSpeed = 300.0
+[node name="CenterTower" parent="Floor" index="14" instance=ExtResource( 11 )]
+position = Vector2( 169, 1083 )
 
 [node name="EnemyPath" type="Path2D" parent="Floor" index="15"]
 z_index = 10
