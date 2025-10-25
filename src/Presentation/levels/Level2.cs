@@ -422,7 +422,7 @@ public partial class Level2
 
     private void TowerClicked(BaseUnit tower)
     {
-        if (tower.Intent != null)
+        if (tower.Intent != null && !(tower.Intent is AttackOpponentIntent) && !(tower.Intent is CompositeIntent<BaseUnit>))
         {
             return;
         }
@@ -456,9 +456,10 @@ public partial class Level2
             return;
         }
 
+        IIntent<BaseUnit> newIntent;
         if (against == enemy.GetType())
         {
-            tower.Intent = new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, tower.AttackPower));
+            newIntent = new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, tower.AttackPower));
             if (enemy.HP <= tower.AttackPower)
             {
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
@@ -467,7 +468,17 @@ public partial class Level2
         else
         {
             enemy.HP += (uint)tower.AttackPower;
-            tower.Intent = new AttackOpponentIntent(enemy, () => { });
+            newIntent = new AttackOpponentIntent(enemy, () => { });
+        }
+
+        if (tower.Intent == null)
+        {
+            tower.Intent = newIntent;
+        }
+        else
+        {
+            tower.Intent = new CompositeIntent<BaseUnit>(tower.Intent, newIntent);
+
         }
     }
 

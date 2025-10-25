@@ -81,6 +81,13 @@ z_index = 1
 [node name="RightTower" parent="Floor" index="12" instance=ExtResource( 10 )]
 position = Vector2( 383, 1057 )
 z_index = 2
+AttackDelay = 1.0
+MaxHP = 0
+HP = 0
+AttackPower = 1
+HitDelay = 0.5
+Projectile = ExtResource( 9 )
+MoveSpeed = 300.0
 
 [node name="LeftTower" parent="Floor" index="13" instance=ExtResource( 8 )]
 position = Vector2( 73, 939 )
@@ -94,6 +101,13 @@ MoveSpeed = 300.0
 
 [node name="CenterTower" parent="Floor" index="14" instance=ExtResource( 11 )]
 position = Vector2( 169, 1083 )
+AttackDelay = 1.0
+MaxHP = 0
+HP = 0
+AttackPower = 1
+HitDelay = 0.5
+Projectile = ExtResource( 9 )
+MoveSpeed = 300.0
 
 [node name="EnemyPath" type="Path2D" parent="Floor" index="15"]
 z_index = 10
@@ -118,8 +132,11 @@ Projectile = ExtResource( 9 )
 MoveSpeed = 150.0
 
 [node name="Camera2D" type="Camera2D" parent="Floor/Mage" index="4"]
-position = Vector2( -57, -4 )
 current = true
+limit_left = 0
+limit_top = 0
+limit_right = 480
+limit_bottom = 1400
 
 [node name="TimerLabel" parent="." index="4" instance=ExtResource( 4 )]
 margin_top = 287.0
