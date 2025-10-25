@@ -217,22 +217,10 @@ public partial class Level2
         this.empty.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.empty, reasoner);
 
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
-        this.upgradeDoor.Connect(CommonSignals.Pressed, this, nameof(UpgradeMage));
 
         this.dragonBlueInitialPosition = this.dragonBlue.Position;
         this.dragonRedInitialPosition = this.dragonRed.Position;
         this.dragonGoldInitialPosition = this.dragonGold.Position;
-    }
-
-    private void UpgradeMage()
-    {
-        var count = this.BagInventoryPopup.GetItemCount(nameof(Gold));
-        if (count > this.mage.MaxHP * this.mage.MaxHP)
-        {
-            this.BagInventoryPopup.TryChangeCount(nameof(Gold), -(int)(this.mage.MaxHP * this.mage.MaxHP));
-            this.mage.MaxHP++;
-            this.mage.HP = this.mage.MaxHP;
-        }
     }
 
     private Reasoner<BaseUnit> enemyMoveReasoner;
@@ -308,6 +296,10 @@ public partial class Level2
         {
             enemiesToSpawn.Enqueue(enemy);
         }
+        var boss = BuildEnemy(new List<string> { "OgreGray" }, startPosition, enemyMoveReasoner, speed);
+        boss.MaxHP = 30;
+        boss.HP = 30;
+        enemiesToSpawn.Enqueue(boss);
     }
 
     private void TickWave(float delta)
@@ -375,7 +367,7 @@ public partial class Level2
         enemy.AttackPower = 1;
         enemy.AttackDistance = 100;
         enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
-        enemy.MaxHP = 3;
+        enemy.MaxHP = 1;
         enemy.HP = 1;
         enemy.MoveSpeed = speed;
         enemy.ZIndex = 1;
@@ -412,9 +404,9 @@ public partial class Level2
 
     private readonly Dictionary<Type, HashSet<Type>> attackers = new Dictionary<Type, HashSet<Type>>
     {
-        {typeof(DragonBlue), new HashSet<Type>{typeof(SpiderBlue)}},
-        {typeof(DragonRed), new HashSet<Type>{typeof(SpiderRed)}},
-        {typeof(DragonGold), new HashSet<Type>{typeof(SpiderGold)}},
+        {typeof(DragonBlue), new HashSet<Type>{typeof(SpiderBlue), typeof(OgreGray)}},
+        {typeof(DragonRed), new HashSet<Type>{typeof(SpiderRed), typeof(OgreGray)}},
+        {typeof(DragonGold), new HashSet<Type>{typeof(SpiderGold), typeof(OgreGray)}},
     };
 
     private void TowerClicked(BaseUnit tower)

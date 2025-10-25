@@ -156,15 +156,7 @@ custom_fonts/font = SubResource( 2 )
 text = "Level 1"
 align = 1
 
-[node name="UpgradeDoor" type="Button" parent="." index="5"]
-margin_left = 232.0
-margin_top = 814.0
-margin_right = 297.0
-margin_bottom = 848.0
-text = "Upgrade
-Door"
-
-[node name="ToBattle" type="Button" parent="." index="6"]
+[node name="ToBattle" type="Button" parent="." index="5"]
 margin_left = 232.0
 margin_top = 888.0
 margin_right = 297.0
