@@ -258,16 +258,20 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
         base._UnhandledInput(@event);
         if (@event is InputEventMouseButton mouse && mouse.IsPressed() && !mouse.IsEcho() && (ButtonList)mouse.ButtonIndex == ButtonList.Left)
         {
-            var size = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame).GetSize() * animatedSprite.Scale;
-            var position = this.animatedSprite.Position + this.animatedSprite.Offset - (this.animatedSprite.Centered ? size / 2 : Vector2.Zero);
-
-            var rect = new Rect2(position, size);
-            var mousePos = this.GetLocalMousePosition();
-
-            if (rect.HasPoint(mousePos))
+            var frame = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame);
+            if (frame != null)
             {
-                this.GetTree().SetInputAsHandled();
-                this.EmitSignal(nameof(Clicked));
+                var size = frame.GetSize() * animatedSprite.Scale;
+                var position = this.animatedSprite.Position + this.animatedSprite.Offset - (this.animatedSprite.Centered ? size / 2 : Vector2.Zero);
+
+                var rect = new Rect2(position, size);
+                var mousePos = this.GetLocalMousePosition();
+
+                if (rect.HasPoint(mousePos))
+                {
+                    this.GetTree().SetInputAsHandled();
+                    this.EmitSignal(nameof(Clicked));
+                }
             }
         }
     }

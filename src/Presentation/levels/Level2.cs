@@ -61,12 +61,11 @@ public class FollowPathIntent : IIntent<BaseUnit>
 
     public void Enter(BaseUnit context)
     {
-        context.StartMoveAnimation();
-        this.MoveOffset = 0;
     }
 
     public bool Execute(BaseUnit context)
     {
+        context.StartMoveAnimation();
         var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
         this.MoveOffset += context.MoveSpeed * moveContext.Delta * context.level.HeaderControl.Character.EnemySlowdownCoeff;
         var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
@@ -92,12 +91,12 @@ public class MoveToPointIntent : IIntent<BaseUnit>
     }
     public void Enter(BaseUnit context)
     {
-        context.StartMoveAnimation();
-        context.UpdateAnimationDirection(this.TargetPoint - context.Position);
     }
 
     public bool Execute(BaseUnit context)
     {
+        context.StartMoveAnimation();
+        context.UpdateAnimationDirection(this.TargetPoint - context.Position);
         var moveContext = (TowerContext)context.AutomaticActionGeneratorContext;
         var speed = context.MoveSpeed * moveContext.Delta;
         var dir = (this.TargetPoint - context.Position).Normalized();
@@ -131,13 +130,17 @@ public class AttackOpponentIntent : IIntent<BaseUnit>
 
     public void Enter(BaseUnit context)
     {
-        context.StartAttackAnimation();
-        context.UpdateAnimationDirection(this.opponent.Position - context.Position);
-        this.AttackStep = 0;
     }
 
     public bool Execute(BaseUnit context)
     {
+        if (!Godot.Object.IsInstanceValid(this.opponent))
+        {
+            return true;
+        }
+
+        context.StartAttackAnimation();
+        context.UpdateAnimationDirection(this.opponent.Position - context.Position);
         var commonContext = context.AutomaticActionGeneratorContext;
         var isHit = false;
         if (this.AttackStep == 0 && context.HitDelay == 0)
@@ -182,9 +185,9 @@ public partial class Level2
     private Random r = new Random();
     private int level = 0;
 
-    private Vector2 leftTowerInitialPosition;
-    private Vector2 rightTowerInitialPosition;
-    private Vector2 centerTowerInitialPosition;
+    private Vector2 dragonBlueInitialPosition;
+    private Vector2 dragonRedInitialPosition;
+    private Vector2 dragonGoldInitialPosition;
 
     private bool waveInProgress = false;
     private readonly Queue<BaseUnit> enemiesToSpawn = new Queue<BaseUnit>();
@@ -195,35 +198,30 @@ public partial class Level2
         base._Ready();
         this.FillMembers();
 
-        this.leftTower.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.leftTower });
-        this.rightTower.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.rightTower });
-        this.centerTower.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.centerTower });
+        this.dragonBlue.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonBlue });
+        this.dragonRed.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonRed });
+        this.dragonGold.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonGold });
 
         // Actually towers do not have AI. They just do intents when they are set outside.
         var reasoner = new FirstScoreReasoner<BaseUnit>(1);
         reasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
-        this.leftTower.AutomaticActionGeneratorContext = new TowerContext();
-        this.leftTower.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.leftTower, reasoner);
-        this.rightTower.AutomaticActionGeneratorContext = new TowerContext();
-        this.rightTower.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.rightTower, reasoner);
-        this.centerTower.AutomaticActionGeneratorContext = new TowerContext();
-        this.centerTower.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.centerTower, reasoner);
+        this.dragonBlue.AutomaticActionGeneratorContext = new TowerContext();
+        this.dragonBlue.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonBlue, reasoner);
+        this.dragonRed.AutomaticActionGeneratorContext = new TowerContext();
+        this.dragonRed.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonRed, reasoner);
+        this.dragonGold.AutomaticActionGeneratorContext = new TowerContext();
+        this.dragonGold.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonGold, reasoner);
         this.mage.AutomaticActionGeneratorContext = new TowerContext();
         this.mage.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.mage, reasoner);
+        this.empty.AutomaticActionGeneratorContext = new TowerContext();
+        this.empty.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.empty, reasoner);
 
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
         this.upgradeDoor.Connect(CommonSignals.Pressed, this, nameof(UpgradeMage));
 
-        this.leftTowerInitialPosition = this.leftTower.Position;
-        this.rightTowerInitialPosition = this.rightTower.Position;
-        this.centerTowerInitialPosition = this.centerTower.Position;
-
-        this.leftTower.AttackDelay = 0.3f;
-        this.leftTower.HitDelay = 0.1f;
-        this.rightTower.AttackDelay = 0.3f;
-        this.rightTower.HitDelay = 0.1f;
-        this.centerTower.AttackDelay = 0.3f;
-        this.centerTower.HitDelay = 0.1f;
+        this.dragonBlueInitialPosition = this.dragonBlue.Position;
+        this.dragonRedInitialPosition = this.dragonRed.Position;
+        this.dragonGoldInitialPosition = this.dragonGold.Position;
     }
 
     private void UpgradeMage()
@@ -237,10 +235,10 @@ public partial class Level2
         }
     }
 
+    private Reasoner<BaseUnit> enemyMoveReasoner;
+
     private void StartWave()
     {
-        waveInProgress = true;
-
         waveInProgress = true;
 
         timerLabel.ShowMessage($"Level {level + 1}.", 5);
@@ -248,69 +246,60 @@ public partial class Level2
         switch (level)
         {
             case 0:
-                this.leftTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
-                this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
-                this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
-                this.leftTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
-                this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
-                this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
+                this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(240, 740));
+                this.dragonRed.Intent = new MoveToPointIntent(this.dragonRedInitialPosition);
+                this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
                 break;
             case 1:
-                this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
-                this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
-                this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
-                this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
+                this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(50, 740));
+                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
+                this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
                 break;
             default:
-                this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
-                this.centerTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
-                this.leftTower.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.rightTower.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
-                this.centerTower.Intent = new MoveToPointIntent(new Vector2(240, 740));
+                this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(50, 740));
+                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
+                this.dragonGold.Intent = new MoveToPointIntent(new Vector2(240, 740));
                 break;
         }
 
         this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
-        this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
+        this.empty.Intent = new MoveToPointIntent(new Vector2(240, 400));
 
         var numberOfEnemies = 10 + level * 20;
         var enemyTypes = new List<string>();
         if (level >= 0)
         {
-            enemyTypes.Add(nameof(Wolf));
-            enemyTypes.Add(nameof(Wolf));
+            enemyTypes.Add(nameof(SpiderBlue));
         }
         if (level >= 1)
         {
-            enemyTypes.Add(nameof(Wasp));
-            enemyTypes.Add(nameof(Wasp));
+            enemyTypes.Add(nameof(SpiderRed));
         }
         if (level >= 2)
         {
-            enemyTypes.Add(nameof(Slime));
-            enemyTypes.Add(nameof(Slime));
+            enemyTypes.Add(nameof(SpiderGold));
         }
 
         var speed = 150 + level * 15;
         var startPosition = enemyPath.Curve.GetPointPosition(0);
 
-        var reasoner = new FirstScoreReasoner<BaseUnit>(1);
-        // Intent phase
-        reasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
-        // Decision phase
-        reasoner.Add(
-            new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
-            new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit())));
-        reasoner.Add(
-            new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
-            new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent()));
+        if (enemyMoveReasoner == null)
+        {
+            enemyMoveReasoner = new FirstScoreReasoner<BaseUnit>(1);
+            // Intent phase
+            enemyMoveReasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
+            // Decision phase
+            enemyMoveReasoner.Add(
+                new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
+                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit())));
+            enemyMoveReasoner.Add(
+                new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
+                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent()));
+        }
 
         var enemies = Enumerable
             .Range(0, numberOfEnemies)
-            .Select(a => BuildEnemy(enemyTypes, startPosition, reasoner, speed))
+            .Select(a => BuildEnemy(enemyTypes, startPosition, enemyMoveReasoner, speed))
             .ToList();
 
         enemiesToSpawn.Clear();
@@ -320,6 +309,7 @@ public partial class Level2
             enemiesToSpawn.Enqueue(enemy);
         }
     }
+
     private void TickWave(float delta)
     {
         if (spawnTimeout > 0.3f && enemiesToSpawn.Count > 0)
@@ -338,7 +328,7 @@ public partial class Level2
         else if (this.GetTree().GetNodesInGroup(Groups.Enemy).Count == 0)
         {
             level++;
-            this.StopWave();
+            this.StartWave();
         }
     }
     private void StopWave()
@@ -353,6 +343,9 @@ public partial class Level2
             timerLabel.ShowMessage($"Level clear.", 5);
         }
 
+        this.level = 0;
+
+        this.empty.Intent = new MoveToPointIntent(new Vector2(240, 1200));
         this.mage.Intent = new MoveToPointIntent(new Vector2(297, 1004));
         this.mage.HP = this.mage.MaxHP;
 
@@ -367,12 +360,9 @@ public partial class Level2
 
         this.HeaderControl.ClearBuffs();
 
-        this.leftTower.Intent = new MoveToPointIntent(this.leftTowerInitialPosition);
-        this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
-        this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
-        this.leftTower.Intent = new MoveToPointIntent(this.leftTowerInitialPosition);
-        this.rightTower.Intent = new MoveToPointIntent(this.rightTowerInitialPosition);
-        this.centerTower.Intent = new MoveToPointIntent(this.centerTowerInitialPosition);
+        this.dragonBlue.Intent = new MoveToPointIntent(this.dragonBlueInitialPosition);
+        this.dragonRed.Intent = new MoveToPointIntent(this.dragonRedInitialPosition);
+        this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
     }
 
     private BaseUnit BuildEnemy(List<string> enemies, Vector2 position, Reasoner<BaseUnit> action, int speed)
@@ -420,6 +410,13 @@ public partial class Level2
         }
     }
 
+    private readonly Dictionary<Type, HashSet<Type>> attackers = new Dictionary<Type, HashSet<Type>>
+    {
+        {typeof(DragonBlue), new HashSet<Type>{typeof(SpiderBlue)}},
+        {typeof(DragonRed), new HashSet<Type>{typeof(SpiderRed)}},
+        {typeof(DragonGold), new HashSet<Type>{typeof(SpiderGold)}},
+    };
+
     private void TowerClicked(BaseUnit tower)
     {
         if (tower.Intent != null && !(tower.Intent is AttackOpponentIntent) && !(tower.Intent is CompositeIntent<BaseUnit>))
@@ -427,23 +424,7 @@ public partial class Level2
             return;
         }
 
-        Type against;
-        if (tower == this.leftTower)
-        {
-            against = typeof(Wolf);
-        }
-        else if (tower == this.rightTower)
-        {
-            against = typeof(Wasp);
-        }
-        else if (tower == this.centerTower)
-        {
-            against = typeof(Slime);
-        }
-        else
-        {
-            throw new Exception("Unkonwn tower");
-        }
+        var against = attackers[tower.GetType()];
 
         var enemy = this.GetTree()
             .GetNodesInGroup(Groups.AttackingEnemy)
@@ -457,7 +438,7 @@ public partial class Level2
         }
 
         IIntent<BaseUnit> newIntent;
-        if (against == enemy.GetType())
+        if (against.Contains(enemy.GetType()))
         {
             newIntent = new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, tower.AttackPower));
             if (enemy.HP <= tower.AttackPower)

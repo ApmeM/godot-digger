@@ -544,7 +544,6 @@ position = Vector2( 18, -51 )
 frame = 0
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
-position = Vector2( 0, -48 )
 playing = true
 centered = false
 
