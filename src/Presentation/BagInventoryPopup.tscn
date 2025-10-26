@@ -55,24 +55,24 @@ margin_bottom = 265.0
 
 [node name="InventoriesContainer" type="HBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer" index="0"]
 margin_right = 360.0
-margin_bottom = 256.0
+margin_bottom = 121.0
 
 [node name="EquipmentInventory" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer" index="0" instance=ExtResource( 5 )]
+visible = false
 margin_top = 0.0
 margin_bottom = 256.0
 
 [node name="BagContainer" type="VBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer" index="1"]
-margin_left = 156.0
-margin_right = 360.0
-margin_bottom = 256.0
+margin_right = 204.0
+margin_bottom = 121.0
 
 [node name="BagTopContainer" type="CenterContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer/BagContainer" index="0"]
 margin_right = 204.0
 margin_bottom = 48.0
 
 [node name="BagAndMoneyContainer" type="HBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer/BagContainer/BagTopContainer" index="0"]
-margin_left = 52.0
-margin_right = 152.0
+margin_left = 78.0
+margin_right = 126.0
 margin_bottom = 48.0
 
 [node name="BagSlot" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer/BagContainer/BagTopContainer/BagAndMoneyContainer" index="0" instance=ExtResource( 2 )]
@@ -82,6 +82,7 @@ ItemTypePlaceholderTexture = ExtResource( 4 )
 DropOnAnotherItemType = 2
 
 [node name="MoneySlot" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer/BagContainer/BagTopContainer/BagAndMoneyContainer" index="1" instance=ExtResource( 2 )]
+visible = false
 margin_left = 52.0
 margin_right = 100.0
 margin_bottom = 48.0

@@ -6,9 +6,8 @@ using Godot;
 [SceneReference("BaseLoot.tscn")]
 public partial class BaseLoot
 {
-
-    [Export]
-    public NodePath LevelPath;
+    [Signal]
+    public delegate void LootClicked();
 
     public string LootName => this.GetType().Name;
 
@@ -21,16 +20,7 @@ public partial class BaseLoot
     public uint Price { get; set; }
     public Func<Game, Task<bool>> UseAction { get; set; }
     public Action<Character> EquipAction { get; set; }
-
-    private BaseLevel internalLevel;
-    protected BaseLevel level
-    {
-        get
-        {
-            internalLevel = internalLevel ?? this.GetNode<BaseLevel>(LevelPath);
-            return internalLevel;
-        }
-    }
+    public Action<Character> InventoryAction { get; set; }
 
     public override void _Ready()
     {
@@ -39,14 +29,11 @@ public partial class BaseLoot
 
         this.AddToGroup(Groups.Loot);
 
-        this.texture.Connect(CommonSignals.Pressed, this, nameof(LootClicked));
+        this.texture.Connect(CommonSignals.Pressed, this, nameof(LootTextureClicked));
     }
 
-    public void LootClicked()
+    private void LootTextureClicked()
     {
-        if (level.BagInventoryPopup.TryChangeCount(this.LootName, 1) == 0)
-        {
-            this.QueueFree();
-        }
+        this.EmitSignal(nameof(LootClicked));
     }
 }

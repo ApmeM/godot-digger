@@ -13,6 +13,6 @@ public partial class SlowDown
 
     public override void ApplyBuff(Character character)
     {
-        character.EnemySlowdownCoeff /= 2f;
+        character.EnemySpeedCoeff /= 2f;
     }
 }

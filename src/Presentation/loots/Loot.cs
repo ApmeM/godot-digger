@@ -60,7 +60,8 @@ public class LootDefinition
                 MergeActions = scene.MergeActions,
                 Price = scene.Price,
                 UseAction = scene.UseAction,
-                EquipAction = scene.EquipAction
+                EquipAction = scene.EquipAction,
+                InventoryAction = scene.InventoryAction
             };
             resByName.Add(dirname, definition);
             resById.Add(id, definition);
@@ -82,5 +83,6 @@ public class LootDefinition
 
     public uint Price { get; set; }
     public Func<Game, Task<bool>> UseAction { get; set; }
+    public Action<Character> InventoryAction { get; set; }
     public Action<Character> EquipAction { get; set; }
 }

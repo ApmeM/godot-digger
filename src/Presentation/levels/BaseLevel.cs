@@ -42,11 +42,6 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        foreach (BaseLoot baseLoot in this.GetTree().GetNodesInGroup(Groups.Loot))
-        {
-            baseLoot.LevelPath = this.GetPath();
-        }
-
         foreach (BaseUnit baseUnit in this.GetTree().GetNodesInGroup(Groups.Unit))
         {
             baseUnit.LevelPath = this.GetPath();

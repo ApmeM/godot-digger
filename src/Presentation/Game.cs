@@ -26,6 +26,7 @@ public partial class Game
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.BagChanged), this, nameof(BagChanged));
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.EquipmentChanged), this, nameof(EquipmentChanged));
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.UseItem), this, nameof(InventoryUseItem));
+        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.InventoryChanged), this, nameof(EquipmentChanged));
     }
 
     protected async void InventoryUseItem(InventorySlot slot)

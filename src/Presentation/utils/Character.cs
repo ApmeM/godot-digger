@@ -8,7 +8,7 @@ public class Character
     public bool CanDig = true;
     public uint BagSlots = 4;
 
-    public float EnemySlowdownCoeff = 1f;
+    public float EnemySpeedCoeff = 1f;
 
     public LootDefinition BagId;
     public LootDefinition WeaponId;

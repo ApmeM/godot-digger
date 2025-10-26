@@ -67,7 +67,7 @@ public class FollowPathIntent : IIntent<BaseUnit>
     {
         context.StartMoveAnimation();
         var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
-        this.MoveOffset += context.MoveSpeed * moveContext.Delta * context.level.HeaderControl.Character.EnemySlowdownCoeff;
+        this.MoveOffset += context.MoveSpeed * moveContext.Delta * context.level.HeaderControl.Character.EnemySpeedCoeff;
         var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
         pathPosition.Offset = this.MoveOffset;
         var oldPosition = context.Position;
@@ -299,6 +299,7 @@ public partial class Level2
         var boss = BuildEnemy(new List<string> { "OgreGray" }, startPosition, enemyMoveReasoner, speed);
         boss.MaxHP = 30;
         boss.HP = 30;
+        boss.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Wood)) };
         enemiesToSpawn.Enqueue(boss);
     }
 
@@ -387,7 +388,6 @@ public partial class Level2
         foreach (var loot in loots)
         {
             var newLoot = loot.Instance<BaseLoot>();
-            newLoot.LevelPath = this.GetPath();
             newLoot.Position = unit.Position;
             this.GetParent().AddChild(newLoot);
 
@@ -397,8 +397,10 @@ public partial class Level2
                 .SetTrans(Tween.TransitionType.Linear)
                 .SetEase(Tween.EaseType.InOut);
             await tween.ToMySignal(CommonSignals.Finished);
-
-            newLoot.LootClicked();
+            if (this.BagInventoryPopup.TryChangeCount(newLoot.LootName, 1) == 0)
+            {
+                newLoot.QueueFree();
+            }
         }
     }
 

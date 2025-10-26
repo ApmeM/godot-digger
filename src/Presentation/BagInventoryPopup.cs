@@ -12,6 +12,9 @@ public partial class BagInventoryPopup
     public delegate void EquipmentChanged(InventorySlot slot, int itemId, int from, int to);
 
     [Signal]
+    public delegate void InventoryChanged(InventorySlot slot, int itemId, int from, int to);
+
+    [Signal]
     public delegate void UseItem(InventorySlot slot);
 
     public uint Size { get => this.bagInventory.Size; set => this.bagInventory.Size = value; }
@@ -35,6 +38,7 @@ public partial class BagInventoryPopup
 
         this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
         this.bagInventory.Connect(nameof(Inventory.DragOnAnotherItemType), this, nameof(InventoryTryMergeItems));
+        this.bagInventory.Connect(nameof(Inventory.ItemCountChanged), this, nameof(InventoryContentChanged));
         this.bagSlot.Connect(nameof(InventorySlot.ItemCountChanged), this, nameof(BagSlotChanged));
         this.equipmentInventory.Connect(nameof(EquipmentInventory.ItemCountChanged), this, nameof(EquipmentInventoryChanged));
 
@@ -49,6 +53,10 @@ public partial class BagInventoryPopup
         this.moneySlot.Config = Config;
     }
 
+    private void InventoryContentChanged(InventorySlot slot, int itemId, int from, int to)
+    {
+        this.EmitSignal(nameof(InventoryChanged), slot, itemId, from, to);
+    }
 
     private void EquipmentInventoryChanged(InventorySlot slot, int itemId, int from, int to)
     {
@@ -153,14 +161,24 @@ public partial class BagInventoryPopup
         character.BagId = this.bagSlot.ItemId == -1 ? null : LootDefinition.LootById[this.bagSlot.ItemId];
         character.WeaponId = this.equipmentInventory.WeaponId == -1 ? null : LootDefinition.LootById[this.equipmentInventory.WeaponId];
 
-        var loots = this.equipmentInventory.GetItems()
+        var equipments = this.equipmentInventory.GetItems()
             .Where(a => a.Item1 >= 0)
             .Select(a => LootDefinition.LootById[a.Item1])
             .ToList();
 
-        foreach (var loot in loots)
+        foreach (var loot in equipments)
         {
             loot.EquipAction(character);
+        }
+
+        var inventories = this.bagInventory.GetItems()
+            .Where(a => a.Item1 >= 0)
+            .Select(a => LootDefinition.LootById[a.Item1])
+            .ToList();
+
+        foreach (var loot in inventories)
+        {
+            loot.InventoryAction(character);
         }
 
         character.BagId?.EquipAction(character);
