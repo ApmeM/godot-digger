@@ -279,7 +279,7 @@ public partial class Level2
             // Decision phase
             enemyMoveReasoner.Add(
                 new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit())));
+                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, MageHit)));
             enemyMoveReasoner.Add(
                 new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
                 new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent()));
@@ -299,13 +299,13 @@ public partial class Level2
         var boss = BuildEnemy(new List<string> { "OgreGray" }, startPosition, enemyMoveReasoner, speed);
         boss.MaxHP = 30;
         boss.HP = 30;
-        boss.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Wood)) };
+        boss.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)), Instantiator.LoadLoot(nameof(Wood)) };
         enemiesToSpawn.Enqueue(boss);
     }
 
     private void TickWave(float delta)
     {
-        if (spawnTimeout > 0.3f && enemiesToSpawn.Count > 0)
+        if (spawnTimeout > 0.3f / HeaderControl.Character.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
         {
             spawnTimeout = 0;
             var enemy = enemiesToSpawn.Dequeue();
@@ -318,7 +318,7 @@ public partial class Level2
         {
             this.StopWave();
         }
-        else if (this.GetTree().GetNodesInGroup(Groups.Enemy).Count == 0)
+        else if (this.GetTree().GetNodesInGroup(Groups.Enemy).Count == 0 && enemiesToSpawn.Count == 0)
         {
             level++;
             this.StartWave();
@@ -383,14 +383,16 @@ public partial class Level2
 
     public async void DropLoot(BaseUnit unit)
     {
-        var loots = unit.Loot;
-
-        foreach (var loot in loots)
+        var loots = unit.Loot.Select(loot =>
         {
             var newLoot = loot.Instance<BaseLoot>();
             newLoot.Position = unit.Position;
             this.GetParent().AddChild(newLoot);
+            return newLoot;
+        }).ToList();
 
+        foreach (var newLoot in loots)
+        {
             var toPosition = new Vector2(0, 0);
             var tween = newLoot.CreateTween();
             tween.TweenProperty(newLoot, "position", toPosition, 0.5f)
@@ -462,6 +464,18 @@ public partial class Level2
         base._Process(delta);
         if (waveInProgress)
         {
+            if (Input.IsActionJustPressed("blue") && level >= 0)
+            {
+                TowerClicked(this.dragonBlue);
+            }
+            if (Input.IsActionJustPressed("red") && level >= 1)
+            {
+                TowerClicked(this.dragonRed);
+            }
+            if (Input.IsActionJustPressed("gold") && level >= 2)
+            {
+                TowerClicked(this.dragonGold);
+            }
             this.TickWave(delta);
         }
     }
@@ -494,7 +508,7 @@ public partial class Level2
             .Take(5)
             .Select(enemy =>
             {
-                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, int.MaxValue));
+                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, 10));
             })
             .ToArray();
 
