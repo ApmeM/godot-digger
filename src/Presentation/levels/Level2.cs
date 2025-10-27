@@ -224,11 +224,34 @@ public partial class Level2
         this.bat.AutomaticActionGeneratorContext = new EnemyContext();
         this.bat.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.bat, reasoner);
 
-        this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
+        this.toBattle.Connect(CommonSignals.Pressed, this, nameof(ToBattleClicked));
 
         this.dragonBlueInitialPosition = this.dragonBlue.Position;
         this.dragonRedInitialPosition = this.dragonRed.Position;
         this.dragonGoldInitialPosition = this.dragonGold.Position;
+    }
+
+    private void ToBattleClicked()
+    {
+        this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
+        this.bat.PathFollow2DPath = this.batPathForwardFollow.GetPath();
+        this.bat.Intent = new FollowPathIntent(this);
+
+        if (enemyMoveReasoner == null)
+        {
+            enemyMoveReasoner = new FirstScoreReasoner<BaseUnit>(1);
+            // Intent phase
+            enemyMoveReasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
+            // Decision phase
+            enemyMoveReasoner.Add(
+                new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
+                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit(c.AttackPower))));
+            enemyMoveReasoner.Add(
+                new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
+                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this)));
+        }
+
+        StartWave();
     }
 
     private Reasoner<BaseUnit> enemyMoveReasoner;
@@ -248,19 +271,15 @@ public partial class Level2
                 break;
             case 1:
                 this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
+                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(GetViewport().Size.x - 50, 740));
                 this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
                 break;
             default:
                 this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(480 - 50, 740));
-                this.dragonGold.Intent = new MoveToPointIntent(new Vector2(240, 740));
+                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(GetViewport().Size.x - 50, 740));
+                this.dragonGold.Intent = new MoveToPointIntent(new Vector2(GetViewport().Size.x / 2, 740));
                 break;
         }
-
-        this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
-        this.bat.PathFollow2DPath = this.batPathForwardFollow.GetPath();
-        this.bat.Intent = new FollowPathIntent(this);
 
         var numberOfEnemies = 10 + level * 20;
         var enemyTypes = new List<string>();
@@ -278,20 +297,6 @@ public partial class Level2
         }
 
         var startPosition = enemyPath.Curve.GetPointPosition(0);
-
-        if (enemyMoveReasoner == null)
-        {
-            enemyMoveReasoner = new FirstScoreReasoner<BaseUnit>(1);
-            // Intent phase
-            enemyMoveReasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
-            // Decision phase
-            enemyMoveReasoner.Add(
-                new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit(c.AttackPower))));
-            enemyMoveReasoner.Add(
-                new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this)));
-        }
 
         var enemies = Enumerable
             .Range(0, numberOfEnemies)

@@ -125,6 +125,7 @@ Projectile = ExtResource( 9 )
 MoveSpeed = 300.0
 
 [node name="BatPathForward" type="Path2D" parent="Floor" index="15"]
+visible = false
 z_index = 10
 curve = SubResource( 3 )
 
@@ -134,6 +135,7 @@ rotation = -1.14321
 loop = false
 
 [node name="BatPathBack" type="Path2D" parent="Floor" index="16"]
+visible = false
 z_index = 10
 curve = SubResource( 4 )
 
@@ -143,6 +145,7 @@ rotation = 2.36825
 loop = false
 
 [node name="EnemyPath" type="Path2D" parent="Floor" index="17"]
+visible = false
 z_index = 10
 curve = SubResource( 1 )
 
@@ -158,10 +161,6 @@ MoveSpeed = 500.0
 
 [node name="Camera2D" type="Camera2D" parent="Floor/Bat" index="4"]
 current = true
-limit_left = 0
-limit_top = 0
-limit_right = 480
-limit_bottom = 1400
 
 [node name="Mage" parent="Floor" index="19" groups=["grp_player"] instance=ExtResource( 7 )]
 position = Vector2( 297, 1004 )
