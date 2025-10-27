@@ -204,6 +204,8 @@ public partial class Level2
         base._Ready();
         this.FillMembers();
 
+        this.SetCameraLimits(this.camera2D);
+
         this.dragonBlue.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonBlue });
         this.dragonRed.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonRed });
         this.dragonGold.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonGold });

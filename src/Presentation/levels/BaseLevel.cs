@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
@@ -28,21 +29,22 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
     public Header HeaderControl;
     public BagInventoryPopup BagInventoryPopup;
 
-    public FloatingTextManager FloatingTextManagerControl => this.floatingTextManager;
-
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
 
-        // this.draggableCamera.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
-        // this.draggableCamera.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
-        // this.draggableCamera.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
-        // this.draggableCamera.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
-
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.AddToGroup(Groups.LevelScene);
+    }
+
+    public void SetCameraLimits(Camera2D camera2D)
+    {
+        camera2D.LimitLeft = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.x) * this.floor.CellSize.x * this.floor.Scale.x);
+        camera2D.LimitRight = (int)Math.Max(this.GetViewport().Size.x, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.x + 1) * this.floor.CellSize.x * this.floor.Scale.x);
+        camera2D.LimitTop = (int)Math.Min(0, this.floor.GetUsedCells().Cast<Vector2>().Min(a => a.y) * this.floor.CellSize.y * this.floor.Scale.x);
+        camera2D.LimitBottom = (int)Math.Max(this.GetViewport().Size.y, this.floor.GetUsedCells().Cast<Vector2>().Max(a => a.y + 1) * this.floor.CellSize.y * this.floor.Scale.x);
     }
 
     public void GetNeighbors((Vector2, HashSet<Floor>) node, ICollection<(Vector2, HashSet<Floor>)> result)
