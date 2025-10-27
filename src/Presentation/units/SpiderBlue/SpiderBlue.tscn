@@ -492,12 +492,12 @@ animations = [ {
 [node name="SpiderBlue" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
 AttackDelay = 0.6
-MaxHP = 30
-HP = 30
-AttackPower = 5
+MaxHP = 1
+HP = 1
+AttackPower = 1
 AttackDistance = 100.0
-HitDelay = 0
-MoveSpeed = 100.0
+HitDelay = 0.3
+MoveSpeed = 150.0
 
 [node name="Healthbar" parent="." index="0"]
 position = Vector2( 28, -41 )

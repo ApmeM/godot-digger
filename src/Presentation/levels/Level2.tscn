@@ -141,9 +141,9 @@ z_index = 1
 AttackDelay = 0.5
 MaxHP = 3
 HP = 3
-AttackPower = 0
+AttackPower = 10
 AttackDistance = 0.0
-HitDelay = 0.1
+HitDelay = 0.2
 Projectile = ExtResource( 9 )
 MoveSpeed = 150.0
 

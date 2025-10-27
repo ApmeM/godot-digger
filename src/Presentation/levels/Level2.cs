@@ -276,7 +276,6 @@ public partial class Level2
             enemyTypes.Add(nameof(SpiderGold));
         }
 
-        var speed = 150 + level * 15;
         var startPosition = enemyPath.Curve.GetPointPosition(0);
 
         if (enemyMoveReasoner == null)
@@ -287,7 +286,7 @@ public partial class Level2
             // Decision phase
             enemyMoveReasoner.Add(
                 new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, MageHit)));
+                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit(c.AttackPower))));
             enemyMoveReasoner.Add(
                 new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
                 new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this)));
@@ -295,7 +294,7 @@ public partial class Level2
 
         var enemies = Enumerable
             .Range(0, numberOfEnemies)
-            .Select(a => BuildEnemy(enemyTypes, startPosition, enemyMoveReasoner, speed))
+            .Select(a => BuildEnemy(enemyTypes, startPosition, enemyMoveReasoner))
             .ToList();
 
         enemiesToSpawn.Clear();
@@ -304,9 +303,7 @@ public partial class Level2
         {
             enemiesToSpawn.Enqueue(enemy);
         }
-        var boss = BuildEnemy(new List<string> { "OgreGray" }, startPosition, enemyMoveReasoner, speed);
-        boss.MaxHP = 30;
-        boss.HP = 30;
+        var boss = BuildEnemy(nameof(OgreGray), startPosition, enemyMoveReasoner);
         boss.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)), Instantiator.LoadLoot(nameof(Wood)) };
         enemiesToSpawn.Enqueue(boss);
     }
@@ -366,21 +363,19 @@ public partial class Level2
         this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
     }
 
-    private BaseUnit BuildEnemy(List<string> enemies, Vector2 position, Reasoner<BaseUnit> action, int speed)
+    private BaseUnit BuildEnemy(List<string> enemies, Vector2 position, Reasoner<BaseUnit> action)
     {
         var enemyName = enemies[r.Next(enemies.Count)];
+        return BuildEnemy(enemyName, position, action);
+    }
+
+    private BaseUnit BuildEnemy(string enemyName, Vector2 position, Reasoner<BaseUnit> action)
+    {
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
         enemy.PathFollow2DPath = this.enemyPathFollow.GetPath();
-        enemy.AttackPower = 1;
-        enemy.AttackDistance = 100;
         enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
-        enemy.MaxHP = 1;
-        enemy.HP = 1;
-        enemy.MoveSpeed = speed;
         enemy.ZIndex = 1;
-        enemy.AttackDelay = 0.3f;
-        enemy.HitDelay = enemy.AttackDelay / 2;
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
         enemy.AutomaticActionGeneratorContext = new EnemyContext();
@@ -502,11 +497,11 @@ public partial class Level2
         }
     }
 
-    private void MageHit()
+    private void MageHit(int attackPower)
     {
         // TODO: Boom animation
 
-        this.mage.HP--;
+        this.mage.HP -= Math.Min(this.mage.HP, (uint)attackPower);
 
         var mageShoots = this.GetTree()
             .GetNodesInGroup(Groups.Enemy)
@@ -515,11 +510,9 @@ public partial class Level2
             .Take(5)
             .Select(enemy =>
             {
-                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, 10));
+                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, this.mage.AttackPower));
             })
             .ToArray();
-
-        this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
 
         this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
 
