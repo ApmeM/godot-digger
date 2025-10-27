@@ -221,8 +221,8 @@ public partial class Level2
         this.dragonGold.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonGold, reasoner);
         this.mage.AutomaticActionGeneratorContext = new TowerContext();
         this.mage.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.mage, reasoner);
-        this.empty.AutomaticActionGeneratorContext = new TowerContext();
-        this.empty.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.empty, reasoner);
+        this.bat.AutomaticActionGeneratorContext = new EnemyContext();
+        this.bat.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.bat, reasoner);
 
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(StartWave));
 
@@ -259,7 +259,8 @@ public partial class Level2
         }
 
         this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
-        this.empty.Intent = new MoveToPointIntent(new Vector2(240, 400));
+        this.bat.PathFollow2DPath = this.batPathForwardFollow.GetPath();
+        this.bat.Intent = new FollowPathIntent(this);
 
         var numberOfEnemies = 10 + level * 20;
         var enemyTypes = new List<string>();
@@ -343,7 +344,8 @@ public partial class Level2
 
         this.level = 0;
 
-        this.empty.Intent = new MoveToPointIntent(new Vector2(240, 1200));
+        this.bat.PathFollow2DPath = this.batPathBackFollow.GetPath();
+        this.bat.Intent = new FollowPathIntent(this);
         this.mage.Intent = new MoveToPointIntent(new Vector2(297, 1004));
         this.mage.HP = this.mage.MaxHP;
 

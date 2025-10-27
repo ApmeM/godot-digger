@@ -98,7 +98,7 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     #region Move
 
     [Export]
-    public string PathFollow2DPath;
+    public NodePath PathFollow2DPath;
 
     [Export]
     public float MoveSpeed;
