@@ -57,7 +57,13 @@ public class UnitInGroupAppraisal : IAppraisal<BaseUnit>
 }
 public class FollowPathIntent : IIntent<BaseUnit>
 {
+    public FollowPathIntent(BaseLevel level)
+    {
+        this.level = level;
+    }
+
     public float MoveOffset;
+    private readonly BaseLevel level;
 
     public void Enter(BaseUnit context)
     {
@@ -67,7 +73,7 @@ public class FollowPathIntent : IIntent<BaseUnit>
     {
         context.StartMoveAnimation();
         var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
-        this.MoveOffset += context.MoveSpeed * moveContext.Delta * context.level.HeaderControl.Character.EnemySpeedCoeff;
+        this.MoveOffset += context.MoveSpeed * moveContext.Delta * this.level.HeaderControl.Character.EnemySpeedCoeff;
         var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
         pathPosition.Offset = this.MoveOffset;
         var oldPosition = context.Position;
@@ -282,7 +288,7 @@ public partial class Level2
                 new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, MageHit)));
             enemyMoveReasoner.Add(
                 new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent()));
+                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this)));
         }
 
         var enemies = Enumerable
@@ -363,7 +369,6 @@ public partial class Level2
         var enemyName = enemies[r.Next(enemies.Count)];
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
-        enemy.LevelPath = this.GetPath();
         enemy.PathFollow2DPath = this.enemyPathFollow.GetPath();
         enemy.AttackPower = 1;
         enemy.AttackDistance = 100;

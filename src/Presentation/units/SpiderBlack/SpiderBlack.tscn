@@ -496,7 +496,6 @@ MaxHP = 30
 HP = 30
 AttackPower = 5
 AttackDistance = 100.0
-HitDelay = 0
 MoveSpeed = 100.0
 
 [node name="Healthbar" parent="." index="0"]

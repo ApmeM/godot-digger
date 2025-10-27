@@ -172,23 +172,6 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #endregion
 
-    #region Level
-
-    [Export]
-    public NodePath LevelPath;
-
-    private BaseLevel internalLevel;
-    public BaseLevel level
-    {
-        get
-        {
-            internalLevel = internalLevel ?? this.GetNode<BaseLevel>(LevelPath);
-            return internalLevel;
-        }
-    }
-
-    #endregion
-
     public IAITurn AutomaticActionGenerator;
     public IContext AutomaticActionGeneratorContext;
 

@@ -42,11 +42,6 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
-        foreach (BaseUnit baseUnit in this.GetTree().GetNodesInGroup(Groups.Unit))
-        {
-            baseUnit.LevelPath = this.GetPath();
-        }
-
         this.AddToGroup(Groups.LevelScene);
     }
 
@@ -132,7 +127,6 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
     {
         var unit = Instantiator.CreateUnit(unitName);
         unit.Position = position;
-        unit.LevelPath = this.GetPath();
         floor.AddChild(unit);
     }
 
