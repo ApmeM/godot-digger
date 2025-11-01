@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Presentation/assets/Header/stamina-progress.png" type="Texture" id=1]
 [ext_resource path="res://Presentation/assets/Header/Red.png" type="Texture" id=2]
@@ -7,9 +7,8 @@
 [ext_resource path="res://Presentation/assets/Header/header_avatars.png" type="Texture" id=5]
 [ext_resource path="res://Presentation/assets/Header/header_panel.png" type="Texture" id=6]
 [ext_resource path="res://Presentation/Header.cs" type="Script" id=7]
-[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=8]
-[ext_resource path="res://Presentation/assets/Header/button-menu.png" type="Texture" id=9]
-[ext_resource path="res://Presentation/assets/Header/button-save.png" type="Texture" id=10]
+[ext_resource path="res://Presentation/buffs/BuffContainer.tscn" type="PackedScene" id=9]
+[ext_resource path="res://gd-inventory/BagInventoryPopup.tscn" type="PackedScene" id=11]
 
 [node name="Header" type="CanvasLayer"]
 script = ExtResource( 7 )
@@ -89,59 +88,20 @@ margin_right = 108.0
 margin_bottom = 130.0
 text = "10"
 
-[node name="BuffContainer" type="GridContainer" parent="."]
-margin_left = 113.0
-margin_top = 34.0
-margin_right = 277.0
-margin_bottom = 56.0
-columns = 6
+[node name="BuffContainer" parent="." instance=ExtResource( 9 )]
 
-[node name="BuffPopup" parent="." instance=ExtResource( 8 )]
+[node name="BagInventoryPopup" parent="." instance=ExtResource( 11 )]
 visible = false
-Title = "Buff"
 
-[node name="HeaderMargin" parent="BuffPopup/CustomPopupContainer/HeaderCenter" index="0"]
-margin_left = 128.0
-margin_right = 179.0
+[node name="InventoriesContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer" index="0"]
+margin_bottom = 256.0
 
-[node name="TitleBackground" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
-margin_right = 51.0
+[node name="EquipmentInventory" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer" index="0"]
+visible = true
 
-[node name="TitleMargin" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
-margin_right = 51.0
+[node name="BagContainer" parent="BagInventoryPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/DifferentInventoriesContainer/InventoriesContainer" index="1"]
+margin_left = 156.0
+margin_right = 360.0
+margin_bottom = 256.0
 
-[node name="TitleLabel" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
-margin_right = 41.0
-text = "Buff"
-
-[node name="BuffDescriptionLabel" type="Label" parent="BuffPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
-margin_left = 9.0
-margin_top = 37.0
-margin_right = 281.0
-margin_bottom = 51.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-text = "Text"
-align = 1
-
-[node name="MenuButton" type="TextureButton" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -67.0
-margin_top = 4.0
-margin_right = 1.0
-margin_bottom = 68.0
-texture_normal = ExtResource( 9 )
-__meta__ = {
-"_edit_use_anchors_": true
-}
-
-[node name="QuickSaveButton" type="TextureButton" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -130.0
-margin_top = 4.0
-margin_right = -62.0
-margin_bottom = 68.0
-texture_normal = ExtResource( 10 )
-
-[editable path="BuffPopup"]
+[editable path="BagInventoryPopup"]

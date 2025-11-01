@@ -57,13 +57,13 @@ public class UnitInGroupAppraisal : IAppraisal<BaseUnit>
 }
 public class FollowPathIntent : IIntent<BaseUnit>
 {
-    public FollowPathIntent(BaseLevel level)
+    public FollowPathIntent(BaseUnit mage)
     {
-        this.level = level;
+        this.mage = mage;
     }
 
     public float MoveOffset;
-    private readonly BaseLevel level;
+    private readonly BaseUnit mage;
 
     public void Enter(BaseUnit context)
     {
@@ -73,7 +73,7 @@ public class FollowPathIntent : IIntent<BaseUnit>
     {
         context.StartMoveAnimation();
         var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
-        this.MoveOffset += context.MoveSpeed * moveContext.Delta * this.level.HeaderControl.Character.EnemySpeedCoeff;
+        this.MoveOffset += context.MoveSpeed * moveContext.Delta * this.mage.EnemySpeedCoeff;
         var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
         pathPosition.Offset = this.MoveOffset;
         var oldPosition = context.Position;
@@ -229,13 +229,15 @@ public partial class Level2
         this.dragonBlueInitialPosition = this.dragonBlue.Position;
         this.dragonRedInitialPosition = this.dragonRed.Position;
         this.dragonGoldInitialPosition = this.dragonGold.Position;
+
+        this.HeaderControl.TrackingUnit = this.mage;
     }
 
     private void ToBattleClicked()
     {
         this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
         this.bat.PathFollow2DPath = this.batPathForwardFollow.GetPath();
-        this.bat.Intent = new FollowPathIntent(this);
+        this.bat.Intent = new FollowPathIntent(this.mage);
 
         if (enemyMoveReasoner == null)
         {
@@ -248,7 +250,7 @@ public partial class Level2
                 new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit(c.AttackPower))));
             enemyMoveReasoner.Add(
                 new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this)));
+                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this.mage)));
         }
 
         StartWave();
@@ -316,7 +318,7 @@ public partial class Level2
 
     private void TickWave(float delta)
     {
-        if (spawnTimeout > 0.3f / HeaderControl.Character.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
+        if (spawnTimeout > 0.5f / HeaderControl.TrackingUnit.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
         {
             spawnTimeout = 0;
             var enemy = enemiesToSpawn.Dequeue();
@@ -325,7 +327,7 @@ public partial class Level2
 
         spawnTimeout += delta;
 
-        if (this.mage.HP <= 1)
+        if (this.mage.HP < 1)
         {
             this.StopWave();
         }
@@ -350,7 +352,7 @@ public partial class Level2
         this.level = 0;
 
         this.bat.PathFollow2DPath = this.batPathBackFollow.GetPath();
-        this.bat.Intent = new FollowPathIntent(this);
+        this.bat.Intent = new FollowPathIntent(this.mage);
         this.mage.Intent = new MoveToPointIntent(new Vector2(297, 1004));
         this.mage.HP = this.mage.MaxHP;
 
@@ -363,7 +365,8 @@ public partial class Level2
             enemy.QueueFree();
         }
 
-        this.HeaderControl.ClearBuffs();
+        this.mage.Buffs.Clear();
+        this.HeaderControl.UpdateTrackingUnit();
 
         this.dragonBlue.Intent = new MoveToPointIntent(this.dragonBlueInitialPosition);
         this.dragonRed.Intent = new MoveToPointIntent(this.dragonRedInitialPosition);
@@ -407,8 +410,10 @@ public partial class Level2
             tween.TweenProperty(newLoot, "position", toPosition, 0.5f)
                 .SetTrans(Tween.TransitionType.Linear)
                 .SetEase(Tween.EaseType.InOut);
+
             await tween.ToMySignal(CommonSignals.Finished);
-            if (this.BagInventoryPopup.TryChangeCount(newLoot.LootName, 1) == 0)
+
+            if (this.mage.Inventory.TryChangeCount(newLoot.LootName, 1) == 0)
             {
                 newLoot.QueueFree();
             }
@@ -464,7 +469,6 @@ public partial class Level2
         else
         {
             tower.Intent = new CompositeIntent<BaseUnit>(tower.Intent, newIntent);
-
         }
     }
 
@@ -507,7 +511,6 @@ public partial class Level2
     private void MageHit(int attackPower)
     {
         // TODO: Boom animation
-
         this.mage.HP -= Math.Min(this.mage.HP, (uint)attackPower);
 
         var mageShoots = this.GetTree()
@@ -517,12 +520,16 @@ public partial class Level2
             .Take(5)
             .Select(enemy =>
             {
+                if (enemy.HP <= this.mage.AttackPower)
+                {
+                    enemy.RemoveFromGroup(Groups.AttackingEnemy);
+                }
                 return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, this.mage.AttackPower));
             })
             .ToArray();
 
         this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
-
-        this.HeaderControl.AddBuff(nameof(SlowDown));
+        this.mage.AddBuff(nameof(SlowDown));
+        this.HeaderControl.UpdateTrackingUnit();
     }
 }

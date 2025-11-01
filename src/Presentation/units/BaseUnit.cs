@@ -172,6 +172,33 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #endregion
 
+    #region Basic characteristics
+
+    public uint MaxStamina = 10;
+    public float StaminaRecoverySeconds = 20;
+    public bool CanDig = true;
+
+    public float EnemySpeedCoeff = 1f;
+
+    public BuffsListData Buffs = new BuffsListData();
+
+    public void AddBuff(string buffName)
+    {
+        var buff = Buffs.AddBuff(buffName);
+        buff.BuffDefinition.ApplyBuff(this);
+        buff.OnBuffRemoved += this.RemoveBuff;
+    }
+
+    private void RemoveBuff(BuffData buff)
+    {
+        buff.BuffDefinition.RemoveBuff(this);
+        buff.OnBuffRemoved -= this.RemoveBuff;
+    }
+
+    public BagInventoryData Inventory = new BagInventoryData();
+
+    #endregion
+
     public IAITurn AutomaticActionGenerator;
     public IContext AutomaticActionGeneratorContext;
 
@@ -196,6 +223,7 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     public override void _Process(float delta)
     {
         base._Process(delta);
+        Buffs.Tick(delta);
         AutomaticActionGeneratorContext?.Update(delta);
         AutomaticActionGenerator?.Tick();
     }

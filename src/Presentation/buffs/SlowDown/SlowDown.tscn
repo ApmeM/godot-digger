@@ -7,6 +7,8 @@
 [node name="SlowDown" instance=ExtResource( 1 )]
 texture_normal = ExtResource( 2 )
 script = ExtResource( 3 )
+Description = "All units loose speed."
+TotalTime = 5.0
 
-[node name="TextureProgress" parent="." index="1"]
+[node name="TextureProgress" parent="." index="0"]
 texture_progress = ExtResource( 2 )

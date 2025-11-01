@@ -27,7 +27,6 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
     };
 
     public Header HeaderControl;
-    public BagInventoryPopup BagInventoryPopup;
 
     public override void _Ready()
     {
@@ -134,11 +133,9 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 
     internal async Task<Vector2?> ChoosePosition()
     {
-        this.BagInventoryPopup.Close();
         this.selectPosition.Show();
         var res = await this.ToMySignal<Vector2?, bool>(nameof(CellClicked));
         this.selectPosition.Hide();
-        this.BagInventoryPopup.Show();
         return res.Item2 ? res.Item1 : null;
     }
 }

@@ -7,8 +7,8 @@ public partial class Bag1
     {
         this.Price = 1; 
         this.MaxCount = 1; 
-        this.ItemType = ItemType.Bag; 
-        EquipAction = (c) => c.BagSlots += 1;
+        this.ItemType = ItemType.Bag;
+        EquipAction = (c) => c.Inventory.Inventory.SlotsCount += 3;
     }
 
     public override void _Ready()

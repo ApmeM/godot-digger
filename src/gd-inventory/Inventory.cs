@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using static InventorySlot;
@@ -8,24 +6,6 @@ using static InventorySlot;
 [Tool]
 public partial class Inventory
 {
-    public Dictionary<int, InventorySlot.InventorySlotConfig> config = new Dictionary<int, InventorySlot.InventorySlotConfig>();
-
-    public Dictionary<int, InventorySlot.InventorySlotConfig> Config
-    {
-        get => config;
-        set
-        {
-            config = value;
-            if (IsInsideTree())
-            {
-                foreach (InventorySlot slot in this.slotContainer.GetChildren().Cast<InventorySlot>())
-                {
-                    slot.Config = value;
-                }
-            }
-        }
-    }
-
     private DropOnAnotherItemTypeAction dropOnAnotherItemType = DropOnAnotherItemTypeAction.Not_Allowed;
 
     [Export]
@@ -54,65 +34,28 @@ public partial class Inventory
     [Signal]
     public delegate void DragOnAnotherItemType(InventorySlot from, InventorySlot to);
 
-    [Signal]
-    public delegate void ItemCountChanged(InventorySlot slot, int itemId, int from, int to);
-
-    private uint size;
+    private InventoryData slotData = new InventoryData();
+    public InventoryData SlotData
+    {
+        get => slotData;
+        set
+        {
+            if (slotData == value)
+            {
+                return;
+            }
+            this.slotData.SlotsCountChanged -= RefreshFromDump;
+            slotData = value;
+            this.slotData.SlotsCountChanged += RefreshFromDump;
+            RefreshFromDump();
+        }
+    }
 
     [Export]
     public uint Size
     {
-        get
-        {
-            return this.size;
-        }
-        set
-        {
-            if (IsInsideTree())
-            {
-                if (this.slotContainer.GetChildCount() < value)
-                {
-                    var toAdd = value - this.slotContainer.GetChildCount();
-                    for (var i = 0; i < toAdd; i++)
-                    {
-                        var slot = this.InventorySlotScene.Instance<InventorySlot>();
-                        slot.Config = Config;
-                        this.slotContainer.AddChild(slot);
-                        slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
-                        slot.Connect(nameof(InventorySlot.DragOnAnotherItemType), this, nameof(SlotDragOnAnotherItemType));
-                        slot.Connect(nameof(InventorySlot.ItemCountChanged), this, nameof(SlotItemCountChanged), new Godot.Collections.Array { slot });
-                    }
-                }
-                else if (this.slotContainer.GetChildCount() > value)
-                {
-                    var toDelete = this.slotContainer.GetChildCount() - value;
-                    var emptyList = this.slotContainer.GetChildren().OfType<InventorySlot>().Where(a => !a.HasItem()).ToList();
-                    var deleteEmpty = Math.Min(toDelete, emptyList.Count);
-                    var deleteNonEmpty = toDelete - deleteEmpty;
-
-                    for (var i = 0; i < deleteEmpty; i++)
-                    {
-                        var child = emptyList[i];
-                        child.QueueFree();
-                        this.slotContainer.RemoveChild(child);
-                    }
-
-                    for (var i = 0; i < deleteNonEmpty - value; i++)
-                    {
-                        GD.Print("Forced to remove slot with items.");
-                        var child = this.slotContainer.GetChild(0);
-                        child.QueueFree();
-                        this.slotContainer.RemoveChild(child);
-                    }
-                }
-            }
-            this.size = value;
-        }
-    }
-
-    private void SlotItemCountChanged(int itemId, int from, int to, InventorySlot slot)
-    {
-        this.EmitSignal(nameof(ItemCountChanged), slot, itemId, from, to);
+        get => this.slotData.SlotsCount;
+        set => this.slotData.SlotsCount = value;
     }
 
     private void SlotUseItem(InventorySlot slot)
@@ -162,89 +105,30 @@ public partial class Inventory
         base._Ready();
         this.FillMembers();
         this.SizePerRow = this.sizePerRow;
-        this.Size = size;
         this.Title = this.title;
-        this.Config = this.config;
         this.DropOnAnotherItemType = this.dropOnAnotherItemType;
+
+        this.slotData.SlotsCountChanged += this.RefreshFromDump;
+        RefreshFromDump();
     }
 
-    public int TryChangeCount(int itemId, int countDiff)
+    private void RefreshFromDump()
     {
-        if (countDiff == 0)
+        if (!Godot.Object.IsInstanceValid(this) || !this.IsInsideTree())
         {
-            return 0;
+            return;
         }
 
-        foreach (InventorySlot slot in this.slotContainer.GetChildren())
+        // ToDo: check the problem with events.
+        this.slotContainer.RemoveChildren();
+
+        for (var i = 0; i < this.slotData.SlotsCount; i++)
         {
-            countDiff = slot.TryChangeCount(itemId, countDiff);
-            if (countDiff == 0)
-            {
-                return 0;
-            }
+            var slot = this.InventorySlotScene.Instance<InventorySlot>();
+            slot.SlotData = this.slotData.Slots[i];
+            this.slotContainer.AddChild(slot);
+            slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
+            slot.Connect(nameof(InventorySlot.DragOnAnotherItemType), this, nameof(SlotDragOnAnotherItemType));
         }
-
-        return countDiff;
-    }
-
-    public bool TryChangeCountsOrCancel(IEnumerable<(int, int)> items)
-    {
-        var before = this.slotContainer.GetChildren()
-            .OfType<InventorySlot>()
-            .Where(a => a.HasItem())
-            .Select(a => new { slot = a, item = a.GetItem() })
-            .ToList();
-
-        foreach (var item in items)
-        {
-            var result = this.TryChangeCount(item.Item1, item.Item2);
-            if (result != 0)
-            {
-                foreach (var restore in before)
-                {
-                    restore.slot.ForceSetCount(restore.item.Item1, restore.item.Item2);
-                }
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void ClearItems()
-    {
-        foreach (InventorySlot slot in this.slotContainer.GetChildren())
-        {
-            if (!slot.HasItem())
-            {
-                continue;
-            }
-
-            slot.ClearItem();
-        }
-    }
-
-    public List<(int, int)> GetItems()
-    {
-        return this.slotContainer.GetChildren()
-            .OfType<InventorySlot>()
-            .Select(a => a.GetItem())
-            .ToList();
-    }
-
-    public void SetItems(List<(int, int)> items)
-    {
-        var slots = this.slotContainer.GetChildren().OfType<InventorySlot>().ToList();
-        for (var i = 0; i < Math.Min(items.Count, slots.Count); i++)
-        {
-            slots[i].ForceSetCount(items[i].Item1, items[i].Item2);
-        }
-    }
-
-    public int GetItemCount(int item)
-    {
-        return this.GetItems()
-            .Where(a => a.Item1 == item)
-            .Sum(a => a.Item2);
     }
 }

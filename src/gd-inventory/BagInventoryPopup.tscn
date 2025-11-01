@@ -3,10 +3,10 @@
 [ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=1]
 [ext_resource path="res://gd-inventory/InventorySlot.tscn" type="PackedScene" id=2]
 [ext_resource path="res://gd-inventory/Inventory.tscn" type="PackedScene" id=3]
-[ext_resource path="res://Presentation/assets/Equipment/slot_bag.png" type="Texture" id=4]
-[ext_resource path="res://Presentation/EquipmentInventory.tscn" type="PackedScene" id=5]
-[ext_resource path="res://Presentation/BagInventoryPopup.cs" type="Script" id=6]
-[ext_resource path="res://Presentation/assets/Equipment/Gold.png" type="Texture" id=7]
+[ext_resource path="res://gd-inventory/resources/slot_bag.png" type="Texture" id=4]
+[ext_resource path="res://gd-inventory/EquipmentInventory.tscn" type="PackedScene" id=5]
+[ext_resource path="res://gd-inventory/BagInventoryPopup.cs" type="Script" id=6]
+[ext_resource path="res://gd-inventory/resources/Gold.png" type="Texture" id=7]
 
 [node name="BagInventoryPopup" instance=ExtResource( 1 )]
 script = ExtResource( 6 )

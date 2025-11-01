@@ -7,6 +7,8 @@
 [node name="Dead" instance=ExtResource( 1 )]
 texture_normal = ExtResource( 2 )
 script = ExtResource( 3 )
+Description = "You were near dead. \\nNow you should rest. \\nYou cant attack, dig or cut trees."
+TotalTime = 120.0
 
 [node name="Timer" parent="." index="0"]
 wait_time = 120.0
