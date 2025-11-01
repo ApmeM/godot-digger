@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,25 +6,20 @@ using Godot;
 [SceneReference("QuestPopup.tscn")]
 public partial class QuestPopup
 {
-    [Export]
-    public NodePath BagInventoryPath;
-
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
     }
 
-    public Task<bool> ShowQuestPopup(string description, List<QuestData> requirements, List<QuestData> rewards)
+    public Task<bool> ShowQuestPopup(string description, BagInventoryData inventory, List<QuestData> requirements, List<QuestData> rewards)
     {
         this.Content = description;
-        return ShowQuestPopup(requirements, rewards);
+        return ShowQuestPopup(inventory, requirements, rewards);
     }
 
-    public async Task<bool> ShowQuestPopup(List<QuestData> requirements, List<QuestData> rewards)
+    public async Task<bool> ShowQuestPopup(BagInventoryData inventory, List<QuestData> requirements, List<QuestData> rewards)
     {
-        var inventory = this.GetNode<BagInventoryPopup>(this.BagInventoryPath);
-
         this.requirementsList.RemoveChildren();
 
         var isEnough = true;

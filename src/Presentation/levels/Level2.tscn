@@ -130,8 +130,8 @@ z_index = 10
 curve = SubResource( 3 )
 
 [node name="BatPathForwardFollow" type="PathFollow2D" parent="Floor/BatPathForward" index="0"]
-position = Vector2( 248, 991 )
-rotation = -1.14321
+position = Vector2( 238, 1216 )
+rotation = -1.12126
 loop = false
 
 [node name="BatPathBack" type="Path2D" parent="Floor" index="16"]
@@ -140,8 +140,8 @@ z_index = 10
 curve = SubResource( 4 )
 
 [node name="BatPathBackFollow" type="PathFollow2D" parent="Floor/BatPathBack" index="0"]
-position = Vector2( 351, 42 )
-rotation = 2.36825
+position = Vector2( 350, 269 )
+rotation = 2.45294
 loop = false
 
 [node name="EnemyPath" type="Path2D" parent="Floor" index="17"]

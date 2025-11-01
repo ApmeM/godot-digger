@@ -83,6 +83,6 @@ public class LootDefinition
 
     public uint Price { get; set; }
     public Func<Game, Task<bool>> UseAction { get; set; }
-    public Action<Character> InventoryAction { get; set; }
-    public Action<Character> EquipAction { get; set; }
+    public Action<BaseUnit> InventoryAction { get; set; }
+    public Action<BaseUnit> EquipAction { get; set; }
 }

@@ -8,11 +8,6 @@ public partial class PotionLightBlue
     {
         Price = 1;
         MaxCount = 1;
-        UseAction = (level) =>
-        {
-            level.HeaderControl.CurrentStamina += 10;
-            return Task.FromResult(true);
-        };
         ItemType = ItemType.Potion;
     }
 

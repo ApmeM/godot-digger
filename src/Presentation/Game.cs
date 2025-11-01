@@ -19,57 +19,18 @@ public partial class Game
 
         ChangeLevel("Level2");
 
-        this.header.Connect(nameof(Header.InventoryButtonClicked), this, nameof(ShowInventoryPopup));
-        this.header.Connect(nameof(Header.BuffsChanged), this, nameof(BuffsChanged));
-        this.header.Connect(nameof(Header.Save), this, nameof(Save));
-        this.header.Connect(nameof(Header.Load), this, nameof(Load));
-        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.BagChanged), this, nameof(BagChanged));
-        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.EquipmentChanged), this, nameof(EquipmentChanged));
-        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.UseItem), this, nameof(InventoryUseItem));
-        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.InventoryChanged), this, nameof(EquipmentChanged));
+        this.quickSaveButton.Connect(CommonSignals.Pressed, this, nameof(QuickSaveClicked));
+        this.menuButton.Connect(CommonSignals.Pressed, this, nameof(MenuButtonClicked));
     }
 
-    protected async void InventoryUseItem(InventorySlot slot)
+    private void QuickSaveClicked()
     {
-        var tileId = slot.ItemId;
-        if (LootDefinition.LootById[tileId].UseAction != null)
-        {
-            var isUsed = await LootDefinition.LootById[tileId].UseAction(this);
-            if (isUsed)
-            {
-                slot.TryChangeCount(slot.ItemId, -1);
-            }
-        }
+        Save("quicksave");
     }
 
-    private void CharacteristicsChanged()
+    private void MenuButtonClicked()
     {
-        var character = new Character();
-        this.bagInventoryPopup.ApplyEquipment(character);
-        this.header.ApplyBuffs(character);
-
-        this.header.Character = character;
-        this.bagInventoryPopup.Size = character.BagSlots;
-    }
-
-    private void BuffsChanged()
-    {
-        CallDeferred(nameof(CharacteristicsChanged));
-    }
-
-    private void EquipmentChanged(InventorySlot slot, int itemId, int from, int to)
-    {
-        CallDeferred(nameof(CharacteristicsChanged));
-    }
-
-    private void BagChanged(int itemId, int from, int to)
-    {
-        CallDeferred(nameof(CharacteristicsChanged));
-    }
-
-    private void ShowInventoryPopup()
-    {
-        this.bagInventoryPopup.Show();
+        this.GetTree().ChangeScene("res://Presentation/Main.tscn");
     }
 
     public void GameOver()
@@ -88,31 +49,23 @@ public partial class Game
         }
         this.gamePosition.RemoveChildren();
         var levelScene = ResourceLoader.Load<PackedScene>($"res://Presentation/levels/{nextLevel}.tscn");
-        var game = levelScene.Instance<BaseLevel>();
-        game.HeaderControl = this.header;
-        game.BagInventoryPopup = this.bagInventoryPopup;
-        game.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
-        game.Connect(nameof(BaseLevel.GameOver), this, nameof(GameOver));
-        this.gamePosition.AddChild(game);
-        CurrentSave.CurrentLevel = game.Name;
+        var level = levelScene.Instance<BaseLevel>();
+        level.HeaderControl = this.header;
+        level.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
+        level.Connect(nameof(BaseLevel.GameOver), this, nameof(GameOver));
+        this.gamePosition.AddChild(level);
+        CurrentSave.CurrentLevel = level.Name;
         LoadCurrentDump();
-
-        CharacteristicsChanged();
     }
 
     private void LoadCurrentDump()
     {
         CurrentLevel.LoadLevelDump(CurrentSave.Levels.ContainsKey(CurrentLevel.Name) ? CurrentSave.Levels[CurrentLevel.Name] : null);
-        this.HeaderControl.LoadHeaderDump(CurrentSave.Header);
-        this.bagInventoryPopup.LoadInventoryDump(CurrentSave.Inventory);
     }
-
 
     private void UpdateCurrentDump()
     {
         CurrentSave.Levels[CurrentLevel.Name] = CurrentLevel.GetLevelDump();
-        CurrentSave.Header = this.HeaderControl.GetHeaderDump();
-        CurrentSave.Inventory = this.bagInventoryPopup.GetInventoryDump();
     }
 
     public void Save(string name)
@@ -150,5 +103,22 @@ public partial class Game
 
         ChangeLevel(this.CurrentSave.CurrentLevel);
         GD.Print("Loaded.");
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+        {
+            if ((KeyList)keyEvent.Scancode == KeyList.F2)
+            {
+                this.EmitSignal(nameof(Save), "quicksave");
+            }
+
+            if ((KeyList)keyEvent.Scancode == KeyList.F3)
+            {
+                this.EmitSignal(nameof(Load), "quicksave");
+            }
+        }
     }
 }

@@ -3,16 +3,21 @@ using Godot;
 [SceneReference("Dead.tscn")]
 public partial class Dead
 {
+    public Dead()
+    {
+        this.ApplyBuff = (character) =>
+        {
+            character.CanDig = false;
+        };
+        this.RemoveBuff  = (character) =>
+        {
+            character.CanDig = true;
+        };
+    }
+
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
-    }
-
-    public override string Description => "You were near dead. \nNow you should rest. \nYou cant attack, dig or cut trees.";
-
-    public override void ApplyBuff(Character character)
-    {
-        character.CanDig = false;
     }
 }
