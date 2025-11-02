@@ -108,9 +108,6 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     #region Loot
 
     [Export]
-    public List<PackedScene> Loot = new List<PackedScene>();
-
-    [Export]
     public bool GrabLoot;
 
     #endregion

@@ -312,7 +312,7 @@ public partial class Level2
             enemiesToSpawn.Enqueue(enemy);
         }
         var boss = BuildEnemy(nameof(OgreGray), startPosition, enemyMoveReasoner);
-        boss.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)), Instantiator.LoadLoot(nameof(Wood)) };
+        boss.Inventory.TryChangeCount(nameof(Wood), 1);
         enemiesToSpawn.Enqueue(boss);
     }
 
@@ -384,7 +384,8 @@ public partial class Level2
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
         enemy.PathFollow2DPath = this.enemyPathFollow.GetPath();
-        enemy.Loot = new List<PackedScene> { Instantiator.LoadLoot(nameof(Gold)) };
+        enemy.Inventory.Inventory.SlotsCount = 2;
+        enemy.Inventory.TryChangeCount(nameof(Gold), 1);
         enemy.ZIndex = 1;
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
@@ -395,9 +396,12 @@ public partial class Level2
 
     public async void DropLoot(BaseUnit unit)
     {
-        var loots = unit.Loot.Select(loot =>
+        var loots = unit.Inventory.Inventory.Slots
+            .Union(new[] { unit.Inventory.Money })
+            .Where(a => a.HasItem())
+            .Select(loot =>
         {
-            var newLoot = loot.Instance<BaseLoot>();
+            var newLoot = Instantiator.CreateLoot(loot.LootName);
             newLoot.Position = unit.Position;
             this.GetParent().AddChild(newLoot);
             return newLoot;
