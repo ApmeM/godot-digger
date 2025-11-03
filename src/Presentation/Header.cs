@@ -12,6 +12,7 @@ public partial class Header
         this.FillMembers();
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
+        this.bagInventoryPopup.Connect(nameof(CustomPopup.PopupClosed), this, nameof(CloseInventory));
         this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.UseItem), this, nameof(InventoryUseItem));
     }
 
@@ -80,8 +81,13 @@ public partial class Header
         this.staminaLabel.Text = character.MaxStamina.ToString();
     }
 
+    private void CloseInventory()
+    {
+        this.GetTree().Paused = false;
+    }
     private void OpenInventory()
     {
+        this.GetTree().Paused = true;
         this.bagInventoryPopup.Show();
     }
 }

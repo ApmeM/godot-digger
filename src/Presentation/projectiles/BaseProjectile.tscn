@@ -3,4 +3,5 @@
 [ext_resource path="res://Presentation/projectiles/BaseProjectile.cs" type="Script" id=1]
 
 [node name="BaseProjectile" type="Node2D"]
+pause_mode = 1
 script = ExtResource( 1 )

@@ -534,9 +534,9 @@ tracks/0/keys = {
 }
 
 [node name="BaseUnit" type="Node2D"]
+pause_mode = 1
 script = ExtResource( 1 )
 AttackDelay = 1.0
-LevelPath = NodePath("")
 
 [node name="Healthbar" parent="." instance=ExtResource( 2 )]
 visible = false

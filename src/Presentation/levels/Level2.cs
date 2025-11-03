@@ -318,6 +318,11 @@ public partial class Level2
 
     private void TickWave(float delta)
     {
+        if (this.GetTree().Paused)
+        {
+            return;
+        }
+        
         if (spawnTimeout > 0.5f / HeaderControl.TrackingUnit.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
         {
             spawnTimeout = 0;
