@@ -48,7 +48,7 @@ public class BuffsListData
         this.BuffsChanged?.Invoke();
     }
 
-    public void ApplyBuffs(BaseUnit character)
+    public void ApplyBuffs(BaseUnit.EffectiveCharacteristics character)
     {
         foreach (var buff in buffs)
         {

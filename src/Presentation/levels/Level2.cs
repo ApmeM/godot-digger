@@ -73,7 +73,7 @@ public class FollowPathIntent : IIntent<BaseUnit>
     {
         context.StartMoveAnimation();
         var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
-        this.MoveOffset += context.MoveSpeed * moveContext.Delta * this.mage.EnemySpeedCoeff;
+        this.MoveOffset += context.MoveSpeed * moveContext.Delta * this.mage.Character.EnemySpeedCoeff;
         var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
         pathPosition.Offset = this.MoveOffset;
         var oldPosition = context.Position;
@@ -322,7 +322,7 @@ public partial class Level2
         {
             return;
         }
-        
+
         if (spawnTimeout > 0.5f / HeaderControl.TrackingUnit.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
         {
             spawnTimeout = 0;
@@ -389,7 +389,7 @@ public partial class Level2
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
         enemy.PathFollow2DPath = this.enemyPathFollow.GetPath();
-        enemy.Inventory.Inventory.SlotsCount = 2;
+        enemy.InitialSlotsCount = 2;
         enemy.Inventory.TryChangeCount(nameof(Gold), 1);
         enemy.ZIndex = 1;
         enemy.AddToGroup(Groups.Enemy);
@@ -529,16 +529,16 @@ public partial class Level2
             .Take(5)
             .Select(enemy =>
             {
-                if (enemy.HP <= this.mage.AttackPower)
+                if (enemy.HP <= this.mage.Character.AttackPower)
                 {
                     enemy.RemoveFromGroup(Groups.AttackingEnemy);
                 }
-                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, this.mage.AttackPower));
+                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, this.mage.Character.AttackPower));
             })
             .ToArray();
 
         this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
-        this.mage.AddBuff(nameof(SlowDown));
+        this.mage.Buffs.AddBuff(nameof(SlowDown));
         this.HeaderControl.UpdateTrackingUnit();
     }
 }

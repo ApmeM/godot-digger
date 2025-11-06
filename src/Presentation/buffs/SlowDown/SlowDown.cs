@@ -9,10 +9,6 @@ public partial class SlowDown
         {
             character.EnemySpeedCoeff /= 2f;
         };
-        this.RemoveBuff = (character) =>
-        {
-            character.EnemySpeedCoeff *= 2f;
-        };
     }
 
     public override void _Ready()

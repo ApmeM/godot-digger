@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Godot;
 
 [SceneReference("Header.tscn")]
@@ -85,6 +87,7 @@ public partial class Header
     {
         this.GetTree().Paused = false;
     }
+
     private void OpenInventory()
     {
         this.GetTree().Paused = true;

@@ -9,10 +9,6 @@ public partial class Dead
         {
             character.CanDig = false;
         };
-        this.RemoveBuff  = (character) =>
-        {
-            character.CanDig = true;
-        };
     }
 
     public override void _Ready()

@@ -12,8 +12,7 @@ public partial class BaseBuff
     [Export]
     public float TotalTime { get; set; } = 1;
 
-    public Action<BaseUnit> ApplyBuff { get; set; }
-    public Action<BaseUnit> RemoveBuff { get; set; }
+    public Action<BaseUnit.EffectiveCharacteristics> ApplyBuff { get; set; }
 
     public override void _Ready()
     {

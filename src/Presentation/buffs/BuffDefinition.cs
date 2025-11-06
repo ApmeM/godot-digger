@@ -56,7 +56,6 @@ public class BuffDefinition
                 Name = dirname,
                 Description = scene.Description,
                 ApplyBuff = scene.ApplyBuff,
-                RemoveBuff = scene.RemoveBuff,
                 TotalTime = scene.TotalTime
             };
             resByName.Add(dirname, definition);
@@ -73,6 +72,5 @@ public class BuffDefinition
     public string Name;
     public string Description;
     public double TotalTime;
-    public Action<BaseUnit> ApplyBuff;
-    public Action<BaseUnit> RemoveBuff;
+    public Action<BaseUnit.EffectiveCharacteristics> ApplyBuff;
 }

@@ -6,14 +6,9 @@ using System.Linq;
 public class InventoryData
 {
     public event Action SlotsCountChanged;
+    public event Action SlotContentChanged;
 
-    private InventorySlotData[] slots = new[]
-    {
-        new InventorySlotData(),
-        new InventorySlotData(),
-        new InventorySlotData(),
-        new InventorySlotData()
-    };
+    private InventorySlotData[] slots = new InventorySlotData[0];
     public InventorySlotData[] Slots => this.slots;
 
     public uint SlotsCount
@@ -32,6 +27,11 @@ public class InventoryData
                 this.slots = this.slots.Where(a => a.HasItem()).ToArray();
             }
 
+            foreach (var slot in slots)
+            {
+                slot.SlotContentChanged -= this.SlotContentChanged;
+            }
+
             // WARNING: may loose items. Should be handled outside
             Array.Resize(ref this.slots, (int)value);
             for (var i = 0; i < value; i++)
@@ -41,6 +41,12 @@ public class InventoryData
                     this.slots[i] = new InventorySlotData();
                 }
             }
+
+            foreach (var slot in slots)
+            {
+                slot.SlotContentChanged += this.SlotContentChanged;
+            }
+            
             SlotsCountChanged?.Invoke();
         }
     }

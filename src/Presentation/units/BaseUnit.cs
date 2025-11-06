@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using BrainAI.AI;
 using BrainAI.AI.UtilityAI;
 using Godot;
@@ -7,6 +6,7 @@ using Godot;
 [SceneReference("BaseUnit.tscn")]
 public partial class BaseUnit : IIntentContainer<BaseUnit>
 {
+
     #region Attack
 
     [Export]
@@ -110,6 +110,21 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     [Export]
     public bool GrabLoot;
 
+    public BagInventoryData Inventory = new BagInventoryData();
+
+    private uint initialSlotsCount;
+
+    [Export]
+    public uint InitialSlotsCount
+    {
+        set
+        {
+            this.initialSlotsCount = value;
+            RecalculateEffectiveValues();
+        }
+        get => this.initialSlotsCount;
+    }
+
     #endregion
 
     #region Defence
@@ -171,6 +186,18 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #region Basic characteristics
 
+
+    public class EffectiveCharacteristics
+    {
+        public float EnemySpeedCoeff;
+        public int AttackPower;
+        public float MaxStamina;
+        public float StaminaRecoverySeconds;
+        public uint SlotsCount;
+        public bool CanDig;
+    }
+    public EffectiveCharacteristics Character = new EffectiveCharacteristics();
+
     public uint MaxStamina = 10;
     public float StaminaRecoverySeconds = 20;
     public bool CanDig = true;
@@ -179,27 +206,34 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     public BuffsListData Buffs = new BuffsListData();
 
-    public void AddBuff(string buffName)
-    {
-        var buff = Buffs.AddBuff(buffName);
-        buff.BuffDefinition.ApplyBuff(this);
-        buff.OnBuffRemoved += this.RemoveBuff;
-    }
-
-    private void RemoveBuff(BuffData buff)
-    {
-        buff.BuffDefinition.RemoveBuff(this);
-        buff.OnBuffRemoved -= this.RemoveBuff;
-    }
-
-    public BagInventoryData Inventory = new BagInventoryData();
-
     #endregion
 
     public IAITurn AutomaticActionGenerator;
     public IContext AutomaticActionGeneratorContext;
 
     public IIntent<BaseUnit> Intent { get; set; }
+
+    public BaseUnit()
+    {
+        this.Inventory.SlotContentChanged += this.RecalculateEffectiveValues;
+        this.Buffs.BuffsChanged += this.RecalculateEffectiveValues;
+        RecalculateEffectiveValues();
+    }
+
+    private void RecalculateEffectiveValues()
+    {
+        this.Character.EnemySpeedCoeff = this.EnemySpeedCoeff;
+        this.Character.AttackPower = this.AttackPower;
+        this.Character.MaxStamina = this.MaxStamina;
+        this.Character.StaminaRecoverySeconds = this.StaminaRecoverySeconds;
+        this.Character.SlotsCount = this.InitialSlotsCount;
+        this.Character.CanDig = this.CanDig;
+
+        this.Inventory.Inventory.SlotsCount = this.Character.SlotsCount;
+
+        this.Inventory.ApplyEquipment(this.Character);
+        this.Buffs.ApplyBuffs(this.Character);
+    }
 
     [Signal]
     public delegate void Clicked();

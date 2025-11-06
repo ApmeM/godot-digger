@@ -9,10 +9,6 @@ public partial class StaminaRegen
         {
             character.StaminaRecoverySeconds -= 15;
         };
-        this.RemoveBuff = (character) =>
-        {
-            character.StaminaRecoverySeconds += 15;
-        };
     }
     public override void _Ready()
     {

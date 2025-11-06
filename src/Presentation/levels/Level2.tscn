@@ -166,6 +166,7 @@ current = true
 position = Vector2( 297, 1004 )
 z_index = 1
 AttackDelay = 0.5
+InitialSlotsCount = 4
 MaxHP = 3
 HP = 3
 AttackPower = 10

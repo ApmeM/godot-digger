@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 public class EquipmentInventoryData
 {
+    public event Action SlotContentChanged;
+    
     public InventorySlotData Neck = new InventorySlotData(string.Empty, 0, new HashSet<ItemType> { ItemType.Neck });
     public InventorySlotData Helm = new InventorySlotData(string.Empty, 0, new HashSet<ItemType> { ItemType.Helm });
     public InventorySlotData Weapon = new InventorySlotData(string.Empty, 0, new HashSet<ItemType> { ItemType.Weapon });
@@ -19,6 +22,11 @@ public class EquipmentInventoryData
     public EquipmentInventoryData()
     {
         this.All = new InventorySlotData[] { Neck, Helm, Weapon, Chest, Shield, Ring1, Belt, Ring2, Pants, Boots };
+
+        foreach (var slot in this.All)
+        {
+            slot.SlotContentChanged -= this.SlotContentChanged;
+        }
     }
 
     public List<InventorySlotData> GetItems()

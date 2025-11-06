@@ -9,7 +9,7 @@ public partial class Wood
         MaxCount = 1;
         ItemType = ItemType.Weapon;
         EquipAction = (c) => c.AttackPower += 1;
-        InventoryAction = (c) => c.EnemySpeedCoeff = 0.1f;
+        InventoryAction = (c) => c.EnemySpeedCoeff /= 2f;
     }
 
     public override void _Ready()
