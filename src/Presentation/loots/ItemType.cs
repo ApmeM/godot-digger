@@ -1,5 +1,6 @@
 public enum ItemType
 {
+    None = 0,
     Neck = 1,
     Helm = 2,
     Weapon = 3,

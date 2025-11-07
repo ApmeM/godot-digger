@@ -6,8 +6,6 @@ public partial class PotionEmpty
 {
     public PotionEmpty()
     {
-        Price = 1;
-        MaxCount = 1;
         MergeActions = new Dictionary<string, string>{
             {nameof(PlantBlue), nameof(PotionBlue)},
             {nameof(PlantBrown), nameof(PotionBrown)},

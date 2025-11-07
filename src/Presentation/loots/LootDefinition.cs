@@ -54,7 +54,8 @@ public class LootDefinition
             {
                 Image = texture,
                 Id = id,
-                Name = dirname,
+                Name = scene.LootName,
+                Description = scene.LootDescription,
                 ItemType = scene.ItemType,
                 MaxCount = scene.MaxCount,
                 MergeActions = scene.MergeActions,
@@ -75,13 +76,12 @@ public class LootDefinition
     public int Id;
     public Texture Image;
     public string Name;
-    public Dictionary<string, string> MergeActions = new Dictionary<string, string>();
-
+    public string Description;
     public int MaxCount;
-
     public ItemType ItemType { get; set; }
-
     public uint Price { get; set; }
+
+    public Dictionary<string, string> MergeActions = new Dictionary<string, string>();
     public Func<Game, Task<bool>> UseAction { get; set; }
     public Action<BaseUnit.EffectiveCharacteristics> InventoryAction { get; set; }
     public Action<BaseUnit.EffectiveCharacteristics> EquipAction { get; set; }

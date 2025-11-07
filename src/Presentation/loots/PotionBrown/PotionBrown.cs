@@ -5,8 +5,6 @@ public partial class PotionBrown
 {
     public PotionBrown()
     {
-        this.Price = 1;
-        this.MaxCount = 1;
         this.UseAction = async (game) =>
         {
             game.HeaderControl.BagInventoryPopup.Hide();

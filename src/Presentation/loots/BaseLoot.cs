@@ -11,13 +11,19 @@ public partial class BaseLoot
 
     public string LootName => this.GetType().Name;
 
-    public Dictionary<string, string> MergeActions = new Dictionary<string, string>();
+    [Export]
+    public string LootDescription = "Default loot description.";
 
+    [Export]
     public int MaxCount;
-    
+
+    [Export]
     public ItemType ItemType { get; set; }
 
+    [Export]
     public uint Price { get; set; }
+
+    public Dictionary<string, string> MergeActions = new Dictionary<string, string>();
     public Func<Game, Task<bool>> UseAction { get; set; }
     public Action<BaseUnit.EffectiveCharacteristics> EquipAction { get; set; }
     public Action<BaseUnit.EffectiveCharacteristics> InventoryAction { get; set; }
@@ -29,11 +35,24 @@ public partial class BaseLoot
 
         this.AddToGroup(Groups.Loot);
 
-        this.texture.Connect(CommonSignals.Pressed, this, nameof(LootTextureClicked));
+        this.texture.Connect(CommonSignals.GuiInput, this, nameof(LootTextureClicked));
     }
 
-    private void LootTextureClicked()
+    public void LootTextureClicked(InputEvent @event)
     {
-        this.EmitSignal(nameof(LootClicked));
+        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
+        {
+            switch ((ButtonList)mouseEvent.ButtonIndex)
+            {
+                case ButtonList.Left:
+                    this.EmitSignal(nameof(LootClicked));
+                    break;
+
+                case ButtonList.Right:
+                    this.buffDescriptionLabel.Text = LootDescription;
+                    this.lootPopup.Show();
+                    break;
+            }
+        }
     }
 }

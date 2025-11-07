@@ -5,9 +5,6 @@ public partial class Bag3
 {
     public Bag3()
     {
-        Price = 1;
-        MaxCount = 1;
-        ItemType = ItemType.Bag;
         EquipAction = (c) => c.SlotsCount += 3;
     }
 

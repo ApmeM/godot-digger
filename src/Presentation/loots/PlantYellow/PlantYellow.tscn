@@ -6,8 +6,13 @@
 
 [node name="PlantYellow" instance=ExtResource( 3 )]
 script = ExtResource( 2 )
+Price = 1
+LootDescription = "Yellow plant"
+MaxCount = 1
 
 [node name="Texture" parent="." index="0"]
-margin_top = -48.0
-margin_right = 48.0
+margin_top = -16.0
+margin_right = 16.0
 texture_normal = ExtResource( 4 )
+
+[editable path="LootPopup"]

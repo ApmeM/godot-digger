@@ -6,8 +6,14 @@
 
 [node name="ChestCloth" instance=ExtResource( 3 )]
 script = ExtResource( 2 )
+ItemType = 4
+Price = 1
+LootDescription = "Linen cloth."
+MaxCount = 1
 
 [node name="Texture" parent="." index="0"]
 margin_top = -48.0
 margin_right = 48.0
 texture_normal = ExtResource( 4 )
+
+[editable path="LootPopup"]

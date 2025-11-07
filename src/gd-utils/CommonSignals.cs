@@ -1,5 +1,6 @@
 public class CommonSignals
 {
+    public static string GuiInput = "gui_input";
     public static string Pressed = "pressed";
     public static string Timeout = "timeout";
     public static string ScreenExited = "screen_exited";
