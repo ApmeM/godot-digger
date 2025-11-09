@@ -59,7 +59,10 @@ public partial class InventorySlot
     }
 
     [Signal]
-    public delegate void UseItem();
+    public delegate void SlotItemDoubleClicked(InventorySlot slot);
+
+    [Signal]
+    public delegate void SlotItemRightClicked(InventorySlot slot);
 
     [Signal]
     public delegate void DragOnAnotherItemType(InventorySlot from, InventorySlot to);
@@ -113,7 +116,18 @@ public partial class InventorySlot
 
         if (mouse.Doubleclick)
         {
-            this.EmitSignal(nameof(UseItem));
+            this.EmitSignal(nameof(SlotItemDoubleClicked), this);
+            return;
+        }
+        
+        if (mouse.Pressed)
+        {
+            switch ((ButtonList)mouse.ButtonIndex)
+            {
+                case ButtonList.Right:
+                    this.EmitSignal(nameof(SlotItemRightClicked), this);
+                    break;
+            }
         }
     }
 

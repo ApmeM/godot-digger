@@ -52,4 +52,40 @@ text = "Left click: Select position
 Right click: Cancel"
 align = 1
 
+[node name="LootPopup" parent="." instance=ExtResource( 1 )]
+visible = false
+Title = "Loot"
+
+[node name="HeaderMargin" parent="LootPopup/CustomPopupContainer/HeaderCenter" index="0"]
+margin_right = 181.0
+
+[node name="TitleBackground" parent="LootPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 54.0
+
+[node name="TitleMargin" parent="LootPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 54.0
+
+[node name="TitleLabel" parent="LootPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 44.0
+text = "Loot"
+
+[node name="LootDefinitionContainer" type="HBoxContainer" parent="LootPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 281.0
+margin_bottom = 79.0
+
+[node name="LootDescriptionImage" type="TextureRect" parent="LootPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/LootDefinitionContainer"]
+margin_bottom = 70.0
+
+[node name="LootDescriptionLabel" type="Label" parent="LootPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/LootDefinitionContainer"]
+margin_left = 4.0
+margin_top = 28.0
+margin_right = 31.0
+margin_bottom = 42.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Text"
+align = 1
+
 [editable path="SelectPosition"]
+[editable path="LootPopup"]

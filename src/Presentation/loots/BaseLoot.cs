@@ -7,7 +7,9 @@ using Godot;
 public partial class BaseLoot
 {
     [Signal]
-    public delegate void LootClicked();
+    public delegate void LootLeftClicked();
+    [Signal]
+    public delegate void LootRightClicked();
 
     public string LootName => this.GetType().Name;
 
@@ -45,12 +47,11 @@ public partial class BaseLoot
             switch ((ButtonList)mouseEvent.ButtonIndex)
             {
                 case ButtonList.Left:
-                    this.EmitSignal(nameof(LootClicked));
+                    this.EmitSignal(nameof(LootLeftClicked));
                     break;
 
                 case ButtonList.Right:
-                    this.buffDescriptionLabel.Text = LootDescription;
-                    this.lootPopup.Show();
+                    this.EmitSignal(nameof(LootRightClicked));
                     break;
             }
         }

@@ -3,6 +3,12 @@ using Godot;
 [SceneReference("EquipmentInventory.tscn")]
 public partial class EquipmentInventory
 {
+    [Signal]
+    public delegate void SlotItemDoubleClicked(InventorySlot slot);
+
+    [Signal]
+    public delegate void SlotItemRightClicked(InventorySlot slot);
+
     private EquipmentInventoryData slotData = new EquipmentInventoryData();
     public EquipmentInventoryData SlotData
     {
@@ -18,9 +24,36 @@ public partial class EquipmentInventory
         }
     }
 
+    private void SlotItemDoubleClickedHandler(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(SlotItemDoubleClicked), slot);
+    }
+    private void SlotItemRightClickedHandler(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(SlotItemRightClicked), slot);
+    }
+
     public override void _Ready()
     {
         RefreshFromDump();
+        var all = new[]{
+            this.neckSlot,
+            this.helmSlot,
+            this.weaponSlot,
+            this.chestSlot,
+            this.shieldSlot,
+            this.ring1Slot,
+            this.beltSlot,
+            this.ring2Slot,
+            this.pantsSlot,
+            this.bootsSlot
+        };
+
+        foreach (var slot in all)
+        {
+            slot.Connect(nameof(InventorySlot.SlotItemDoubleClicked), this, nameof(SlotItemDoubleClickedHandler));
+            slot.Connect(nameof(InventorySlot.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
+        }
     }
 
     public void RefreshFromDump()

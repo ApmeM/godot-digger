@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Godot;
 
 [SceneReference("Header.tscn")]
@@ -15,7 +13,7 @@ public partial class Header
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
         this.bagInventoryPopup.Connect(nameof(CustomPopup.PopupClosed), this, nameof(CloseInventory));
-        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.UseItem), this, nameof(InventoryUseItem));
+        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(InventoryUseItem));
     }
 
     protected async void InventoryUseItem(InventorySlot inventorySlot)
@@ -24,7 +22,7 @@ public partial class Header
 
         if (slot.LootDefinition?.UseAction != null)
         {
-            var isUsed = await slot.LootDefinition.UseAction(this.GetParent<Game>());
+            var isUsed = await slot.LootDefinition.UseAction?.Invoke(this.GetParent<Game>());
             if (isUsed)
             {
                 slot.TryChangeCount(slot.LootName, -1);

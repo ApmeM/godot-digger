@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 [SceneReference("BagInventoryPopup.tscn")]
@@ -19,22 +20,36 @@ public partial class BagInventoryPopup
     }
 
     [Signal]
-    public delegate void UseItem(InventorySlot slot);
+    public delegate void SlotItemDoubleClicked(InventorySlot slot);
+
+    [Signal]
+    public delegate void SlotItemRightClicked(InventorySlot slot);
 
     public override void _Ready()
     {
         base._Ready();
         this.FillMembers();
 
-        this.bagInventory.Connect(nameof(Inventory.UseItem), this, nameof(InventoryUseItem));
         this.bagInventory.Connect(nameof(Inventory.DragOnAnotherItemType), this, nameof(InventoryTryMergeItems));
+        this.bagInventory.Connect(nameof(Inventory.SlotItemDoubleClicked), this, nameof(SlotItemDoubleClickedHandler));
+        this.bagInventory.Connect(nameof(Inventory.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
+        this.equipmentInventory.Connect(nameof(EquipmentInventory.SlotItemDoubleClicked), this, nameof(SlotItemDoubleClickedHandler));
+        this.equipmentInventory.Connect(nameof(EquipmentInventory.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
+        this.bagSlot.Connect(nameof(InventorySlot.SlotItemDoubleClicked), this, nameof(SlotItemDoubleClickedHandler));
+        this.bagSlot.Connect(nameof(InventorySlot.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
+        this.moneySlot.Connect(nameof(InventorySlot.SlotItemDoubleClicked), this, nameof(SlotItemDoubleClickedHandler));
+        this.moneySlot.Connect(nameof(InventorySlot.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
 
         RefreshFromDump();
     }
 
-    protected void InventoryUseItem(InventorySlot slot)
+    private void SlotItemDoubleClickedHandler(InventorySlot slot)
     {
-        this.EmitSignal(nameof(UseItem), slot);
+        this.EmitSignal(nameof(SlotItemDoubleClicked), slot);
+    }
+    private void SlotItemRightClickedHandler(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(SlotItemRightClicked), slot);
     }
 
     protected void InventoryTryMergeItems(InventorySlot fromSlot, InventorySlot toSlot)

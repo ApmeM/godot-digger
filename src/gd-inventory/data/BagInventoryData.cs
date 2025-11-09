@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 public class BagInventoryData
 {
@@ -61,7 +62,7 @@ public class BagInventoryData
 
         foreach (var loot in equipments)
         {
-            loot.EquipAction(character);
+            loot.EquipAction?.Invoke(character);
         }
 
         var inventories = this.Inventory.Slots
@@ -71,12 +72,12 @@ public class BagInventoryData
 
         foreach (var loot in inventories)
         {
-            loot.InventoryAction(character);
+            loot.InventoryAction?.Invoke(character);
         }
 
         if (this.Bag.HasItem())
         {
-            this.Bag.LootDefinition.EquipAction(character);
+            this.Bag.LootDefinition.EquipAction?.Invoke(character);
         }
     }
 }

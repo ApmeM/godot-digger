@@ -29,7 +29,10 @@ public partial class Inventory
     public PackedScene InventorySlotScene;
 
     [Signal]
-    public delegate void UseItem(InventorySlot slot);
+    public delegate void SlotItemDoubleClicked(InventorySlot slot);
+
+    [Signal]
+    public delegate void SlotItemRightClicked(InventorySlot slot);
 
     [Signal]
     public delegate void DragOnAnotherItemType(InventorySlot from, InventorySlot to);
@@ -58,9 +61,13 @@ public partial class Inventory
         set => this.slotData.SlotsCount = value;
     }
 
-    private void SlotUseItem(InventorySlot slot)
+    private void SlotItemDoubleClickedHandler(InventorySlot slot)
     {
-        this.EmitSignal(nameof(UseItem), slot);
+        this.EmitSignal(nameof(SlotItemDoubleClicked), slot);
+    }
+    private void SlotItemRightClickedHandler(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(SlotItemRightClicked), slot);
     }
 
     private void SlotDragOnAnotherItemType(InventorySlot from, InventorySlot to)
@@ -127,7 +134,8 @@ public partial class Inventory
             var slot = this.InventorySlotScene.Instance<InventorySlot>();
             slot.SlotData = this.slotData.Slots[i];
             this.slotContainer.AddChild(slot);
-            slot.Connect(nameof(InventorySlot.UseItem), this, nameof(SlotUseItem), new Godot.Collections.Array { slot });
+            slot.Connect(nameof(InventorySlot.SlotItemDoubleClicked), this, nameof(SlotItemDoubleClickedHandler));
+            slot.Connect(nameof(InventorySlot.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
             slot.Connect(nameof(InventorySlot.DragOnAnotherItemType), this, nameof(SlotDragOnAnotherItemType));
         }
     }

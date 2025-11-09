@@ -36,6 +36,26 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
         // this.achievementNotifications.UnlockAchievement("MyFirstAchievement");
 
         this.AddToGroup(Groups.LevelScene);
+
+        this.HeaderControl.BagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(InventorySlotLeftClicked));
+
+        foreach (BaseLoot loot in this.GetTree().GetNodesInGroup(Groups.Loot))
+        {
+            loot.Connect(nameof(BaseLoot.LootRightClicked), this, nameof(ShowLootPopup), new Godot.Collections.Array { loot.LootName });
+        }
+    }
+
+    private void InventorySlotLeftClicked(InventorySlot slot)
+    {
+        ShowLootPopup(slot.Loot.Item1);
+    }
+
+    private void ShowLootPopup(string lootName)
+    {
+        var loot = LootDefinition.LootByName[lootName];
+        this.lootDescriptionLabel.Text = loot.Description;
+        this.lootDescriptionImage.Texture = loot.Image;
+        this.lootPopup.Show();
     }
 
     public void SetCameraLimits(Camera2D camera2D)
