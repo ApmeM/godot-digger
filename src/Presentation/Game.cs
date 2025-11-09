@@ -6,7 +6,6 @@ public partial class Game
 {
     private LevelData CurrentSave = new LevelData();
 
-    public Header HeaderControl => this.header;
     public BaseLevel CurrentLevel => this.gamePosition.GetChildCount() > 0 ? this.gamePosition.GetChild<BaseLevel>(0) : null;
 
     public override void _Ready()
@@ -17,28 +16,7 @@ public partial class Game
         // For debug purposes all achievements can be reset
         // this.di.localAchievementRepository.ResetAchievements();
 
-        ChangeLevel("Level2");
-
-        this.quickSaveButton.Connect(CommonSignals.Pressed, this, nameof(QuickSaveClicked));
-        this.menuButton.Connect(CommonSignals.Pressed, this, nameof(MenuButtonClicked));
-    }
-
-    private void QuickSaveClicked()
-    {
-        Save("quicksave");
-    }
-
-    private void MenuButtonClicked()
-    {
-        this.GetTree().ChangeScene("res://Presentation/Main.tscn");
-    }
-
-    public void GameOver()
-    {
-        if (this.IsInsideTree())
-        {
-            this.GetTree().ChangeScene("res://Presentation/Main.tscn");
-        }
+        ChangeLevel("LevelMenu");
     }
 
     public void ChangeLevel(string nextLevel)
@@ -50,9 +28,7 @@ public partial class Game
         this.gamePosition.RemoveChildren();
         var levelScene = ResourceLoader.Load<PackedScene>($"res://Presentation/levels/{nextLevel}.tscn");
         var level = levelScene.Instance<BaseLevel>();
-        level.HeaderControl = this.header;
         level.Connect(nameof(BaseLevel.ChangeLevel), this, nameof(ChangeLevel));
-        level.Connect(nameof(BaseLevel.GameOver), this, nameof(GameOver));
         this.gamePosition.AddChild(level);
         CurrentSave.CurrentLevel = level.Name;
         LoadCurrentDump();
@@ -90,7 +66,7 @@ public partial class Game
         if (!f.FileExists($"user://SaveLevel_{name}.dat"))
         {
             this.CurrentSave = new LevelData();
-            ChangeLevel("Level1");
+            ChangeLevel("LevelMenu");
             return;
         }
 

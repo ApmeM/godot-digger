@@ -7,13 +7,13 @@ public partial class PotionBrown
     {
         this.UseAction = async (game) =>
         {
-            game.HeaderControl.BagInventoryPopup.Hide();
+            game.CurrentLevel.HeaderControl.BagInventoryPopup.Hide();
             var pos = await game.CurrentLevel.ChoosePosition();
             if (pos != null)
             {
                 game.CurrentLevel.AddUnit(pos.Value, nameof(Tree));
             }
-            game.HeaderControl.BagInventoryPopup.Show();
+            game.CurrentLevel.HeaderControl.BagInventoryPopup.Show();
             return pos != null;
         };
     }

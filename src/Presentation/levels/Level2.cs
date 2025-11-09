@@ -230,7 +230,7 @@ public partial class Level2
         this.dragonRedInitialPosition = this.dragonRed.Position;
         this.dragonGoldInitialPosition = this.dragonGold.Position;
 
-        this.HeaderControl.TrackingUnit = this.mage;
+        this.header.TrackingUnit = this.mage;
     }
 
     private void ToBattleClicked()
@@ -323,7 +323,7 @@ public partial class Level2
             return;
         }
 
-        if (spawnTimeout > 0.5f / HeaderControl.TrackingUnit.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
+        if (spawnTimeout > 0.5f / this.header.TrackingUnit.EnemySpeedCoeff && enemiesToSpawn.Count > 0)
         {
             spawnTimeout = 0;
             var enemy = enemiesToSpawn.Dequeue();
@@ -371,7 +371,7 @@ public partial class Level2
         }
 
         this.mage.Buffs.Clear();
-        this.HeaderControl.UpdateTrackingUnit();
+        this.header.UpdateTrackingUnit();
 
         this.dragonBlue.Intent = new MoveToPointIntent(this.dragonBlueInitialPosition);
         this.dragonRed.Intent = new MoveToPointIntent(this.dragonRedInitialPosition);
@@ -537,6 +537,6 @@ public partial class Level2
 
         this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
         this.mage.Buffs.AddBuff(nameof(SlowDown));
-        this.HeaderControl.UpdateTrackingUnit();
+        this.header.UpdateTrackingUnit();
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
 using System.Threading.Tasks;
 using BrainAI.Pathfinding;
 using Godot;
@@ -11,9 +10,6 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 {
     [Signal]
     public delegate void ChangeLevel(string nextLevel);
-
-    [Signal]
-    public delegate void GameOver();
 
     public readonly Vector2[] moveDirections = new Vector2[] {
         Vector2.Down,
@@ -26,7 +22,7 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
         Vector2.Right + Vector2.Down,
     };
 
-    public Header HeaderControl;
+    public Header HeaderControl => this.header;
 
     public override void _Ready()
     {
@@ -37,7 +33,7 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 
         this.AddToGroup(Groups.LevelScene);
 
-        this.HeaderControl.BagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(InventorySlotLeftClicked));
+        this.header.BagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(InventorySlotLeftClicked));
 
         foreach (BaseLoot loot in this.GetTree().GetNodesInGroup(Groups.Loot))
         {
