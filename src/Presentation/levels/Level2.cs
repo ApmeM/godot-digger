@@ -409,6 +409,7 @@ public partial class Level2
             var newLoot = Instantiator.CreateLoot(loot.LootName);
             newLoot.Position = unit.Position;
             this.GetParent().AddChild(newLoot);
+            this.mage.Inventory.TryChangeCount(newLoot.LootName, 1);
             return newLoot;
         }).ToList();
 
@@ -422,10 +423,7 @@ public partial class Level2
 
             await tween.ToMySignal(CommonSignals.Finished);
 
-            if (this.mage.Inventory.TryChangeCount(newLoot.LootName, 1) == 0)
-            {
-                newLoot.QueueFree();
-            }
+            newLoot.QueueFree();
         }
     }
 
