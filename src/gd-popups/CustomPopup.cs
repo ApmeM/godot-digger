@@ -7,21 +7,8 @@ public partial class CustomPopup
     [Signal]
     public delegate void PopupClosed();
 
-    private bool closeOnClickOutside = true;
-
     [Export]
-    public bool CloseOnClickOutside
-    {
-        get => closeOnClickOutside;
-        set
-        {
-            closeOnClickOutside = value;
-            if (this.IsInsideTree())
-            {
-                this.outsidePopupButton.Disabled = !value;
-            }
-        }
-    }
+    public bool CloseOnClickOutside { get; set; } = true;
 
     private bool closeOnClickButton;
 
@@ -62,15 +49,29 @@ public partial class CustomPopup
 
         this.Title = this.title;
         this.CloseOnClickButton = this.closeOnClickButton;
-        this.CloseOnClickOutside = this.closeOnClickOutside;
 
-        this.closeButton.Connect(CommonSignals.Pressed, this, nameof(Close));
-        this.outsidePopupButton.Connect(CommonSignals.Pressed, this, nameof(Close));
+        this.closeButton.Connect(CommonSignals.Pressed, this, nameof(CloseButton));
+        this.outsidePopupButton.Connect(CommonSignals.Pressed, this, nameof(CloseOutside));
 
 #if DEBUG
         this.GetTree().EditedSceneRoot?.SetEditableInstance(this, true);
         this.SetDisplayFolded(true);
 #endif
+    }
+
+    private void CloseButton()
+    {
+        if (this.CloseOnClickButton)
+        {
+            this.Close();
+        }
+    }
+    private void CloseOutside()
+    {
+        if (this.CloseOnClickOutside)
+        {
+            this.Close();
+        }
     }
 
     public virtual void Close()

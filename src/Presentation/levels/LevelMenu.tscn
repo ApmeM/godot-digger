@@ -24,6 +24,9 @@ visible = false
 [node name="Header" parent="." index="3"]
 visible = false
 
+[node name="SelectPosition" parent="." index="4"]
+CloseOnClickOutside = true
+
 [node name="Backround" type="TextureRect" parent="." index="6"]
 margin_left = -1.0
 margin_right = 479.0

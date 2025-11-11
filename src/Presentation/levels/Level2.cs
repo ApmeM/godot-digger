@@ -233,39 +233,8 @@ public partial class Level2
         this.header.TrackingUnit = this.mage;
 
         this.cocoon.Connect(nameof(BaseUnit.Clicked), this, nameof(CocoonClicked), new Godot.Collections.Array { this.cocoon });
-        this.dialogNextButton.Connect(CommonSignals.Pressed, this, nameof(NextDialogText));
     }
 
-
-    private readonly Queue<string> dialogTexts = new Queue<string>();
-    private void NextDialogText()
-    {
-        var text = this.dialogTexts.Peek();
-
-        if (this.dialogLabel.Text != text)
-        {
-            this.dialogLabel.Text = text;
-            this.dialogLabel.Start();
-            return;
-        }
-
-        if (this.dialogLabel.IsTyping)
-        {
-            this.dialogLabel.ForceFinish();
-            return;
-        }
-
-        this.dialogTexts.Dequeue();
-
-        if (this.dialogTexts.Count == 0)
-        {
-            this.dialogPopup.Hide();
-            return;
-        }
-
-        this.dialogLabel.Text = this.dialogTexts.Peek();
-        this.dialogLabel.Start();
-    }
 
     private void CocoonClicked(BaseUnit cocoon)
     {
@@ -274,7 +243,7 @@ public partial class Level2
         action.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
 
         this.mage.Intent = new QueueIntent<BaseUnit>(
-            new MoveToPointIntent(cocoon.Position - Vector2.Left * 20),
+            new MoveToPointIntent(cocoon.Position + Vector2.Left * 40),
             new AttackOpponentIntent(cocoon, () =>
             {
                 var unit = this.cocoon.SpawnUnit.Instance<BaseUnit>();
@@ -288,9 +257,43 @@ public partial class Level2
                 cocoon.GetParent().AddChild(unit);
                 cocoon.QueueFree();
 
-                this.dialogTexts.Enqueue("Thank you very much. \n Our village was attacked by giant spiders. \n They left for now, but I think they will return. \n Save us please, go to the main gate and stop the invasion.");
-                this.dialogPopup.Show();
-                this.NextDialogText();
+                this.questPopup.PopupData = new Queue<QuestPopupData>();
+                this.questPopup.PopupData.Enqueue(new QuestPopupData { Description = " Thank you very much! \n Our village was attacked by giant spiders. \n They left for now, but I think they will return." });
+                this.questPopup.PopupData.Enqueue(new QuestPopupData { Description = " Save us please, go to the main gate and stop the invasion. \n Find me in the village and I'll check what can I do for you." });
+                this.questPopup.ShowQuestPopup(this.mage.Inventory.Inventory);
+
+                unit.Connect(nameof(BaseUnit.Clicked), this, nameof(QuestClicked), new Godot.Collections.Array { unit });
+            }));
+    }
+
+    private void QuestClicked(BaseUnit unit)
+    {
+        this.mage.Intent = new QueueIntent<BaseUnit>(
+            new MoveToPointIntent(unit.Position + Vector2.Left * 40),
+            new ActionIntent<BaseUnit>(u =>
+            {
+                this.questPopup.PopupData = new Queue<QuestPopupData>();
+                this.questPopup.PopupData.Enqueue(new QuestPopupData { Description = "Hi again." });
+                this.questPopup.PopupData.Enqueue(new QuestPopupData
+                {
+                    Description = "Please bring me a few wooden sticks.",
+                    requirements = new List<QuestData>
+                    {
+                        new QuestData{
+                            Loot = Instantiator.LoadLoot(nameof(Wood)),
+                            Count = 2
+                        }
+                    },
+                    rewards = new List<QuestData>
+                    {
+                        new QuestData{
+                            Loot = Instantiator.LoadLoot(nameof(Gold)),
+                            Count = 10
+                        }
+                    }
+                });
+                this.questPopup.ShowQuestPopup(this.mage.Inventory.Inventory);
+                return true;
             }));
     }
 

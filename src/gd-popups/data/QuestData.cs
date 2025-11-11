@@ -11,6 +11,8 @@ public class QuestData : Resource
     [Export]
     public PackedScene Loot;
 
+    public string LootName => Loot.GetState().GetNodeName(0);
+
     [Export]
     public uint Count;
 }

@@ -1,0 +1,95 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Presentation/loots/Wood/Wood.png" type="Texture" id=2]
+[ext_resource path="res://gd-popups/QuestPopup.cs" type="Script" id=3]
+[ext_resource path="res://gd-typewriterLabel/TypewriterLabel.tscn" type="PackedScene" id=4]
+
+[node name="QuestPopup" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+CloseOnClickOutside = false
+Title = "Quest"
+
+[node name="PopupContainer" parent="CustomPopupContainer" index="1"]
+margin_bottom = 147.0
+
+[node name="MarginContainer" parent="CustomPopupContainer/PopupContainer" index="0"]
+margin_bottom = 126.0
+
+[node name="PopupOuterBackground" parent="CustomPopupContainer/PopupContainer/MarginContainer" index="0"]
+margin_bottom = 126.0
+
+[node name="PopupOuterMargin" parent="CustomPopupContainer/PopupContainer/MarginContainer" index="1"]
+margin_bottom = 126.0
+
+[node name="PopupInnerBackground" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="0"]
+margin_bottom = 117.0
+
+[node name="ContentMargin" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin" index="1"]
+margin_bottom = 117.0
+
+[node name="ContentContainer" type="VBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 281.0
+margin_bottom = 99.0
+
+[node name="ContentTextLabel" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="0" instance=ExtResource( 4 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 272.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Some text"
+autowrap = true
+
+[node name="RequirementsContainer" type="CenterContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="1"]
+margin_top = 18.0
+margin_right = 272.0
+margin_bottom = 66.0
+
+[node name="RequirementsList" type="HBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/RequirementsContainer" index="0"]
+margin_left = 91.0
+margin_right = 180.0
+margin_bottom = 48.0
+
+[node name="Label1" type="Label" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/RequirementsContainer/RequirementsList" index="0"]
+margin_top = 17.0
+margin_right = 37.0
+margin_bottom = 31.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "0 / 10"
+
+[node name="Item1" type="TextureRect" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/RequirementsContainer/RequirementsList" index="1"]
+margin_left = 41.0
+margin_right = 89.0
+margin_bottom = 48.0
+texture = ExtResource( 2 )
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer" index="2"]
+margin_top = 70.0
+margin_right = 272.0
+margin_bottom = 90.0
+size_flags_horizontal = 3
+custom_constants/separation = 50
+
+[node name="ButtonYes" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/ButtonsContainer" index="0"]
+margin_right = 57.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+disabled = true
+text = "Yes"
+
+[node name="ButtonNo" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/ButtonsContainer" index="1"]
+margin_left = 107.0
+margin_right = 164.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "No"
+
+[node name="ButtonNext" type="Button" parent="CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/ContentContainer/ButtonsContainer" index="2"]
+margin_left = 214.0
+margin_right = 272.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Next"

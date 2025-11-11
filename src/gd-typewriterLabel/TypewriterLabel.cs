@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Specialized;
 using Godot;
 
 [SceneReference("TypewriterLabel.tscn")]
@@ -6,6 +7,9 @@ public partial class TypewriterLabel
 {
     [Export]
     public float Speed;
+
+    [Signal]
+    public delegate void TypingFinished();
 
     private float currentDelay = 0;
 
@@ -54,8 +58,9 @@ public partial class TypewriterLabel
         this.currentDelay -= this.Speed;
 
         this.VisibleCharacters++;
-        if (this.VisibleCharacters > this.Text.Length)
+        if (this.VisibleCharacters >= this.Text.Length)
         {
+            this.EmitSignal(nameof(TypingFinished));
             this.Pause();
         }
     }
@@ -79,13 +84,14 @@ public partial class TypewriterLabel
 
     public bool ForceFinish()
     {
-        if (this.VisibleCharacters == this.Text.Length)
+        if (!this.IsTyping)
         {
-            return true;
+            return false;
         }
 
+        this.EmitSignal(nameof(TypingFinished));
         this.VisibleCharacters = this.Text.Length;
         this.Pause();
-        return false;
+        return true;
     }
 }

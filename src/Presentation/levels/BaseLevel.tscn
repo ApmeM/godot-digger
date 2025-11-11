@@ -24,7 +24,6 @@ format = 1
 
 [node name="SelectPosition" parent="." instance=ExtResource( 1 )]
 visible = false
-CloseOnClickOutside = false
 Title = "Select Position"
 
 [node name="OutsidePopupButton" parent="SelectPosition" index="0"]

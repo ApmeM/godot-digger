@@ -812,25 +812,21 @@ animations = [ {
 [node name="Mage" instance=ExtResource( 2 )]
 script = ExtResource( 3 )
 AttackDelay = 1.2
-MoveFloors = null
 MaxHP = 30
 HP = 30
 AttackPower = 5
 AttackDistance = 100.0
 HitDelay = 0.8
-AggroAgainst = null
 MoveSpeed = 100.0
 
 [node name="Healthbar" parent="." index="0"]
-position = Vector2( 28, -41 )
+visible = true
+position = Vector2( 0, -20 )
 
 [node name="AnimatedSprite" parent="." index="1"]
-position = Vector2( 0, -40 )
 frames = SubResource( 185 )
 animation = "StayBottom"
+centered = true
 
-[node name="AnimationTree" parent="." index="4"]
+[node name="AnimationTree" parent="." index="2"]
 parameters/playback = SubResource( 186 )
-
-[editable path="QuestPopup"]
-[editable path="SignPopup"]
