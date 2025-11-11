@@ -208,6 +208,9 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #endregion
 
+    [Export]
+    public PackedScene SpawnUnit;
+
     public IAITurn AutomaticActionGenerator;
     public IContext AutomaticActionGeneratorContext;
 

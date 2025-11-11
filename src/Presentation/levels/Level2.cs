@@ -231,6 +231,67 @@ public partial class Level2
         this.dragonGoldInitialPosition = this.dragonGold.Position;
 
         this.header.TrackingUnit = this.mage;
+
+        this.cocoon.Connect(nameof(BaseUnit.Clicked), this, nameof(CocoonClicked), new Godot.Collections.Array { this.cocoon });
+        this.dialogNextButton.Connect(CommonSignals.Pressed, this, nameof(NextDialogText));
+    }
+
+
+    private readonly Queue<string> dialogTexts = new Queue<string>();
+    private void NextDialogText()
+    {
+        var text = this.dialogTexts.Peek();
+
+        if (this.dialogLabel.Text != text)
+        {
+            this.dialogLabel.Text = text;
+            this.dialogLabel.Start();
+            return;
+        }
+
+        if (this.dialogLabel.IsTyping)
+        {
+            this.dialogLabel.ForceFinish();
+            return;
+        }
+
+        this.dialogTexts.Dequeue();
+
+        if (this.dialogTexts.Count == 0)
+        {
+            this.dialogPopup.Hide();
+            return;
+        }
+
+        this.dialogLabel.Text = this.dialogTexts.Peek();
+        this.dialogLabel.Start();
+    }
+
+    private void CocoonClicked(BaseUnit cocoon)
+    {
+        var action = new FirstScoreReasoner<BaseUnit>(1);
+        // Intent phase
+        action.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
+
+        this.mage.Intent = new QueueIntent<BaseUnit>(
+            new MoveToPointIntent(cocoon.Position - Vector2.Left * 20),
+            new AttackOpponentIntent(cocoon, () =>
+            {
+                var unit = this.cocoon.SpawnUnit.Instance<BaseUnit>();
+                unit.Position = cocoon.Position;
+                unit.ZIndex = cocoon.ZIndex;
+                unit.AutomaticActionGeneratorContext = new TowerContext();
+                unit.AutomaticActionGenerator = new UtilityAI<BaseUnit>(unit, action);
+                unit.Intent = new QueueIntent<BaseUnit>(
+                    new MoveToPointIntent(new Vector2(241, 1215)),
+                    new MoveToPointIntent(new Vector2(337, 1265)));
+                cocoon.GetParent().AddChild(unit);
+                cocoon.QueueFree();
+
+                this.dialogTexts.Enqueue("Thank you very much. \n Our village was attacked by giant spiders. \n They left for now, but I think they will return. \n Save us please, go to the main gate and stop the invasion.");
+                this.dialogPopup.Show();
+                this.NextDialogText();
+            }));
     }
 
     private void ToBattleClicked()

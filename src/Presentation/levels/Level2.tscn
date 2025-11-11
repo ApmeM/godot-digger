@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level2.cs" type="Script" id=2]
@@ -12,6 +12,11 @@
 [ext_resource path="res://Presentation/units/DragonRed/DragonRed.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Presentation/units/DragonGold/DragonGold.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/units/Bat/Bat.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Presentation/units/Cocoon/Cocoon.tscn" type="PackedScene" id=13]
+[ext_resource path="res://Presentation/units/OgreRed/OgreRed.tscn" type="PackedScene" id=14]
+[ext_resource path="res://Presentation/units/Hut/Hut.tscn" type="PackedScene" id=15]
+[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=16]
+[ext_resource path="res://gd-typewriterLabel/TypewriterLabel.tscn" type="PackedScene" id=17]
 
 [sub_resource type="Curve2D" id=3]
 bake_interval = 24.0
@@ -175,6 +180,15 @@ HitDelay = 0.2
 Projectile = ExtResource( 9 )
 MoveSpeed = 150.0
 
+[node name="Cocoon" parent="Floor" index="20" instance=ExtResource( 13 )]
+position = Vector2( 313, 1121 )
+z_index = 2
+SpawnUnit = ExtResource( 14 )
+
+[node name="Hut" parent="Floor" index="21" instance=ExtResource( 15 )]
+position = Vector2( 391, 1227 )
+z_index = 2
+
 [node name="TimerLabel" parent="." index="4" instance=ExtResource( 4 )]
 margin_top = 287.0
 margin_right = 480.0
@@ -191,5 +205,34 @@ margin_right = 297.0
 margin_bottom = 908.0
 text = "To Battle"
 
+[node name="DialogPopup" parent="." index="8" instance=ExtResource( 16 )]
+visible = false
+CloseOnClickOutside = false
+
+[node name="OutsidePopupButton" parent="DialogPopup" index="0"]
+disabled = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DialogPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 281.0
+margin_bottom = 79.0
+
+[node name="DialogLabel" parent="DialogPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/VBoxContainer" index="0" instance=ExtResource( 17 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 272.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_shadow = Color( 1, 1, 1, 1 )
+autowrap = true
+
+[node name="DialogNextButton" type="Button" parent="DialogPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin/VBoxContainer" index="1"]
+margin_top = 18.0
+margin_right = 272.0
+margin_bottom = 38.0
+text = "Next >>"
+
 [editable path="SelectPosition"]
 [editable path="LootPopup"]
+[editable path="DialogPopup"]
