@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BrainAI.AI;
 using BrainAI.AI.UtilityAI;
 using Godot;
@@ -208,6 +209,12 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
 
     #endregion
 
+    #region Chat
+
+    [Export(PropertyHint.ResourceType, nameof(QuestPopupData))]
+    public List<QuestPopupData> QuestDialogs;
+
+    #endregion
     [Export]
     public PackedScene SpawnUnit;
 

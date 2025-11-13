@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level2.cs" type="Script" id=2]
@@ -16,6 +16,7 @@
 [ext_resource path="res://Presentation/units/OgreRed/OgreRed.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Presentation/units/Hut/Hut.tscn" type="PackedScene" id=15]
 [ext_resource path="res://gd-popups/QuestPopup.tscn" type="PackedScene" id=16]
+[ext_resource path="res://Presentation/units/Leader/Leader.tscn" type="PackedScene" id=17]
 
 [sub_resource type="Curve2D" id=3]
 bake_interval = 24.0
@@ -187,6 +188,12 @@ SpawnUnit = ExtResource( 14 )
 [node name="Hut" parent="Floor" index="21" instance=ExtResource( 15 )]
 position = Vector2( 391, 1227 )
 z_index = 2
+
+[node name="Leader" parent="Floor" index="22" instance=ExtResource( 17 )]
+visible = false
+position = Vector2( 312, 1120 )
+z_index = 2
+HitDelay = 0.0
 
 [node name="TimerLabel" parent="." index="4" instance=ExtResource( 4 )]
 margin_top = 287.0

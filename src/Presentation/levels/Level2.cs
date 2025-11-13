@@ -184,6 +184,32 @@ public class AttackOpponentIntent : IIntent<BaseUnit>
         context.StartStayAnimation();
     }
 }
+public class TalkIntent : IIntent<BaseUnit>
+{
+    private readonly Queue<QuestPopupData> talk;
+    private readonly QuestPopup questPopup;
+
+    public TalkIntent(Queue<QuestPopupData> talk, QuestPopup questPopup)
+    {
+        this.talk = talk;
+        this.questPopup = questPopup;
+    }
+
+    public void Enter(BaseUnit context)
+    {
+        this.questPopup.PopupData = talk;
+        this.questPopup.ShowQuestPopup(null);
+    }
+
+    public bool Execute(BaseUnit context)
+    {
+        return !this.questPopup.Visible;
+    }
+
+    public void Exit(BaseUnit context)
+    {
+    }
+}
 
 [SceneReference("Level2.tscn")]
 public partial class Level2
@@ -235,7 +261,6 @@ public partial class Level2
         this.cocoon.Connect(nameof(BaseUnit.Clicked), this, nameof(CocoonClicked), new Godot.Collections.Array { this.cocoon });
     }
 
-
     private void CocoonClicked(BaseUnit cocoon)
     {
         var action = new FirstScoreReasoner<BaseUnit>(1);
@@ -246,52 +271,52 @@ public partial class Level2
             new MoveToPointIntent(cocoon.Position + Vector2.Left * 40),
             new AttackOpponentIntent(cocoon, () =>
             {
-                var unit = this.cocoon.SpawnUnit.Instance<BaseUnit>();
-                unit.Position = cocoon.Position;
-                unit.ZIndex = cocoon.ZIndex;
-                unit.AutomaticActionGeneratorContext = new TowerContext();
-                unit.AutomaticActionGenerator = new UtilityAI<BaseUnit>(unit, action);
-                unit.Intent = new QueueIntent<BaseUnit>(
+                this.cocoon.QueueFree();
+
+                var talk = new Queue<QuestPopupData>();
+                talk.Enqueue(new QuestPopupData { Description = " Thank you very much! \n Our village was attacked by giant spiders. \n They left for now, but I think they will return." });
+                talk.Enqueue(new QuestPopupData { Description = " Save us please, go to the main gate and stop the invasion. \n Find me in the village and I'll check what can I do for you." });
+
+                this.leader.Connect(nameof(BaseUnit.Clicked), this, nameof(QuestClicked), new Godot.Collections.Array { this.leader });
+                this.leader.Visible = true;
+                this.leader.AutomaticActionGeneratorContext = new TowerContext();
+                this.leader.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.leader, action);
+                this.leader.Intent = new QueueIntent<BaseUnit>(
+                    new TalkIntent(talk, this.questPopup),
                     new MoveToPointIntent(new Vector2(241, 1215)),
                     new MoveToPointIntent(new Vector2(337, 1265)));
-                cocoon.GetParent().AddChild(unit);
-                cocoon.QueueFree();
 
-                this.questPopup.PopupData = new Queue<QuestPopupData>();
-                this.questPopup.PopupData.Enqueue(new QuestPopupData { Description = " Thank you very much! \n Our village was attacked by giant spiders. \n They left for now, but I think they will return." });
-                this.questPopup.PopupData.Enqueue(new QuestPopupData { Description = " Save us please, go to the main gate and stop the invasion. \n Find me in the village and I'll check what can I do for you." });
-                this.questPopup.ShowQuestPopup(this.mage.Inventory.Inventory);
-
-                unit.Connect(nameof(BaseUnit.Clicked), this, nameof(QuestClicked), new Godot.Collections.Array { unit });
             }));
     }
 
     private void QuestClicked(BaseUnit unit)
     {
-        this.mage.Intent = new QueueIntent<BaseUnit>(
-            new MoveToPointIntent(unit.Position + Vector2.Left * 40),
-            new ActionIntent<BaseUnit>(u =>
-            {
-                this.questPopup.PopupData = new Queue<QuestPopupData>();
-                this.questPopup.PopupData.Enqueue(new QuestPopupData { Description = "Hi again." });
-                this.questPopup.PopupData.Enqueue(new QuestPopupData
-                {
-                    Description = "Please bring me a few wooden sticks.",
-                    requirements = new List<QuestData>
+        var talk = new Queue<QuestPopupData>();
+        talk.Enqueue(new QuestPopupData { Description = "Hi again." });
+        talk.Enqueue(new QuestPopupData
+        {
+            Description = "Please bring me a few wooden sticks.",
+            requirements = new List<QuestData>
                     {
                         new QuestData{
                             Loot = Instantiator.LoadLoot(nameof(Wood)),
                             Count = 2
                         }
                     },
-                    rewards = new List<QuestData>
+            rewards = new List<QuestData>
                     {
                         new QuestData{
                             Loot = Instantiator.LoadLoot(nameof(Gold)),
                             Count = 10
                         }
                     }
-                });
+        });
+
+        this.mage.Intent = new QueueIntent<BaseUnit>(
+            new MoveToPointIntent(unit.Position + Vector2.Left * 40),
+            new ActionIntent<BaseUnit>(u =>
+            {
+                this.questPopup.PopupData = new Queue<QuestPopupData>(talk);
                 this.questPopup.ShowQuestPopup(this.mage.Inventory.Inventory);
                 return true;
             }));
