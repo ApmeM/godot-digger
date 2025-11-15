@@ -21,7 +21,7 @@ public partial class QuestPopup
 
     private void TypingFinished()
     {
-        if (this.PopupData.Peek().requirements != null)
+        if (this.PopupData.Peek().Requirements != null)
         {
             ShowQuest();
         }
@@ -32,7 +32,7 @@ public partial class QuestPopup
         if (this.contentTextLabel.IsTyping)
         {
             this.contentTextLabel.ForceFinish();
-            if (this.PopupData.Peek().requirements != null)
+            if (this.PopupData.Peek().Requirements != null)
             {
                 ShowQuest();
             }
@@ -53,9 +53,9 @@ public partial class QuestPopup
     {
         var dialogData = this.PopupData.Peek();
         var success = inventory.TryChangeCountsOrCancel(
-            dialogData.requirements
+            dialogData.Requirements
                 .Select(a => (a.LootName, -(int)a.Count))
-                .Concat(dialogData.rewards.Select(a => (a.LootName, (int)a.Count))));
+                .Concat(dialogData.Rewards.Select(a => (a.LootName, (int)a.Count))));
 
         if (success)
         {
@@ -91,7 +91,7 @@ public partial class QuestPopup
         var dialogData = this.PopupData.Peek();
 
         var isEnough = true;
-        foreach (var req in dialogData.requirements)
+        foreach (var req in dialogData.Requirements)
         {
             var definition = LootDefinition.LootByName[req.LootName];
             this.requirementsList.AddChild(new TextureRect

@@ -296,14 +296,14 @@ public partial class Level2
         talk.Enqueue(new QuestPopupData
         {
             Description = "Please bring me a few wooden sticks.",
-            requirements = new List<QuestData>
+            Requirements = new List<QuestData>
                     {
                         new QuestData{
                             Loot = Instantiator.LoadLoot(nameof(Wood)),
                             Count = 2
                         }
                     },
-            rewards = new List<QuestData>
+            Rewards = new List<QuestData>
                     {
                         new QuestData{
                             Loot = Instantiator.LoadLoot(nameof(Gold)),

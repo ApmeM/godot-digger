@@ -13,8 +13,8 @@ public class QuestPopupData : Resource
     public string Description;
 
     [Export]
-    public List<QuestData> requirements;
+    public List<QuestData> Requirements;
 
     [Export]
-    public List<QuestData> rewards;
+    public List<QuestData> Rewards;
 }
