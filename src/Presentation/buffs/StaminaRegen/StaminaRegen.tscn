@@ -10,8 +10,5 @@ script = ExtResource( 3 )
 Description = "Stamina recovery increased."
 TotalTime = 20.0
 
-[node name="Timer" parent="." index="0"]
-wait_time = 20.0
-
-[node name="TextureProgress" parent="." index="1"]
+[node name="TextureProgress" parent="." index="0"]
 texture_progress = ExtResource( 2 )

@@ -10,8 +10,5 @@ script = ExtResource( 3 )
 Description = "You were near dead. \\nNow you should rest. \\nYou cant attack, dig or cut trees."
 TotalTime = 120.0
 
-[node name="Timer" parent="." index="0"]
-wait_time = 120.0
-
-[node name="TextureProgress" parent="." index="1"]
+[node name="TextureProgress" parent="." index="0"]
 texture_progress = ExtResource( 2 )
