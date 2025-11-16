@@ -128,15 +128,9 @@ public partial class Level2
         dragons[2] = dragonGold;
 
         // Actually towers do not have AI. They just do intents when they are set outside.
-        var reasoner = new FirstScoreReasoner<BaseUnit>(1);
-        reasoner.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
-        this.mage.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.mage, reasoner);
-        this.bat.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.bat, reasoner);
-
         foreach (var dragon in dragons)
         {
             dragon.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { dragon });
-            dragon.AutomaticActionGenerator = new UtilityAI<BaseUnit>(dragon, reasoner);
         }
 
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(ToBattleClicked));
@@ -155,10 +149,6 @@ public partial class Level2
 
     private void CocoonHit(BaseUnit attacker, BaseUnit defender)
     {
-        var action = new FirstScoreReasoner<BaseUnit>(1);
-        // Intent phase
-        action.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
-
         defender.QueueFree();
 
         var talk = new List<QuestPopupData>
@@ -169,7 +159,6 @@ public partial class Level2
 
         this.leader.Connect(nameof(BaseUnit.Clicked), this, nameof(QuestClicked), new Godot.Collections.Array { this.leader });
         this.leader.Visible = true;
-        this.leader.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.leader, action);
         this.leader.CurrentAction = new CustomActionQueue
         {
             CustomActions = new List<Resource>
@@ -247,29 +236,8 @@ public partial class Level2
             MoveOffset = 0,
         };
 
-        if (enemyMoveReasoner == null)
-        {
-            enemyMoveReasoner = new FirstScoreReasoner<BaseUnit>(1);
-            // Intent phase
-            enemyMoveReasoner.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
-            // Decision phase
-            enemyMoveReasoner.Add(
-                new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
-                new SetCurrentActionAction((c) => new CustomActionAttackOpponent { OpponentPath = this.mage.GetPath() }));
-            enemyMoveReasoner.Add(
-                new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
-                new SetCurrentActionAction((c) => new CustomActionFollowPath
-                {
-                    MagePath = this.mage.GetPath(),
-                    FollowPath = this.enemyPathFollow.GetPath(),
-                    MoveOffset = 0,
-                }));
-        }
-
         StartWave();
     }
-
-    private Reasoner<BaseUnit> enemyMoveReasoner;
 
     private void StartWave()
     {
@@ -315,7 +283,7 @@ public partial class Level2
 
         var enemies = Enumerable
             .Range(0, numberOfEnemies)
-            .Select(a => BuildEnemy(enemyTypes, startPosition, enemyMoveReasoner))
+            .Select(a => BuildEnemy(enemyTypes, startPosition))
             .ToList();
 
         enemiesToSpawn.Clear();
@@ -324,7 +292,7 @@ public partial class Level2
         {
             enemiesToSpawn.Enqueue(enemy);
         }
-        var boss = BuildEnemy(nameof(OgreGray), startPosition, enemyMoveReasoner);
+        var boss = BuildEnemy(nameof(OgreGray), startPosition);
         boss.Inventory.TryChangeCount(nameof(Wood), 1);
         enemiesToSpawn.Enqueue(boss);
     }
@@ -355,6 +323,7 @@ public partial class Level2
             this.StartWave();
         }
     }
+    
     private void StopWave()
     {
         waveInProgress = false;
@@ -395,22 +364,36 @@ public partial class Level2
         this.dragonGold.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonGoldInitialPosition };
     }
 
-    private BaseUnit BuildEnemy(List<string> enemies, Vector2 position, Reasoner<BaseUnit> action)
+    private BaseUnit BuildEnemy(List<string> enemies, Vector2 position)
     {
         var enemyName = enemies[r.Next(enemies.Count)];
-        return BuildEnemy(enemyName, position, action);
+        return BuildEnemy(enemyName, position);
     }
 
-    private BaseUnit BuildEnemy(string enemyName, Vector2 position, Reasoner<BaseUnit> action)
+    private BaseUnit BuildEnemy(string enemyName, Vector2 position)
     {
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
+
         enemy.InitialSlotsCount = 2;
         enemy.Inventory.TryChangeCount(nameof(Gold), 1);
         enemy.ZIndex = 1;
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
-        enemy.AutomaticActionGenerator = new UtilityAI<BaseUnit>(enemy, action);
+        enemy.CurrentAction = new CustomActionQueue
+        {
+            CustomActions = new List<Resource>
+            {
+                new CustomActionFollowPath{
+                    MagePath = this.mage.GetPath(),
+                    FollowPath = this.enemyPathFollow.GetPath(),
+                },
+                new CustomActionAttackOpponent{
+                    OpponentPath = this.mage.GetPath()
+                }
+            }
+        };
+
         enemy.Connect(nameof(BaseUnit.OnHit), this, nameof(EnemyHit));
         return enemy;
     }

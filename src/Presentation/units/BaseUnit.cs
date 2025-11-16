@@ -225,10 +225,26 @@ public partial class BaseUnit
     [Export]
     public Resource ClickAction;
 
+    private static Reasoner<BaseUnit> actionMoveReasonerInternal;
+    private static Reasoner<BaseUnit> actionMoveReasoner
+    {
+        get
+        {
+            if (actionMoveReasonerInternal == null)
+            {
+                actionMoveReasonerInternal = new FirstScoreReasoner<BaseUnit>(1);
+                actionMoveReasonerInternal.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
+            }
+
+            return actionMoveReasonerInternal;
+        }
+    }
+
     public BaseUnit()
     {
         this.Inventory.SlotContentChanged += this.RecalculateEffectiveValues;
         this.Buffs.BuffsChanged += this.RecalculateEffectiveValues;
+        this.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this, actionMoveReasoner);
     }
 
     private void RecalculateEffectiveValues()
