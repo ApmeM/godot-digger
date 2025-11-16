@@ -7,8 +7,14 @@ public partial class BaseProjectile
     [Export]
     public float Speed = 1000;
 
-    private Func<Vector2> to;
-    private Action onHit;
+    [Export]
+    public BaseUnit toUnit;
+
+    [Export]
+    public Vector2 toPoint;
+
+    [Export]
+    public BaseUnit fromUnit;
 
     public override void _Ready()
     {
@@ -20,7 +26,9 @@ public partial class BaseProjectile
     {
         base._Process(delta);
 
-        var dir = to() - this.Position;
+        this.toPoint = Godot.Object.IsInstanceValid(this.toUnit) ? this.toUnit.Position : toPoint;
+
+        var dir = this.toPoint - this.Position;
         var dist = Speed * delta;
         if (dir.LengthSquared() > dist * dist)
         {
@@ -29,28 +37,25 @@ public partial class BaseProjectile
             return;
         }
 
-        this.Position = to();
+        this.Position = this.toPoint;
         // TODO: Animate BOOM
         this.QueueFree();
-        onHit?.Invoke();
+
+        if (!Godot.Object.IsInstanceValid(this.toUnit))
+        {
+            return;
+        }
+
+        this.toUnit.GotHit(fromUnit);
     }
 
-    public void Shoot(Vector2 from, BaseUnit toUnit, Action onHit)
+    public void Shoot(BaseUnit fromUnit, BaseUnit toUnit)
     {
-        this.Position = from;
-        this.Rotation = (toUnit.Position - from).Angle();
-        var lastSeen = toUnit.Position;
-        this.to = () =>
-        {
-            if (Godot.Object.IsInstanceValid(toUnit))
-            {
-                lastSeen = toUnit.Position;
-                return toUnit.Position;
-            }
-            this.to = () => lastSeen;
-            return lastSeen;
-        };
+        this.toUnit = toUnit;
+        this.fromUnit = fromUnit;
+        this.toPoint = this.toUnit.Position;
 
-        this.onHit = onHit;
+        this.Position = this.fromUnit.Position;
+        this.Rotation = (this.toUnit.Position - this.fromUnit.Position).Angle();
     }
 }

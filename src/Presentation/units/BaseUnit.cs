@@ -5,7 +5,7 @@ using BrainAI.AI.UtilityAI;
 using Godot;
 
 [SceneReference("BaseUnit.tscn")]
-public partial class BaseUnit : IIntentContainer<BaseUnit>
+public partial class BaseUnit
 {
 
     #region Attack
@@ -97,9 +97,6 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     #endregion
 
     #region Move
-
-    [Export]
-    public NodePath PathFollow2DPath;
 
     [Export]
     public float MoveSpeed;
@@ -215,19 +212,23 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     public List<QuestPopupData> QuestDialogs;
 
     #endregion
-    [Export]
-    public PackedScene SpawnUnit;
+
+    public float Delta;
 
     public IAITurn AutomaticActionGenerator;
-    public IContext AutomaticActionGeneratorContext;
 
-    public IIntent<BaseUnit> Intent { get; set; }
+    // Resource should be of type Intent<BaseUnit>
+    [Export]
+    public Resource CurrentAction;
+
+    // Resource should be of type Intent<BaseUnit>
+    [Export]
+    public Resource ClickAction;
 
     public BaseUnit()
     {
         this.Inventory.SlotContentChanged += this.RecalculateEffectiveValues;
         this.Buffs.BuffsChanged += this.RecalculateEffectiveValues;
-        RecalculateEffectiveValues();
     }
 
     private void RecalculateEffectiveValues()
@@ -259,13 +260,15 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
         // HP order matters. Do not change it.
         this.HP = this.hp;
         this.AttackDelay = this.attackDelay;
+
+        RecalculateEffectiveValues();
     }
 
     public override void _Process(float delta)
     {
         base._Process(delta);
+        this.Delta = delta;
         Buffs.Tick(delta);
-        AutomaticActionGeneratorContext?.Update(delta);
         AutomaticActionGenerator?.Tick();
     }
 
@@ -308,6 +311,12 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
     public override void _UnhandledInput(InputEvent @event)
     {
         base._UnhandledInput(@event);
+
+        if (!Visible)
+        {
+            return;
+        }
+
         if (@event is InputEventMouseButton mouse && mouse.IsPressed() && !mouse.IsEcho() && (ButtonList)mouse.ButtonIndex == ButtonList.Left)
         {
             var frame = animatedSprite.Frames.GetFrame(animatedSprite.Animation, animatedSprite.Frame);
@@ -322,9 +331,29 @@ public partial class BaseUnit : IIntentContainer<BaseUnit>
                 if (rect.HasPoint(mousePos))
                 {
                     this.GetTree().SetInputAsHandled();
-                    this.EmitSignal(nameof(Clicked));
+                    if (ClickAction != null)
+                    {
+                        this.CurrentAction = this.ClickAction;
+                    }
+                    else
+                    {
+                        this.EmitSignal(nameof(Clicked));
+                    }
                 }
             }
         }
+    }
+
+    public float GetAnimationTimePassed()
+    {
+        var fps = animatedSprite.Frames.GetAnimationSpeed(animatedSprite.Animation);
+        return animatedSprite.Frame / fps;
+    }
+
+    [Signal]
+    public delegate void OnHit(BaseUnit attacker, BaseUnit defender);
+    public void GotHit(BaseUnit opponent)
+    {
+        this.EmitSignal(nameof(OnHit), opponent, this);
     }
 }

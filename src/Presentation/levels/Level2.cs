@@ -4,29 +4,6 @@ using System.Linq;
 using BrainAI.AI.UtilityAI;
 using Godot;
 
-public interface IContext
-{
-    float Delta { get; set; }
-    void Update(float delta);
-}
-public class EnemyContext : IContext
-{
-    public float Delta { get; set; }
-
-    public void Update(float delta)
-    {
-        this.Delta = delta;
-    }
-}
-public class TowerContext : IContext
-{
-    public float Delta { get; set; }
-
-    public void Update(float delta)
-    {
-        this.Delta = delta;
-    }
-}
 public class CanAttackUnitAppraisal : IAppraisal<BaseUnit>
 {
     private readonly BaseUnit unit;
@@ -55,155 +32,67 @@ public class UnitInGroupAppraisal : IAppraisal<BaseUnit>
         return context.IsInGroup(this.group) ? 1 : 0;
     }
 }
-public class FollowPathIntent : IIntent<BaseUnit>
+public class HasCurrentActionAppraisal : IAppraisal<BaseUnit>
 {
-    public FollowPathIntent(BaseUnit mage)
+    private readonly float score;
+
+    public HasCurrentActionAppraisal(float score)
     {
-        this.mage = mage;
+        this.score = score;
     }
 
-    public float MoveOffset;
-    private readonly BaseUnit mage;
+    public float GetScore(BaseUnit context)
+    {
+        if (context.CurrentAction != null)
+        {
+            return score;
+        }
 
+        return 0f;
+    }
+}
+public class DoCurrentActionAction : IAction<BaseUnit>
+{
     public void Enter(BaseUnit context)
     {
+        ((IIntent<BaseUnit>)context.CurrentAction).Enter(context);
     }
 
-    public bool Execute(BaseUnit context)
+    public void Execute(BaseUnit context)
     {
-        context.StartMoveAnimation();
-        var moveContext = (EnemyContext)context.AutomaticActionGeneratorContext;
-        this.MoveOffset += context.MoveSpeed * moveContext.Delta * this.mage.Character.EnemySpeedCoeff;
-        var pathPosition = (PathFollow2D)context.GetNode(context.PathFollow2DPath);
-        pathPosition.Offset = this.MoveOffset;
-        var oldPosition = context.Position;
-        context.Position = pathPosition.Position;
-        context.UpdateAnimationDirection(context.Position - oldPosition);
-        return pathPosition.UnitOffset == 1;
+        if (((IIntent<BaseUnit>)context.CurrentAction).Execute(context))
+        {
+            Exit(context);
+        }
     }
 
     public void Exit(BaseUnit context)
     {
-        context.StartStayAnimation();
+        ((IIntent<BaseUnit>)context.CurrentAction)?.Exit(context);
+        context.CurrentAction = null;
     }
 }
-public class MoveToPointIntent : IIntent<BaseUnit>
+public class SetCurrentActionAction : IAction<BaseUnit>
 {
-    private readonly Vector2 TargetPoint;
+    private readonly Func<BaseUnit, Resource> intentFactory;
 
-    public MoveToPointIntent(Vector2 targetPoint)
+    public SetCurrentActionAction(Resource intent)
     {
-        this.TargetPoint = targetPoint;
-    }
-    public void Enter(BaseUnit context)
-    {
+        intentFactory = (BaseUnit ctx) => intent;
     }
 
-    public bool Execute(BaseUnit context)
+    public SetCurrentActionAction(Func<BaseUnit, Resource> intentFactory)
     {
-        context.StartMoveAnimation();
-        context.UpdateAnimationDirection(this.TargetPoint - context.Position);
-        var moveContext = (TowerContext)context.AutomaticActionGeneratorContext;
-        var speed = context.MoveSpeed * moveContext.Delta;
-        var dir = (this.TargetPoint - context.Position).Normalized();
-        var sqDistanceLeft = (context.Position - this.TargetPoint).LengthSquared();
-        if (sqDistanceLeft < speed * speed)
-        {
-            context.Position = this.TargetPoint;
-            return true;
-        }
-
-        context.Position += dir * speed;
-        return false;
-    }
-
-    public void Exit(BaseUnit context)
-    {
-        context.StartStayAnimation();
-    }
-}
-public class AttackOpponentIntent : IIntent<BaseUnit>
-{
-    private readonly BaseUnit opponent;
-    private Action onHit;
-    private float AttackStep;
-
-    public AttackOpponentIntent(BaseUnit opponent, Action onHit)
-    {
-        this.opponent = opponent;
-        this.onHit = onHit;
+        this.intentFactory = intentFactory;
     }
 
     public void Enter(BaseUnit context)
     {
     }
 
-    public bool Execute(BaseUnit context)
+    public void Execute(BaseUnit context)
     {
-        if (!Godot.Object.IsInstanceValid(this.opponent))
-        {
-            return true;
-        }
-
-        context.StartAttackAnimation();
-        context.UpdateAnimationDirection(this.opponent.Position - context.Position);
-        var commonContext = context.AutomaticActionGeneratorContext;
-        var isHit = false;
-        if (this.AttackStep == 0 && context.HitDelay == 0)
-        {
-            isHit = true;
-        }
-
-        if (this.AttackStep < context.HitDelay && this.AttackStep + commonContext.Delta >= context.HitDelay)
-        {
-            isHit = true;
-        }
-
-        this.AttackStep += commonContext.Delta;
-
-        if (isHit)
-        {
-            if (context.Projectile != null)
-            {
-                var instance = context.Projectile.Instance<BaseProjectile>();
-                context.GetParent().AddChild(instance);
-                instance.Shoot(context.Position, opponent, onHit);
-                instance.ZIndex = context.ZIndex;
-            }
-            else
-            {
-                onHit();
-            }
-        }
-
-        return this.AttackStep >= context.AttackDelay;
-    }
-
-    public void Exit(BaseUnit context)
-    {
-        context.StartStayAnimation();
-    }
-}
-public class TalkIntent : IIntent<BaseUnit>
-{
-    private readonly Queue<QuestPopupData> talk;
-    private readonly QuestPopup questPopup;
-
-    public TalkIntent(Queue<QuestPopupData> talk, QuestPopup questPopup)
-    {
-        this.talk = talk;
-        this.questPopup = questPopup;
-    }
-
-    public void Enter(BaseUnit context)
-    {
-        this.questPopup.PopupData = talk;
-        this.questPopup.ShowQuestPopup(null);
-    }
-
-    public bool Execute(BaseUnit context)
-    {
-        return !this.questPopup.Visible;
+        context.CurrentAction = intentFactory(context);
     }
 
     public void Exit(BaseUnit context)
@@ -216,6 +105,8 @@ public partial class Level2
 {
     private Random r = new Random();
     private int level = 0;
+
+    private BaseUnit[] dragons = new BaseUnit[3];
 
     private Vector2 dragonBlueInitialPosition;
     private Vector2 dragonRedInitialPosition;
@@ -232,23 +123,21 @@ public partial class Level2
 
         this.SetCameraLimits(this.camera2D);
 
-        this.dragonBlue.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonBlue });
-        this.dragonRed.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonRed });
-        this.dragonGold.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { this.dragonGold });
+        dragons[0] = dragonBlue;
+        dragons[1] = dragonRed;
+        dragons[2] = dragonGold;
 
         // Actually towers do not have AI. They just do intents when they are set outside.
         var reasoner = new FirstScoreReasoner<BaseUnit>(1);
-        reasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
-        this.dragonBlue.AutomaticActionGeneratorContext = new TowerContext();
-        this.dragonBlue.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonBlue, reasoner);
-        this.dragonRed.AutomaticActionGeneratorContext = new TowerContext();
-        this.dragonRed.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonRed, reasoner);
-        this.dragonGold.AutomaticActionGeneratorContext = new TowerContext();
-        this.dragonGold.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.dragonGold, reasoner);
-        this.mage.AutomaticActionGeneratorContext = new TowerContext();
+        reasoner.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
         this.mage.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.mage, reasoner);
-        this.bat.AutomaticActionGeneratorContext = new EnemyContext();
         this.bat.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.bat, reasoner);
+
+        foreach (var dragon in dragons)
+        {
+            dragon.Connect(nameof(BaseUnit.Clicked), this, nameof(TowerClicked), new Godot.Collections.Array { dragon });
+            dragon.AutomaticActionGenerator = new UtilityAI<BaseUnit>(dragon, reasoner);
+        }
 
         this.toBattle.Connect(CommonSignals.Pressed, this, nameof(ToBattleClicked));
 
@@ -259,87 +148,122 @@ public partial class Level2
         this.header.TrackingUnit = this.mage;
 
         this.cocoon.Connect(nameof(BaseUnit.Clicked), this, nameof(CocoonClicked), new Godot.Collections.Array { this.cocoon });
+        this.cocoon.Connect(nameof(BaseUnit.OnHit), this, nameof(CocoonHit));
+
+        this.mage.Connect(nameof(BaseUnit.OnHit), this, nameof(MageHit));
+    }
+
+    private void CocoonHit(BaseUnit attacker, BaseUnit defender)
+    {
+        var action = new FirstScoreReasoner<BaseUnit>(1);
+        // Intent phase
+        action.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
+
+        defender.QueueFree();
+
+        var talk = new List<QuestPopupData>
+        {
+            new QuestPopupData { Description = " Thank you very much! \n Our village was attacked by giant spiders. \n They left for now, but I think they will return." },
+            new QuestPopupData { Description = " Save us please, go to the main gate and stop the invasion. \n Find me in the village and I'll check what can I do for you." }
+        };
+
+        this.leader.Connect(nameof(BaseUnit.Clicked), this, nameof(QuestClicked), new Godot.Collections.Array { this.leader });
+        this.leader.Visible = true;
+        this.leader.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.leader, action);
+        this.leader.CurrentAction = new CustomActionQueue
+        {
+            CustomActions = new List<Resource>
+                    {
+                        new CustomActionTalk { QuestData = talk, QuestPopupPath = this.questPopup.GetPath() },
+                        new CustomActionMoveToPoint { TargetPoint = new Vector2(241, 1215) },
+                        new CustomActionMoveToPoint { TargetPoint = new Vector2(337, 1265) }
+                    }
+        };
     }
 
     private void CocoonClicked(BaseUnit cocoon)
     {
-        var action = new FirstScoreReasoner<BaseUnit>(1);
-        // Intent phase
-        action.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
-
-        this.mage.Intent = new QueueIntent<BaseUnit>(
-            new MoveToPointIntent(cocoon.Position + Vector2.Left * 40),
-            new AttackOpponentIntent(cocoon, () =>
-            {
-                this.cocoon.QueueFree();
-
-                var talk = new Queue<QuestPopupData>();
-                talk.Enqueue(new QuestPopupData { Description = " Thank you very much! \n Our village was attacked by giant spiders. \n They left for now, but I think they will return." });
-                talk.Enqueue(new QuestPopupData { Description = " Save us please, go to the main gate and stop the invasion. \n Find me in the village and I'll check what can I do for you." });
-
-                this.leader.Connect(nameof(BaseUnit.Clicked), this, nameof(QuestClicked), new Godot.Collections.Array { this.leader });
-                this.leader.Visible = true;
-                this.leader.AutomaticActionGeneratorContext = new TowerContext();
-                this.leader.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this.leader, action);
-                this.leader.Intent = new QueueIntent<BaseUnit>(
-                    new TalkIntent(talk, this.questPopup),
-                    new MoveToPointIntent(new Vector2(241, 1215)),
-                    new MoveToPointIntent(new Vector2(337, 1265)));
-
-            }));
+        this.mage.CurrentAction = new CustomActionQueue
+        {
+            CustomActions = new List<Resource> {
+                new CustomActionMoveToPoint { TargetPoint = cocoon.Position + Vector2.Left * 40 },
+                new CustomActionAttackOpponent { OpponentPath = cocoon.GetPath() }
+            }
+        };
     }
 
     private void QuestClicked(BaseUnit unit)
     {
-        var talk = new Queue<QuestPopupData>();
-        talk.Enqueue(new QuestPopupData { Description = "Hi again." });
-        talk.Enqueue(new QuestPopupData
+        var talk = new List<QuestPopupData>
         {
-            Description = "Please bring me a few wooden sticks.",
-            Requirements = new List<QuestData>
+            new QuestPopupData { Description = "Hi again." },
+            new QuestPopupData
+            {
+                Description = "Please bring me a few wooden sticks.",
+                Requirements = new List<QuestData>
                     {
                         new QuestData{
                             Loot = Instantiator.LoadLoot(nameof(Wood)),
                             Count = 2
                         }
                     },
-            Rewards = new List<QuestData>
+                Rewards = new List<QuestData>
                     {
                         new QuestData{
                             Loot = Instantiator.LoadLoot(nameof(Gold)),
                             Count = 10
                         }
                     }
-        });
+            }
+        };
 
-        this.mage.Intent = new QueueIntent<BaseUnit>(
-            new MoveToPointIntent(unit.Position + Vector2.Left * 40),
-            new ActionIntent<BaseUnit>(u =>
-            {
-                this.questPopup.PopupData = new Queue<QuestPopupData>(talk);
-                this.questPopup.ShowQuestPopup(this.mage.Inventory.Inventory);
-                return true;
-            }));
+        this.mage.CurrentAction = new CustomActionQueue
+        {
+            CustomActions = new List<Resource>{
+                new CustomActionMoveToPoint
+                {
+                    TargetPoint = unit.Position + Vector2.Left * 40
+                },
+                new CustomActionTalk
+                {
+                    InventoryUnitPath = this.mage.GetPath(),
+                    QuestData = talk,
+                    QuestPopupPath = this.questPopup.GetPath(),
+                }
+            }
+        };
     }
 
     private void ToBattleClicked()
     {
-        this.mage.Intent = new MoveToPointIntent(new Vector2(255, 686));
-        this.bat.PathFollow2DPath = this.batPathForwardFollow.GetPath();
-        this.bat.Intent = new FollowPathIntent(this.mage);
+        this.mage.CurrentAction = new CustomActionMoveToPoint
+        {
+            TargetPoint = new Vector2(255, 686)
+        };
+        this.bat.CurrentAction = new CustomActionFollowPath
+        {
+            MagePath = this.mage.GetPath(),
+            FollowPath = this.batPathForwardFollow.GetPath(),
+            MoveOffset = 0,
+        };
 
         if (enemyMoveReasoner == null)
         {
             enemyMoveReasoner = new FirstScoreReasoner<BaseUnit>(1);
             // Intent phase
-            enemyMoveReasoner.Add(new HasIntentAppraisal<BaseUnit>(1), new UseIntentAction<BaseUnit>());
+            enemyMoveReasoner.Add(new HasCurrentActionAppraisal(1), new DoCurrentActionAction());
             // Decision phase
             enemyMoveReasoner.Add(
                 new MultAppraisal<BaseUnit>(new UnitInGroupAppraisal(Groups.AttackingEnemy), new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, AttackOpponentIntent>((c) => new AttackOpponentIntent(this.mage, () => MageHit(c.AttackPower))));
+                new SetCurrentActionAction((c) => new CustomActionAttackOpponent { OpponentPath = this.mage.GetPath() }));
             enemyMoveReasoner.Add(
                 new NotAppraisal<BaseUnit>(new CanAttackUnitAppraisal(this.mage)),
-                new SetIntentAction<BaseUnit, FollowPathIntent>((c) => new FollowPathIntent(this.mage)));
+                new SetCurrentActionAction((c) => new CustomActionFollowPath
+                {
+                    MagePath = this.mage.GetPath(),
+                    FollowPath = this.enemyPathFollow.GetPath(),
+                    MoveOffset = 0,
+                }));
         }
 
         StartWave();
@@ -356,19 +280,19 @@ public partial class Level2
         switch (level)
         {
             case 0:
-                this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(240, 740));
-                this.dragonRed.Intent = new MoveToPointIntent(this.dragonRedInitialPosition);
-                this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
+                this.dragonBlue.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(240, 740) };
+                this.dragonRed.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonRedInitialPosition };
+                this.dragonGold.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonGoldInitialPosition };
                 break;
             case 1:
-                this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(GetViewport().Size.x - 50, 740));
-                this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
+                this.dragonBlue.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(50, 740) };
+                this.dragonRed.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(GetViewport().Size.x - 50, 740) };
+                this.dragonGold.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonGoldInitialPosition };
                 break;
             default:
-                this.dragonBlue.Intent = new MoveToPointIntent(new Vector2(50, 740));
-                this.dragonRed.Intent = new MoveToPointIntent(new Vector2(GetViewport().Size.x - 50, 740));
-                this.dragonGold.Intent = new MoveToPointIntent(new Vector2(GetViewport().Size.x / 2, 740));
+                this.dragonBlue.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(50, 740) };
+                this.dragonRed.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(GetViewport().Size.x - 50, 740) };
+                this.dragonGold.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(GetViewport().Size.x / 2, 740) };
                 break;
         }
 
@@ -445,9 +369,13 @@ public partial class Level2
 
         this.level = 0;
 
-        this.bat.PathFollow2DPath = this.batPathBackFollow.GetPath();
-        this.bat.Intent = new FollowPathIntent(this.mage);
-        this.mage.Intent = new MoveToPointIntent(new Vector2(297, 1004));
+        this.bat.CurrentAction = new CustomActionFollowPath
+        {
+            MagePath = this.mage.GetPath(),
+            FollowPath = this.batPathBackFollow.GetPath(),
+            MoveOffset = 0,
+        };
+        this.mage.CurrentAction = new CustomActionMoveToPoint { TargetPoint = new Vector2(297, 1004) };
         this.mage.HP = this.mage.MaxHP;
 
         var enemies = this.GetTree()
@@ -462,9 +390,9 @@ public partial class Level2
         this.mage.Buffs.Clear();
         this.header.UpdateTrackingUnit();
 
-        this.dragonBlue.Intent = new MoveToPointIntent(this.dragonBlueInitialPosition);
-        this.dragonRed.Intent = new MoveToPointIntent(this.dragonRedInitialPosition);
-        this.dragonGold.Intent = new MoveToPointIntent(this.dragonGoldInitialPosition);
+        this.dragonBlue.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonBlueInitialPosition };
+        this.dragonRed.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonRedInitialPosition };
+        this.dragonGold.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonGoldInitialPosition };
     }
 
     private BaseUnit BuildEnemy(List<string> enemies, Vector2 position, Reasoner<BaseUnit> action)
@@ -477,14 +405,13 @@ public partial class Level2
     {
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
-        enemy.PathFollow2DPath = this.enemyPathFollow.GetPath();
         enemy.InitialSlotsCount = 2;
         enemy.Inventory.TryChangeCount(nameof(Gold), 1);
         enemy.ZIndex = 1;
         enemy.AddToGroup(Groups.Enemy);
         enemy.AddToGroup(Groups.AttackingEnemy);
-        enemy.AutomaticActionGeneratorContext = new EnemyContext();
         enemy.AutomaticActionGenerator = new UtilityAI<BaseUnit>(enemy, action);
+        enemy.Connect(nameof(BaseUnit.OnHit), this, nameof(EnemyHit));
         return enemy;
     }
 
@@ -525,7 +452,7 @@ public partial class Level2
 
     private void TowerClicked(BaseUnit tower)
     {
-        if (tower.Intent != null && !(tower.Intent is AttackOpponentIntent) && !(tower.Intent is CompositeIntent<BaseUnit>))
+        if (tower.CurrentAction != null && !(tower.CurrentAction is CustomActionAttackOpponent) && !(tower.CurrentAction is CustomActionAllAtOnce))
         {
             return;
         }
@@ -543,10 +470,9 @@ public partial class Level2
             return;
         }
 
-        IIntent<BaseUnit> newIntent;
+        Resource newIntent;
         if (against.Contains(enemy.GetType()))
         {
-            newIntent = new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, tower.AttackPower));
             if (enemy.HP <= tower.AttackPower)
             {
                 enemy.RemoveFromGroup(Groups.AttackingEnemy);
@@ -555,16 +481,24 @@ public partial class Level2
         else
         {
             enemy.HP += (uint)tower.AttackPower;
-            newIntent = new AttackOpponentIntent(enemy, () => { });
         }
 
-        if (tower.Intent == null)
+        newIntent = new CustomActionAttackOpponent { OpponentPath = enemy.GetPath() };
+
+        if (tower.CurrentAction == null)
         {
-            tower.Intent = newIntent;
+            tower.CurrentAction = newIntent;
         }
         else
         {
-            tower.Intent = new CompositeIntent<BaseUnit>(tower.Intent, newIntent);
+            tower.CurrentAction = new CustomActionAllAtOnce
+            {
+                CustomActions = new List<Resource>
+                {
+                    tower.CurrentAction,
+                    newIntent
+                }
+            };
         }
     }
 
@@ -589,23 +523,35 @@ public partial class Level2
         }
     }
 
-    private void EnemyHit(BaseUnit enemy, int attackPower)
+    private void EnemyHit(BaseUnit attacker, BaseUnit defender)
     {
-        if (!Godot.Object.IsInstanceValid(enemy))
+        if (!Godot.Object.IsInstanceValid(defender))
         {
             return;
         }
 
-        enemy.HP -= (uint)Math.Min(attackPower, enemy.HP);
-        if (enemy.HP <= 0)
+        if (this.dragons.Contains(attacker) && !attackers[attacker.GetType()].Contains(defender.GetType()))
         {
-            this.DropLoot(enemy);
-            enemy.QueueFree();
+            return;
+        }
+
+        defender.HP -= (uint)Math.Min(attacker.Character.AttackPower, defender.HP);
+        if (defender.HP <= 0)
+        {
+            this.DropLoot(defender);
+            defender.QueueFree();
         }
     }
 
-    private void MageHit(int attackPower)
+    private void MageHit(BaseUnit attacker, BaseUnit defender)
     {
+        if (defender != this.mage)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var attackPower = attacker.Character.AttackPower;
+
         // TODO: Boom animation
         this.mage.HP -= Math.Min(this.mage.HP, (uint)attackPower);
 
@@ -620,11 +566,12 @@ public partial class Level2
                 {
                     enemy.RemoveFromGroup(Groups.AttackingEnemy);
                 }
-                return new AttackOpponentIntent(enemy, () => this.EnemyHit(enemy, this.mage.Character.AttackPower));
+                return new CustomActionAttackOpponent { OpponentPath = enemy.GetPath() };
             })
-            .ToArray();
+            .Cast<Resource>()
+            .ToList();
 
-        this.mage.Intent = new CompositeIntent<BaseUnit>(mageShoots);
+        this.mage.CurrentAction = new CustomActionAllAtOnce { CustomActions = mageShoots };
         this.mage.Buffs.AddBuff(nameof(SlowDown));
         this.header.UpdateTrackingUnit();
     }

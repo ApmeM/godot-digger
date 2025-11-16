@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Presentation/levels/BaseLevel.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Presentation/levels/Level2.cs" type="Script" id=2]
@@ -13,7 +13,6 @@
 [ext_resource path="res://Presentation/units/DragonGold/DragonGold.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Presentation/units/Bat/Bat.tscn" type="PackedScene" id=12]
 [ext_resource path="res://Presentation/units/Cocoon/Cocoon.tscn" type="PackedScene" id=13]
-[ext_resource path="res://Presentation/units/OgreRed/OgreRed.tscn" type="PackedScene" id=14]
 [ext_resource path="res://Presentation/units/Hut/Hut.tscn" type="PackedScene" id=15]
 [ext_resource path="res://gd-popups/QuestPopup.tscn" type="PackedScene" id=16]
 [ext_resource path="res://Presentation/units/Leader/Leader.tscn" type="PackedScene" id=17]
@@ -183,7 +182,6 @@ MoveSpeed = 150.0
 [node name="Cocoon" parent="Floor" index="20" instance=ExtResource( 13 )]
 position = Vector2( 313, 1121 )
 z_index = 2
-SpawnUnit = ExtResource( 14 )
 
 [node name="Hut" parent="Floor" index="21" instance=ExtResource( 15 )]
 position = Vector2( 391, 1227 )
@@ -193,7 +191,6 @@ z_index = 2
 visible = false
 position = Vector2( 312, 1120 )
 z_index = 2
-HitDelay = 0.0
 
 [node name="TimerLabel" parent="." index="4" instance=ExtResource( 4 )]
 margin_top = 287.0
