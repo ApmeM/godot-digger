@@ -15,6 +15,7 @@ margin_top = 9.0
 margin_right = 101.0
 margin_bottom = 79.0
 script = ExtResource( 4 )
+SizePerRow = 4
 InventorySlotScene = ExtResource( 2 )
 
 [node name="InventoreNameLabel" type="Label" parent="."]

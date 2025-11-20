@@ -33,7 +33,7 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 
         this.AddToGroup(Groups.LevelScene);
 
-        this.header.BagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(InventorySlotLeftClicked));
+        this.header.Connect(nameof(Header.SlotItemRightClicked), this, nameof(InventorySlotLeftClicked));
 
         foreach (BaseLoot loot in this.GetTree().GetNodesInGroup(Groups.Loot))
         {
@@ -43,7 +43,7 @@ public partial class BaseLevel : IWeightedGraph<ValueTuple<Vector2, HashSet<Floo
 
     private void InventorySlotLeftClicked(InventorySlot slot)
     {
-        ShowLootPopup(slot.Loot.Item1);
+        ShowLootPopup(slot.LootName);
     }
 
     private void ShowLootPopup(string lootName)

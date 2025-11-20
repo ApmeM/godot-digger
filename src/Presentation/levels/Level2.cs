@@ -374,8 +374,7 @@ public partial class Level2
     {
         var enemy = Instantiator.CreateUnit(enemyName);
         enemy.Position = position;
-
-        enemy.InitialSlotsCount = 2;
+        enemy.Inventory.UpdateSlotsCount(2);
         enemy.Inventory.TryChangeCount(nameof(Gold), 1);
         enemy.ZIndex = 1;
         enemy.AddToGroup(Groups.Enemy);
@@ -400,7 +399,7 @@ public partial class Level2
 
     public async void DropLoot(BaseUnit unit)
     {
-        var loots = unit.Inventory.Inventory.Slots
+        var loots = unit.Inventory.BagInventory.GetItems()
             .Union(new[] { unit.Inventory.Money })
             .Where(a => a.HasItem())
             .Select(loot =>

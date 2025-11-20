@@ -4,7 +4,6 @@ using Godot;
 public class UnitDump
 {
     public List<BuffData> Buffs;
-    public BagInventoryData Inventory;
 }
 
 public class LevelDump

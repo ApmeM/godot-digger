@@ -17,7 +17,7 @@ public partial class QuestPopup
     }
 
     public Queue<QuestPopupData> PopupData;
-    private InventoryData inventory;
+    private BagInventoryPopup inventory;
 
     private void TypingFinished()
     {
@@ -112,7 +112,7 @@ public partial class QuestPopup
         this.buttonYes.Disabled = !isEnough;
     }
 
-    public void ShowQuestPopup(InventoryData inventory)
+    public void ShowQuestPopup(BagInventoryPopup inventory)
     {
         this.inventory = inventory;
         this.Rebuild();

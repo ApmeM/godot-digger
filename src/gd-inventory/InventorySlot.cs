@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 [SceneReference("InventorySlot.tscn")]
@@ -15,29 +16,6 @@ public partial class InventorySlot
 
     [Export]
     public DropOnAnotherItemTypeAction DropOnAnotherItemType = DropOnAnotherItemTypeAction.Not_Allowed;
-
-    public (string, int) Loot
-    {
-        get => (this.slotData.LootName, this.slotData.ItemsCount);
-        set => this.slotData.ForceSetCount(value.Item1, value.Item2);
-    }
-
-    private InventorySlotData slotData = new InventorySlotData();
-    public InventorySlotData SlotData
-    {
-        get => slotData;
-        set
-        {
-            if (slotData == value)
-            {
-                return;
-            }
-            this.slotData.SlotContentChanged -= RefreshFromDump;
-            slotData = value;
-            this.slotData.SlotContentChanged += RefreshFromDump;
-            RefreshFromDump();
-        }
-    }
 
     [Export]
     public bool CanDragData = true;
@@ -74,7 +52,6 @@ public partial class InventorySlot
 
         this.ItemTypePlaceholderTexture = this.itemTypePlaceholderTexture;
 
-        this.slotData.SlotContentChanged += this.RefreshFromDump;
         RefreshFromDump();
     }
 
@@ -85,14 +62,14 @@ public partial class InventorySlot
             return;
         }
 
-        this.countLabel.Text = this.slotData.ItemsCount.ToString();
-        this.countLabel.Visible = this.slotData.ItemsCount > 1;
+        this.countLabel.Text = this.ItemsCount.ToString();
+        this.countLabel.Visible = this.ItemsCount > 1;
 
         this.lootContainer.RemoveChildren();
-        this.slotTypePlaceholder.Visible = string.IsNullOrWhiteSpace(this.slotData.LootName);
+        this.slotTypePlaceholder.Visible = string.IsNullOrWhiteSpace(this.LootName);
         if (!this.slotTypePlaceholder.Visible)
         {
-            var loot = LootDefinition.LootByName[this.slotData.LootName];
+            var loot = LootDefinition.LootByName[this.LootName];
             this.lootContainer.AddChild(new TextureRect
             {
                 Texture = loot.Image,
@@ -104,7 +81,7 @@ public partial class InventorySlot
     public override void _GuiInput(InputEvent @event)
     {
         base._GuiInput(@event);
-        if (!this.slotData.HasItem())
+        if (!this.HasItem())
         {
             return;
         }
@@ -119,7 +96,7 @@ public partial class InventorySlot
             this.EmitSignal(nameof(SlotItemDoubleClicked), this);
             return;
         }
-        
+
         if (mouse.Pressed)
         {
             switch ((ButtonList)mouse.ButtonIndex)
@@ -138,7 +115,7 @@ public partial class InventorySlot
             return null;
         }
 
-        if (!this.slotData.HasItem())
+        if (!this.HasItem())
         {
             return null;
         }
@@ -150,23 +127,25 @@ public partial class InventorySlot
 
     public override bool CanDropData(Vector2 position, object data)
     {
-        var ddata = (InventorySlot)data;
-        if (this.slotData.HasItem())
+        var ditem = (InventorySlot)data;
+        var item = this;
+
+        if (item.HasItem())
         {
-            return this.slotData.LootName == ddata.slotData.LootName || this.DropOnAnotherItemType != DropOnAnotherItemTypeAction.Not_Allowed;
+            return item.LootName == ditem.LootName || this.DropOnAnotherItemType != DropOnAnotherItemTypeAction.Not_Allowed;
         }
         else
         {
-            var dLoot = ddata.slotData.LootDefinition;
-            return this.slotData.AcceptedTypes.Count == 0 || this.slotData.AcceptedTypes.Contains(dLoot.ItemType);
+            var dLoot = ditem.LootDefinition;
+            return item.AcceptedTypes.Count == 0 || item.AcceptedTypes.Contains(dLoot.ItemType);
         }
     }
 
     public override void DropData(Vector2 position, object data)
     {
         base.DropData(position, data);
-        var ditem = ((InventorySlot)data).slotData;
-        var item = this.slotData;
+        var ditem = (InventorySlot)data;
+        var item = this;
 
         if (ditem == item)
         {
@@ -210,4 +189,87 @@ public partial class InventorySlot
             }
         }
     }
+
+    #region Data
+
+    private string lootName;
+    public string LootName => this.lootName;
+    private int itemsCount;
+    public int ItemsCount => this.itemsCount;
+
+    public LootDefinition LootDefinition => string.IsNullOrWhiteSpace(this.lootName) ? null : LootDefinition.LootByName[this.lootName];
+
+    public readonly HashSet<ItemType> AcceptedTypes = new HashSet<ItemType>();
+
+    [Signal]
+    public delegate void SlotContentChanged(InventorySlot slot);
+    private void InternalSlotContentChanged()
+    {
+        this.EmitSignal(nameof(SlotContentChanged), this);
+    }
+
+    public bool HasItem()
+    {
+        return ItemsCount > 0;
+    }
+
+    public (string, int) GetItem()
+    {
+        return (this.lootName, this.itemsCount);
+    }
+
+    public void ClearItem()
+    {
+        this.ForceSetCount("", 0);
+    }
+
+    public void ForceSetCount(string lootName, int itemsCount)
+    {
+        if (string.IsNullOrWhiteSpace(LootName) && ItemsCount > 0)
+        {
+            throw new Exception($"Inventory slot state inconsistent: LootName = {LootName}, ItemsCount = {ItemsCount}");
+        }
+
+        this.itemsCount = itemsCount;
+        this.lootName = lootName;
+        this.RefreshFromDump();
+        this.InternalSlotContentChanged();
+    }
+
+    public int TryChangeCount(string lootName, int countDiff)
+    {
+        var loot = LootDefinition.LootByName[lootName];
+
+        if (this.AcceptedTypes.Count > 0 && !this.AcceptedTypes.Contains(loot.ItemType))
+        {
+            GD.PrintErr($"This slot does not accept this item type. ItemTypes: {loot.ItemType}, AcceptedType: {string.Join(",", this.AcceptedTypes)}");
+            return countDiff;
+        }
+
+        if (HasItem() && this.LootName != lootName)
+        {
+            GD.PrintErr("Can not add loot item to the slot as it is already occupied by different resouce.");
+            return countDiff;
+        }
+
+        if (!HasItem() && countDiff < 0)
+        {
+            return countDiff;
+        }
+
+        var result = this.ItemsCount + countDiff;
+        if (result <= 0)
+        {
+            ClearItem();
+            return result;
+        }
+
+        var count = Math.Min(result, loot.MaxCount);
+        result -= count;
+
+        ForceSetCount(lootName, count);
+
+        return result;
+    }
+    #endregion
 }

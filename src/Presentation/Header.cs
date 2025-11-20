@@ -1,10 +1,12 @@
+using System;
 using Godot;
 
 [SceneReference("Header.tscn")]
 [Tool]
 public partial class Header
 {
-    public BagInventoryPopup BagInventoryPopup => this.bagInventoryPopup;
+    [Signal]
+    public delegate void SlotItemRightClicked(InventorySlot slot);
 
     public override void _Ready()
     {
@@ -12,13 +14,11 @@ public partial class Header
         this.FillMembers();
 
         this.inventoryButton.Connect(CommonSignals.Pressed, this, nameof(OpenInventory));
-        this.bagInventoryPopup.Connect(nameof(CustomPopup.PopupClosed), this, nameof(CloseInventory));
-        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(InventoryUseItem));
     }
 
     protected async void InventoryUseItem(InventorySlot inventorySlot)
     {
-        var slot = inventorySlot.SlotData;
+        var slot = inventorySlot;
 
         if (slot.LootDefinition?.UseAction != null)
         {
@@ -46,12 +46,10 @@ public partial class Header
             if (this.trackingUnit == null)
             {
                 this.buffContainer.SlotData = new BuffsListData();
-                this.bagInventoryPopup.SlotData = new BagInventoryData();
             }
             else
             {
                 this.buffContainer.SlotData = this.trackingUnit.Buffs;
-                this.bagInventoryPopup.SlotData = this.trackingUnit.Inventory;
             }
             
             UpdateTrackingUnit();
@@ -84,11 +82,34 @@ public partial class Header
     private void CloseInventory()
     {
         this.GetTree().Paused = false;
+        this.trackingUnit.Inventory.Disconnect(nameof(CustomPopup.PopupClosed), this, nameof(CloseInventory));
+        this.trackingUnit.Inventory.Disconnect(nameof(BagInventoryPopup.SlotItemDoubleClicked), this, nameof(InventoryUseItem));
+        this.trackingUnit.Inventory.Disconnect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
+
+        this.RemoveChild(this.trackingUnit.Inventory);
+        this.trackingUnit.AddChild(this.trackingUnit.Inventory);
+
     }
 
     private void OpenInventory()
     {
+        if (this.trackingUnit == null)
+        {
+            return;
+        }
+
         this.GetTree().Paused = true;
-        this.bagInventoryPopup.Show();
+        this.trackingUnit.Inventory.Connect(nameof(CustomPopup.PopupClosed), this, nameof(CloseInventory));
+        this.trackingUnit.Inventory.Connect(nameof(BagInventoryPopup.SlotItemDoubleClicked), this, nameof(InventoryUseItem));
+        this.trackingUnit.Inventory.Connect(nameof(BagInventoryPopup.SlotItemRightClicked), this, nameof(SlotItemRightClickedHandler));
+        this.trackingUnit.Inventory.Show();
+
+        this.trackingUnit.RemoveChild(this.trackingUnit.Inventory);
+        this.AddChild(this.trackingUnit.Inventory);
+    }
+
+    private void SlotItemRightClickedHandler(InventorySlot slot)
+    {
+        this.EmitSignal(nameof(SlotItemRightClicked), slot);
     }
 }

@@ -108,20 +108,7 @@ public partial class BaseUnit
     [Export]
     public bool GrabLoot;
 
-    public BagInventoryData Inventory = new BagInventoryData();
-
     private uint initialSlotsCount;
-
-    [Export]
-    public uint InitialSlotsCount
-    {
-        set
-        {
-            this.initialSlotsCount = value;
-            RecalculateEffectiveValues();
-        }
-        get => this.initialSlotsCount;
-    }
 
     #endregion
 
@@ -226,6 +213,8 @@ public partial class BaseUnit
     public Resource ClickAction;
 
     private static Reasoner<BaseUnit> actionMoveReasonerInternal;
+    public BagInventoryPopup Inventory => this.bagInventoryPopup;
+
     private static Reasoner<BaseUnit> actionMoveReasoner
     {
         get
@@ -242,9 +231,14 @@ public partial class BaseUnit
 
     public BaseUnit()
     {
-        this.Inventory.SlotContentChanged += this.RecalculateEffectiveValues;
+        // this.inventory.SlotContentChanged += this.RecalculateEffectiveValues;
         this.Buffs.BuffsChanged += this.RecalculateEffectiveValues;
         this.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this, actionMoveReasoner);
+    }
+
+    private void SlotContentChangedHandler(InventorySlot slot)
+    {
+        RecalculateEffectiveValuesAndUpdateInventory();
     }
 
     private void RecalculateEffectiveValues()
@@ -253,13 +247,30 @@ public partial class BaseUnit
         this.Character.AttackPower = this.AttackPower;
         this.Character.MaxStamina = this.MaxStamina;
         this.Character.StaminaRecoverySeconds = this.StaminaRecoverySeconds;
-        this.Character.SlotsCount = this.InitialSlotsCount;
+        this.Character.SlotsCount = this.initialSlotsCount;
         this.Character.CanDig = this.CanDig;
 
-        this.Inventory.Inventory.SlotsCount = this.Character.SlotsCount;
-
-        this.Inventory.ApplyEquipment(this.Character);
+        this.bagInventoryPopup.ApplyEquipment(this.Character);
         this.Buffs.ApplyBuffs(this.Character);
+    }
+
+    private void RecalculateEffectiveValuesAndUpdateInventory()
+    {
+        RecalculateEffectiveValues();
+        this.bagInventoryPopup.UpdateSlotsCount((int)this.Character.SlotsCount);
+    }
+
+    private void RecalculateEffectiveValuesAndFindInitialInventorySlotsCount()
+    {
+        RecalculateEffectiveValues();
+
+        if (this.Character.SlotsCount > this.bagInventoryPopup.BagInventory.GetItems().Count)
+        {
+            this.bagInventoryPopup.UpdateSlotsCount((int)this.Character.SlotsCount);
+            return;
+        } else {
+            this.initialSlotsCount = (uint)(this.bagInventoryPopup.BagInventory.GetItems().Count - this.Character.SlotsCount);
+        }
     }
 
     [Signal]
@@ -277,7 +288,9 @@ public partial class BaseUnit
         this.HP = this.hp;
         this.AttackDelay = this.attackDelay;
 
-        RecalculateEffectiveValues();
+        this.Inventory.Connect(nameof(BagInventoryPopup.SlotContentChanged), this, nameof(SlotContentChangedHandler));
+
+        RecalculateEffectiveValuesAndFindInitialInventorySlotsCount();
     }
 
     public override void _Process(float delta)

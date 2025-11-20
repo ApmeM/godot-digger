@@ -26,7 +26,7 @@ public class CustomActionTalk : Resource, IIntent<BaseUnit>
         if (this.InventoryUnitPath != null)
         {
             var unit = context.GetNode<BaseUnit>(this.InventoryUnitPath);
-            questPopup.ShowQuestPopup(unit.Inventory.Inventory);
+            questPopup.ShowQuestPopup(unit.Inventory);
         }
         else
         {
