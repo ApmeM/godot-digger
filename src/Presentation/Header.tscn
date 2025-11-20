@@ -7,7 +7,7 @@
 [ext_resource path="res://Presentation/assets/Header/header_avatars.png" type="Texture" id=5]
 [ext_resource path="res://Presentation/assets/Header/header_panel.png" type="Texture" id=6]
 [ext_resource path="res://Presentation/Header.cs" type="Script" id=7]
-[ext_resource path="res://Presentation/buffs/BuffContainer.tscn" type="PackedScene" id=9]
+[ext_resource path="res://gd-popups/CustomPopup.tscn" type="PackedScene" id=8]
 
 [node name="Header" type="CanvasLayer"]
 script = ExtResource( 7 )
@@ -87,4 +87,37 @@ margin_right = 108.0
 margin_bottom = 130.0
 text = "10"
 
-[node name="BuffContainer" parent="." instance=ExtResource( 9 )]
+[node name="BuffPopup" parent="." instance=ExtResource( 8 )]
+visible = false
+Title = "Buff"
+
+[node name="HeaderMargin" parent="BuffPopup/CustomPopupContainer/HeaderCenter" index="0"]
+margin_left = 128.0
+margin_right = 179.0
+
+[node name="TitleBackground" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="0"]
+margin_right = 51.0
+
+[node name="TitleMargin" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin" index="1"]
+margin_right = 51.0
+
+[node name="TitleLabel" parent="BuffPopup/CustomPopupContainer/HeaderCenter/HeaderMargin/TitleMargin" index="0"]
+margin_right = 41.0
+text = "Buff"
+
+[node name="BuffDescriptionLabel" type="Label" parent="BuffPopup/CustomPopupContainer/PopupContainer/MarginContainer/PopupOuterMargin/ContentMargin" index="0"]
+margin_left = 9.0
+margin_top = 37.0
+margin_right = 281.0
+margin_bottom = 51.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Text"
+align = 1
+
+[node name="BuffPlaceholder" type="Control" parent="."]
+margin_left = 118.0
+margin_top = 34.0
+margin_right = 288.0
+margin_bottom = 89.0
+
+[editable path="BuffPopup"]

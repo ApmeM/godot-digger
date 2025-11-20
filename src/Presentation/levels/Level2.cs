@@ -357,7 +357,7 @@ public partial class Level2
         }
 
         this.mage.Buffs.Clear();
-        this.header.UpdateTrackingUnit();
+        // this.header.UpdateTrackingUnit(); TODO: remove
 
         this.dragonBlue.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonBlueInitialPosition };
         this.dragonRed.CurrentAction = new CustomActionMoveToPoint { TargetPoint = this.dragonRedInitialPosition };
@@ -555,6 +555,6 @@ public partial class Level2
 
         this.mage.CurrentAction = new CustomActionAllAtOnce { CustomActions = mageShoots };
         this.mage.Buffs.AddBuff(nameof(SlowDown));
-        this.header.UpdateTrackingUnit();
+        // this.header.UpdateTrackingUnit(); TODO: remove
     }
 }

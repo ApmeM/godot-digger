@@ -1,8 +1,9 @@
-[gd_scene load_steps=63 format=2]
+[gd_scene load_steps=64 format=2]
 
 [ext_resource path="res://Presentation/units/BaseUnit.cs" type="Script" id=1]
 [ext_resource path="res://gd-hp/HP.tscn" type="PackedScene" id=2]
 [ext_resource path="res://gd-inventory/BagInventoryPopup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Presentation/buffs/BuffContainer.tscn" type="PackedScene" id=4]
 
 [sub_resource type="AnimationNodeAnimation" id=156]
 animation = "AttackTopLeft"
@@ -584,4 +585,7 @@ anims/StayTopLeft = SubResource( 206 )
 anims/StayTopRight = SubResource( 207 )
 
 [node name="BagInventoryPopup" parent="." instance=ExtResource( 3 )]
+visible = false
+
+[node name="BuffContainer" parent="." instance=ExtResource( 4 )]
 visible = false

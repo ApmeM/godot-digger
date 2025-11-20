@@ -3,7 +3,6 @@ using Godot;
 
 public class UnitDump
 {
-    public List<BuffData> Buffs;
 }
 
 public class LevelDump

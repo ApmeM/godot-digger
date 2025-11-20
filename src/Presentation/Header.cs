@@ -41,19 +41,32 @@ public partial class Header
                 return;
             }
 
+            if (this.trackingUnit != null)
+            {
+                this.trackingUnit.Buffs.Disconnect(nameof(BuffContainer.BuffClicked), this, nameof(BuffClickedHandler));
+                this.buffPlaceholder.RemoveChild(this.trackingUnit.Buffs);
+                this.trackingUnit.AddChild(this.trackingUnit.Buffs);
+                this.trackingUnit.Buffs.Visible = false;
+            }
+
             this.trackingUnit = value;
 
-            if (this.trackingUnit == null)
+            if (this.trackingUnit != null)
             {
-                this.buffContainer.SlotData = new BuffsListData();
+                this.trackingUnit.Buffs.Visible = true;
+                this.trackingUnit.RemoveChild(this.trackingUnit.Buffs);
+                this.buffPlaceholder.AddChild(this.trackingUnit.Buffs);
+                this.trackingUnit.Buffs.Connect(nameof(BuffContainer.BuffClicked), this, nameof(BuffClickedHandler));
             }
-            else
-            {
-                this.buffContainer.SlotData = this.trackingUnit.Buffs;
-            }
-            
+
             UpdateTrackingUnit();
         }
+    }
+
+    private void BuffClickedHandler(BaseBuff buff)
+    {
+        this.buffDescriptionLabel.Text = buff.Description;
+        this.buffPopup.Show();
     }
 
     public void UpdateTrackingUnit()
@@ -77,6 +90,7 @@ public partial class Header
         this.hpLabel.Text = character.HP.ToString();
 
         this.staminaLabel.Text = character.MaxStamina.ToString();
+
     }
 
     private void CloseInventory()

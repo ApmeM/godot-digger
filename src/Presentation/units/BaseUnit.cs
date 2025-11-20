@@ -189,8 +189,6 @@ public partial class BaseUnit
 
     public float EnemySpeedCoeff = 1f;
 
-    public BuffsListData Buffs = new BuffsListData();
-
     #endregion
 
     #region Chat
@@ -214,6 +212,7 @@ public partial class BaseUnit
 
     private static Reasoner<BaseUnit> actionMoveReasonerInternal;
     public BagInventoryPopup Inventory => this.bagInventoryPopup;
+    public BuffContainer Buffs => this.buffContainer;
 
     private static Reasoner<BaseUnit> actionMoveReasoner
     {
@@ -231,8 +230,6 @@ public partial class BaseUnit
 
     public BaseUnit()
     {
-        // this.inventory.SlotContentChanged += this.RecalculateEffectiveValues;
-        this.Buffs.BuffsChanged += this.RecalculateEffectiveValues;
         this.AutomaticActionGenerator = new UtilityAI<BaseUnit>(this, actionMoveReasoner);
     }
 
@@ -251,7 +248,7 @@ public partial class BaseUnit
         this.Character.CanDig = this.CanDig;
 
         this.bagInventoryPopup.ApplyEquipment(this.Character);
-        this.Buffs.ApplyBuffs(this.Character);
+        this.buffContainer.ApplyBuffs(this.Character);
     }
 
     private void RecalculateEffectiveValuesAndUpdateInventory()
@@ -288,7 +285,8 @@ public partial class BaseUnit
         this.HP = this.hp;
         this.AttackDelay = this.attackDelay;
 
-        this.Inventory.Connect(nameof(BagInventoryPopup.SlotContentChanged), this, nameof(SlotContentChangedHandler));
+        this.bagInventoryPopup.Connect(nameof(BagInventoryPopup.SlotContentChanged), this, nameof(SlotContentChangedHandler));
+        this.buffContainer.Connect(nameof(BuffContainer.BuffsChanged), this, nameof(RecalculateEffectiveValuesAndUpdateInventory));
 
         RecalculateEffectiveValuesAndFindInitialInventorySlotsCount();
     }
@@ -297,7 +295,6 @@ public partial class BaseUnit
     {
         base._Process(delta);
         this.Delta = delta;
-        Buffs.Tick(delta);
         AutomaticActionGenerator?.Tick();
     }
 

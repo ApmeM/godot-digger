@@ -4,13 +4,14 @@ using Godot;
 [SceneReference("BaseBuff.tscn")]
 public partial class BaseBuff
 {
-    public BuffData buffData = new BuffData();
-
     [Export]
     public string Description { get; set; } = "Default description.";
 
     [Export]
     public float TotalTime { get; set; } = 1;
+
+    [Export]
+    public double Progress;
 
     public Action<BaseUnit.EffectiveCharacteristics> ApplyBuff { get; set; }
 
@@ -24,6 +25,23 @@ public partial class BaseBuff
     {
         base._Process(delta);
 
-        this.textureProgress.Value = 100 * this.buffData.Progress / this.buffData.BuffDefinition.TotalTime;
+        this.Progress += delta;
+
+        this.textureProgress.Value = 100 * this.Progress / this.TotalTime;
+
+        if (this.Progress >= this.TotalTime)
+        {
+            this.EmitSignal(nameof(BuffRemoved), this);
+            this.QueueFree();
+        }
     }
+
+    #region Data
+
+    public BuffDefinition BuffDefinition => BuffDefinition.BuffByName[this.GetType().Name];
+
+    [Signal]
+    public delegate void BuffRemoved(BaseBuff buff);
+
+    #endregion
 }
